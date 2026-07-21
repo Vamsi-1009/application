@@ -85,7 +85,7 @@ a:hover{ color:var(--accent-2); }
 @media (max-width:980px){ .mobile-bar{ display:flex; } }
 
 /* shell + rail */
-.shell{ display:grid; grid-template-columns:300px minmax(0,1fr); min-height:100vh; align-items:start; }
+.shell{ display:block; min-height:100vh; }
 .rail{ position:sticky; top:0; height:100vh; overflow-y:auto; border-right:1px solid var(--line); background:var(--glass); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); padding:0 0 40px; scrollbar-width:thin; }
 .rail-head{ padding:24px 22px 18px; border-bottom:1px solid var(--line-soft); }
 .rail-head .mark{ display:flex; align-items:center; gap:11px; }
@@ -110,7 +110,7 @@ a:hover{ color:var(--accent-2); }
 @keyframes radar{ 0%,100%{ box-shadow:0 0 0 3px var(--accent-soft);} 50%{ box-shadow:0 0 0 7px transparent;} }
 
 /* main + reading */
-main{ padding:70px 8vw 110px; max-width:940px; }
+main{ padding:70px 7vw 110px; max-width:960px; margin:0 auto; }
 @media (max-width:980px){
   .shell{ grid-template-columns:1fr; }
   .rail{ position:fixed; inset:0 auto 0 0; width:300px; max-width:86vw; height:100vh; z-index:55; transform:translateX(-100%); transition:transform var(--dur) var(--ease); box-shadow:var(--shadow); }
@@ -253,54 +253,7 @@ footer{ border-top:1px solid var(--line); padding:28px 0 40px; color:var(--muted
 <body>
 <canvas id="bg-net" aria-hidden="true"></canvas>
 <div id="progress-track"><div id="progress-fill"></div></div>
-<div class="mobile-bar"><a class="title" href="how-to-build-an-application.html">Field Manual</a><button id="menu-toggle" aria-expanded="false" aria-controls="rail">Contents</button></div>
-<div class="rail-scrim" id="rail-scrim"></div>
 <div class="shell">
-<nav class="rail" id="rail" aria-label="Table of contents">
-  <div class="search-wrap"><input id="nav-search" type="text" placeholder="Filter sections… e.g. otp, cdn, dpdp"></div>
-  <div class="toc" id="toc">
-    <div class="toc-group">
-      <div class="toc-group-title">Orientation</div>
-      <a href="how-to-build-an-application.html" class=""><span class="dot"></span>How to use this manual</a>
-    </div>
-    <div class="toc-group">
-      <div class="toc-group-title">Design the thing</div>
-      <a href="01-plan-and-threat-model.html" class=""><span class="dot"></span>Plan & threat-model first</a>
-    </div>
-    <div class="toc-group">
-      <div class="toc-group-title">Build it</div>
-      <a href="02-frontend.html" class="active"><span class="dot"></span>Frontend</a>
-      <a href="03-backend-api.html" class=""><span class="dot"></span>Backend & API</a>
-      <a href="04-database.html" class=""><span class="dot"></span>Database — structure, scaling, and how it actually gets hacked</a>
-      <a href="05-auth-otp-secrets.html" class=""><span class="dot"></span>Auth, OTP & the password wallet</a>
-      <a href="06-email-otp-delivery.html" class=""><span class="dot"></span>Email / OTP delivery</a>
-      <a href="07-storage-cdn.html" class=""><span class="dot"></span>File storage & the CDN</a>
-    </div>
-    <div class="toc-group">
-      <div class="toc-group-title">Ship it</div>
-      <a href="08-servers-vm.html" class=""><span class="dot"></span>Servers & the VM</a>
-      <a href="09-load-balancing-autoscaling.html" class=""><span class="dot"></span>Load balancers & autoscaling</a>
-      <a href="10-domains-dns.html" class=""><span class="dot"></span>Domain names & DNS</a>
-      <a href="11-cicd.html" class=""><span class="dot"></span>CI/CD pipelines</a>
-      <a href="12-monitoring-incident-response.html" class=""><span class="dot"></span>Monitoring & incident response</a>
-    </div>
-    <div class="toc-group">
-      <div class="toc-group-title">Govern it</div>
-      <a href="13-security-checklist.html" class=""><span class="dot"></span>Security hardening checklist — the consolidated view</a>
-      <a href="14-compliance.html" class=""><span class="dot"></span>Compliance & governance, including India</a>
-      <a href="15-skill-roadmap.html" class=""><span class="dot"></span>Skill roadmap: junior → staff</a>
-    </div>
-    <div class="toc-group">
-      <div class="toc-group-title">Reference</div>
-      <a href="16-glossary.html" class=""><span class="dot"></span>Glossary</a>
-      <a href="17-full-resource-catalog.html" class=""><span class="dot"></span>Full resource catalog, explained</a>
-    </div>
-    <div class="toc-group">
-      <div class="toc-group-title">Worked example</div>
-      <a href="18-worked-backend-example.html" class=""><span class="dot"></span>A backend, file by file — then an AI security audit</a>
-    </div>
-  </div>
-</nav>
 <main>
 
 <section class="stage" id="s2">
