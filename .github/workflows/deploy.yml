@@ -14,12 +14,28 @@ on:
     branches: [ main ]
   workflow_dispatch: {}
 
+# Least-privilege default: this workflow only needs to read the repo to
+# check it out conceptually (it doesn't even use GITHUB_TOKEN, since
+# deployment happens over the SSH secrets below) - explicit read-only
+# stops a future step accidentally getting broader token permissions.
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-vm
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Pull latest changes on the VM
-        uses: appleboy/ssh-action@v1.0.3
+        # Pinned to the commit SHA behind the v1.0.3 tag, not the tag
+        # itself - a tag can be moved to point at different code later
+        # (by the maintainer or an attacker who compromises their
+        # account); a commit SHA cannot. This action runs with direct
+        # SSH access to production, so supply-chain pinning here matters.
+        uses: appleboy/ssh-action@029f5b4aeeeb58fdfe1410a5d17f967dacf36262 # v1.0.3
         with:
           host: ${{ secrets.VM_HOST }}
           port: ${{ secrets.VM_PORT }}

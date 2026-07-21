@@ -46,3 +46,72 @@ auto-deploys on every push to `main` by SSHing into the VM and running
 ssh -p <port> vamsi@<vm-ip>
 cd ~/Documents/application && git pull
 ```
+
+## Security hardening still to apply on the VM
+
+These are real findings from a security pass on the live deployment — they
+live in server config, not the git repo, so pushing code can't fix them.
+Run these once, over SSH:
+
+1. **Restrict the GitHub Actions deploy key to only the deploy command.**
+   As set up, `~/.ssh/authorized_keys` grants that key a full interactive
+   shell as `vamsi` (who has sudo) — if the `VM_SSH_KEY` GitHub secret
+   ever leaked, whoever has it gets much more than "run git pull." Lock
+   it down to a forced command with no port/agent/X11 forwarding and no
+   pty:
+   ```bash
+   nano ~/.ssh/authorized_keys
+   ```
+   Find the line ending in `github-actions-deploy` and prefix it with:
+   ```
+   command="cd /home/vamsi/Documents/application && git fetch origin main && git reset --hard origin/main",no-port-forwarding,no-agent-forwarding,no-X11-forwarding,no-pty ssh-ed25519 AAAA...github-actions-deploy
+   ```
+   (keep the existing `ssh-ed25519 AAAA...` key material exactly as-is — only add the `command="...",no-port-forwarding,...` prefix in front of it). After this, that key can *only* ever run the deploy command, nothing else, even with full possession of the private key.
+
+2. **Stop leaking the exact Nginx/OS version.** `curl -I` against the live
+   site currently returns `Server: nginx/1.24.0 (Ubuntu)` — free
+   reconnaissance for an attacker matching known CVEs to your exact
+   version. Add one line to the top of `/etc/nginx/nginx.conf`, inside
+   the `http { }` block:
+   ```bash
+   sudo nano /etc/nginx/nginx.conf
+   ```
+   ```nginx
+   http {
+       server_tokens off;
+       ...
+   }
+   ```
+   ```bash
+   sudo nginx -t && sudo systemctl reload nginx
+   ```
+   Confirm: `curl -I https://webstocking.com/application/` should now show just `Server: nginx` with no version number.
+
+3. **Add security headers** to the `/application/` location block (edit
+   `/etc/nginx/sites-enabled/webstocking.com`, inside the `location
+   /application/ { ... }` block added earlier):
+   ```nginx
+   location /application/ {
+       alias /home/vamsi/Documents/application/docs/;
+       index how-to-build-an-application.html;
+       try_files $uri $uri/ =404;
+
+       add_header X-Content-Type-Options "nosniff" always;
+       add_header X-Frame-Options "SAMEORIGIN" always;
+       add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+       add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
+       add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-ancestors 'self'" always;
+   }
+   ```
+   (`'unsafe-inline'` is needed because every page's CSS/JS is intentionally inline with no build step — a real strict CSP would need nonces, which isn't worth the complexity for a static content site with no user input.)
+
+4. **Enable HSTS** — HTTPS is already fully enforced (HTTP redirects to
+   HTTPS), so this is a safe addition. Add inside the `server { listen
+   443 ssl; ... }` block, near the other `ssl_*` directives:
+   ```nginx
+   add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+   ```
+   Then:
+   ```bash
+   sudo nginx -t && sudo systemctl reload nginx
+   ```
