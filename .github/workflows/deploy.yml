@@ -1,0 +1,32 @@
+name: Deploy to VM
+
+# Runs automatically on every push to main. Requires four repository
+# secrets (Settings -> Secrets and variables -> Actions):
+#   VM_HOST     e.g. 104.207.93.57
+#   VM_PORT     e.g. 22022
+#   VM_USER     e.g. vamsi
+#   VM_SSH_KEY  the PRIVATE key of a dedicated deploy keypair whose
+#               PUBLIC half is added to ~/.ssh/authorized_keys on the VM
+#               (see docs/DEPLOY.md for the one-time setup steps).
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull latest changes on the VM
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VM_HOST }}
+          port: ${{ secrets.VM_PORT }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            set -e
+            cd /home/vamsi/Documents/application
+            git fetch origin main
+            git reset --hard origin/main
