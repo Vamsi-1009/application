@@ -1,0 +1,838 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Building an Application, Ground Up — A Field Manual</title>
+<style>
+:root{
+  --bg:#0b1320;
+  --bg-grid: rgba(95,212,208,0.045);
+  --panel:#101b2d;
+  --panel-2:#0d1726;
+  --line:#243349;
+  --line-soft:#1a2740;
+  --text:#e8edf5;
+  --muted:#93a2ba;
+  --muted-2:#5f7291;
+  --accent:#ff8a3d;
+  --accent-dim:#8a4c26;
+  --accent-2:#5fd4d0;
+  --accent-2-dim:#2c5b59;
+  --danger:#ff6b6b;
+  --ok:#63d99a;
+  --code-bg:#0a1220;
+  --shadow: 0 1px 0 rgba(255,255,255,0.03) inset;
+}
+:root[data-theme="light"]{
+  --bg:#f4f2ec;
+  --bg-grid: rgba(20,60,58,0.045);
+  --panel:#ffffff;
+  --panel-2:#faf8f2;
+  --line:#ddd6c4;
+  --line-soft:#e7e1d2;
+  --text:#1c2230;
+  --muted:#5a6274;
+  --muted-2:#8b8f7e;
+  --accent:#c85a1e;
+  --accent-dim:#f0d3bb;
+  --accent-2:#0e7b76;
+  --accent-2-dim:#cfe9e7;
+  --danger:#c0392b;
+  --ok:#1f7a4d;
+  --code-bg:#efece3;
+  --shadow: 0 1px 0 rgba(0,0,0,0.03) inset;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#f4f2ec;
+    --bg-grid: rgba(20,60,58,0.045);
+    --panel:#ffffff;
+    --panel-2:#faf8f2;
+    --line:#ddd6c4;
+    --line-soft:#e7e1d2;
+    --text:#1c2230;
+    --muted:#5a6274;
+    --muted-2:#8b8f7e;
+    --accent:#c85a1e;
+    --accent-dim:#f0d3bb;
+    --accent-2:#0e7b76;
+    --accent-2-dim:#cfe9e7;
+    --danger:#c0392b;
+    --ok:#1f7a4d;
+    --code-bg:#efece3;
+  }
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:
+    linear-gradient(var(--bg-grid) 1px, transparent 1px) 0 0/42px 42px,
+    linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px) 0 0/42px 42px,
+    var(--bg);
+  color:var(--text);
+  font-family: "Iowan Old Style","Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;
+  line-height:1.65;
+  font-size:17px;
+}
+.mono{font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;}
+h1,h2,h3,.label,.eyebrow,.tag,nav a,th, .stage-num{
+  font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+h1,h2,h3{text-wrap:balance; font-weight:600; letter-spacing:-0.01em;}
+
+a{color:var(--accent-2)}
+a:hover{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent-2); outline-offset:2px}
+
+/* ---------- shell layout ---------- */
+.shell{display:grid; grid-template-columns: 300px minmax(0,1fr); min-height:100vh;}
+@media (max-width: 980px){ .shell{grid-template-columns: 1fr;} .rail{display:none;} }
+
+.rail{
+  position:sticky; top:0; height:100vh; overflow-y:auto;
+  border-right:1px solid var(--line);
+  background:var(--panel-2);
+  padding:0 0 40px;
+}
+.rail-head{padding:22px 20px 14px; border-bottom:1px solid var(--line-soft);}
+.rail-head .mark{display:flex; align-items:center; gap:10px;}
+.rail-head .mark svg{flex:none}
+.rail-head .title{font-size:13px; letter-spacing:0.06em; color:var(--text); text-transform:uppercase;}
+.rail-head .subtitle{margin-top:4px; font-size:12.5px; color:var(--muted); font-family:inherit; letter-spacing:0.02em;}
+
+.search-wrap{padding:14px 20px;}
+#nav-search{
+  width:100%; padding:9px 11px; border-radius:6px; border:1px solid var(--line);
+  background:var(--panel); color:var(--text); font-size:13px; font-family:"SFMono-Regular",Consolas,monospace;
+}
+#nav-search::placeholder{color:var(--muted-2)}
+
+.toc{padding:4px 10px 0;}
+.toc-group{margin-bottom:2px;}
+.toc-group-title{
+  font-size:10.5px; letter-spacing:0.12em; color:var(--muted-2); text-transform:uppercase;
+  padding:14px 10px 6px;
+}
+.toc a{
+  display:flex; gap:9px; align-items:baseline; padding:6px 10px; border-radius:5px;
+  font-size:12.6px; color:var(--muted); text-decoration:none; letter-spacing:0.01em;
+}
+.toc a:hover{background:var(--panel); color:var(--text);}
+.toc a .n{color:var(--muted-2); font-size:11px; min-width:1.6em;}
+.toc a.active{background:var(--line-soft); color:var(--accent-2);}
+
+/* ---------- main content ---------- */
+main{padding: 54px 8vw 100px; max-width: 900px;}
+.hero{border-bottom:1px solid var(--line); padding-bottom:32px; margin-bottom:44px;}
+.eyebrow{
+  display:inline-flex; align-items:center; gap:8px; font-size:11.5px; letter-spacing:0.14em;
+  color:var(--accent); text-transform:uppercase; margin-bottom:16px;
+}
+.eyebrow::before{content:""; width:18px; height:1px; background:var(--accent);}
+.hero h1{font-size:clamp(28px,4vw,42px); margin:0 0 16px; color:var(--text);}
+.hero p.lede{color:var(--muted); font-size:18px; max-width:62ch; margin:0 0 22px;}
+.hero .meta{display:flex; flex-wrap:wrap; gap:10px 22px; font-size:12.5px; color:var(--muted-2); font-family:"SFMono-Regular",monospace;}
+.hero .meta b{color:var(--muted);}
+
+section.stage{padding-top:10px; margin-bottom:64px; scroll-margin-top:24px;}
+.stage-head{display:flex; align-items:baseline; gap:16px; margin-bottom:6px;}
+.stage-num{font-size:13px; color:var(--accent-2); letter-spacing:0.04em;}
+.stage h2{font-size:26px; margin:0; color:var(--text);}
+.stage .dek{color:var(--muted); font-size:15.5px; margin:10px 0 26px; max-width:64ch;}
+
+.stage h3{font-size:17px; color:var(--text); margin: 30px 0 10px; letter-spacing:0.01em;}
+.stage p, .stage li{color:var(--text); max-width:66ch;}
+.stage ul, .stage ol{padding-left:1.25em;}
+.stage li{margin-bottom:6px;}
+.stage li::marker{color:var(--accent-2); font-family:"SFMono-Regular",monospace; font-size:0.9em;}
+
+pre{
+  background:var(--code-bg); border:1px solid var(--line); border-radius:8px;
+  padding:14px 16px; overflow-x:auto; font-size:13px; line-height:1.55;
+  box-shadow:var(--shadow);
+}
+code{font-family:"SFMono-Regular",Consolas,Menlo,monospace;}
+p code, li code{background:var(--code-bg); border:1px solid var(--line-soft); border-radius:4px; padding:1px 6px; font-size:0.86em; color:var(--accent-2);}
+
+.callout{
+  border:1px solid var(--line); border-left:3px solid var(--accent-2);
+  background:var(--panel); border-radius:0 8px 8px 0; padding:16px 18px; margin:22px 0;
+}
+.callout .ctitle{font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent-2); margin-bottom:8px; font-family:"SFMono-Regular",monospace;}
+.callout p, .callout li{font-size:14.5px; margin:0 0 6px;}
+
+.security{
+  border:1px solid var(--accent-dim); border-left:3px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 6%, var(--panel));
+  border-radius:0 8px 8px 0; padding:16px 18px; margin:22px 0;
+}
+.security .ctitle{font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); margin-bottom:10px; font-family:"SFMono-Regular",monospace; display:flex; align-items:center; gap:8px;}
+.security ul{margin:0; padding-left:1.1em;}
+.security li{font-size:14px; margin-bottom:7px;}
+.security li::marker{color:var(--accent);}
+.security .std{
+  display:inline-block; font-family:"SFMono-Regular",monospace; font-size:11px; color:var(--accent);
+  border:1px solid var(--accent-dim); border-radius:4px; padding:1px 6px; margin-left:6px; white-space:nowrap;
+}
+
+.india{
+  border:1px solid var(--line); background:var(--panel-2); border-radius:8px;
+  padding:16px 18px; margin:22px 0;
+}
+.india .ctitle{font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; font-family:"SFMono-Regular",monospace;}
+.india .ctitle::before{content:"IN "; color:var(--accent-2);}
+.india p, .india li{font-size:14.5px;}
+
+table{width:100%; border-collapse:collapse; font-size:13.5px;}
+th,td{padding:10px 12px; text-align:left; vertical-align:top; border-bottom:1px solid var(--line-soft);}
+th{color:var(--muted); font-weight:600; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; background:var(--panel-2); position:sticky; top:0;}
+.tablewrap{overflow:auto; border:1px solid var(--line); border-radius:10px; max-height:520px;}
+
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+@media (max-width:700px){.grid2{grid-template-columns:1fr;}}
+.card{border:1px solid var(--line); border-radius:8px; padding:14px 16px; background:var(--panel);}
+.card h4{margin:0 0 6px; font-size:13.5px; color:var(--accent-2); font-family:"SFMono-Regular",monospace;}
+.card p{font-size:13.8px; margin:0; color:var(--muted);}
+
+.divider{height:1px; background:var(--line); margin:56px 0;}
+.appendix-note{color:var(--muted); font-size:14.5px;}
+
+footer{border-top:1px solid var(--line); padding:26px 0 0; color:var(--muted-2); font-size:12.5px;}
+
+::selection{background:var(--accent-2-dim); color:var(--text);}
+mark{background:var(--accent-dim); color:var(--text); border-radius:2px; padding:0 2px;}
+
+.hidden{display:none !important;}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<nav class="rail" aria-label="Table of contents">
+  <div class="rail-head">
+    <div class="mark">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 12 L12 4 L21 12" stroke="var(--accent-2)" stroke-width="1.6"/><path d="M6 11 V20 H18 V11" stroke="var(--accent)" stroke-width="1.6"/></svg>
+      <div>
+        <div class="title">Field Manual</div>
+      </div>
+    </div>
+    <div class="subtitle">From blank folder to production, with security load-bearing at every stage.</div>
+  </div>
+  <div class="search-wrap"><input id="nav-search" type="text" placeholder="Filter sections… e.g. otp, cdn, dpdp"></div>
+  <div class="toc" id="toc">
+    <div class="toc-group">
+      <div class="toc-group-title">Orientation</div>
+      <a href="#s0"><span class="n">00</span>How to use this manual</a>
+    </div>
+    <div class="toc-group">
+      <div class="toc-group-title">Design the thing</div>
+      <a href="#s1"><span class="n">01</span>Plan &amp; threat-model first</a>
+    </div>
+    <div class="toc-group">
+      <div class="toc-group-title">Build it</div>
+      <a href="#s2"><span class="n">02</span>Frontend</a>
+      <a href="#s3"><span class="n">03</span>Backend &amp; API</a>
+      <a href="#s4"><span class="n">04</span>Database</a>
+      <a href="#s5"><span class="n">05</span>Auth, OTP &amp; the password wallet</a>
+      <a href="#s6"><span class="n">06</span>Email / OTP delivery</a>
+      <a href="#s7"><span class="n">07</span>File storage &amp; the CDN</a>
+    </div>
+    <div class="toc-group">
+      <div class="toc-group-title">Ship it</div>
+      <a href="#s8"><span class="n">08</span>Servers &amp; the VM</a>
+      <a href="#s9"><span class="n">09</span>Load balancers &amp; autoscaling</a>
+      <a href="#s10"><span class="n">10</span>Domain names &amp; DNS</a>
+      <a href="#s11"><span class="n">11</span>CI/CD pipelines</a>
+      <a href="#s12"><span class="n">12</span>Monitoring &amp; incident response</a>
+    </div>
+    <div class="toc-group">
+      <div class="toc-group-title">Govern it</div>
+      <a href="#s13"><span class="n">13</span>Security hardening checklist</a>
+      <a href="#s14"><span class="n">14</span>Compliance, incl. India (DPDP/CERT-In)</a>
+      <a href="#s15"><span class="n">15</span>Skill roadmap: junior → staff</a>
+    </div>
+    <div class="toc-group">
+      <div class="toc-group-title">Reference</div>
+      <a href="#s16"><span class="n">16</span>Glossary</a>
+      <a href="#s17"><span class="n">17</span>Full resource catalog (103)</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+<div class="hero">
+  <div class="eyebrow">Field Manual · 2026 Edition</div>
+  <h1>Building an application, ground up</h1>
+  <p class="lede">Everything between "I have an idea" and "it's live, it scales, and it doesn't leak" — frontend, backend, database, auth, email/OTP, secrets, storage, CDN, VMs, load balancers, domains, monitoring, and the security practice threaded through all of it.</p>
+  <div class="meta">
+    <span><b>Scope:</b> web application, mobile-ready API</span>
+    <span><b>Audience:</b> first build → senior/staff level</span>
+    <span><b>Region notes:</b> India-specific compliance &amp; providers called out inline</span>
+    <span><b>Companion:</b> <a href="security/master_cybersecurity_checks_resources.html">full 103-item security resource catalog</a></span>
+  </div>
+</div>
+
+<section class="stage" id="s0">
+  <div class="stage-head"><span class="stage-num">00</span><h2>How to use this manual</h2></div>
+  <p class="dek">This is one continuous build, told in the order you actually do it. Each stage ends with a <b>security checklist</b> (amber) tying that stage to a named standard, and — where relevant — an <b>India note</b> (teal) on providers, compliance, or market conventions. Skim top to bottom the first time; come back to individual stages as a reference once you're building for real.</p>
+  <div class="callout">
+    <div class="ctitle">A rule that saves every stage below</div>
+    <p>Security is not a stage you do after building — it's a property you decide on <i>while</i> building, at the same moment you decide how a feature works. Every checklist below sits inside the stage it belongs to, not bolted on at the end, because that's the only place it's cheap to apply.</p>
+  </div>
+</section>
+
+<section class="stage" id="s1">
+  <div class="stage-head"><span class="stage-num">01</span><h2>Plan &amp; threat-model first</h2></div>
+  <p class="dek">Before a line of code: what are you building, who is it for, and what happens if it's attacked or it fails?</p>
+
+  <h3>Define the thing in one paragraph</h3>
+  <p>Write down: who the user is, the one core action they take (post a photo, book a slot, send money), and what "done" looks like for v1. Everything you add beyond this is scope creep until v1 ships and has real users.</p>
+
+  <h3>Sketch the architecture before the code</h3>
+  <pre class="mono">Browser/App  →  CDN (static assets, images)
+                 │
+                 ▼
+             Load Balancer  →  App servers (VMs, autoscaled)
+                                  │
+                    ┌─────────────┼─────────────┐
+                    ▼             ▼             ▼
+               Database      Object storage   Email/OTP
+               (Postgres)     (S3-like)        service
+                    │
+               Secrets manager (the "password wallet"
+               for the app itself, not for end users)</pre>
+
+  <h3>Threat-model in five questions</h3>
+  <ul>
+    <li>What data would hurt someone if it leaked? (passwords, phone numbers, payment info, private messages)</li>
+    <li>Who can call each endpoint, and what stops them calling it for <i>someone else's</i> data?</li>
+    <li>What happens if this service gets 100x the traffic in an hour?</li>
+    <li>What happens if a dependency (npm package, cloud provider, email vendor) is compromised?</li>
+    <li>Who gets paged when something breaks at 2 a.m., and how do they know?</li>
+  </ul>
+
+  <div class="security">
+    <div class="ctitle">Security checklist — planning</div>
+    <ul>
+      <li>Do a lightweight STRIDE or attacker-goal pass on your architecture sketch before writing code <span class="std">MITRE ATT&amp;CK</span></li>
+      <li>Decide your data classification (public / internal / sensitive / secret) up front — it drives every later encryption and access decision <span class="std">NIST CSF</span></li>
+      <li>Write your incident-response contact and escalation path before you need it, not during an incident <span class="std">FIRST</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="stage" id="s2">
+  <div class="stage-head"><span class="stage-num">02</span><h2>Frontend</h2></div>
+  <p class="dek">The part users touch. Optimize for clarity of state (loading / error / empty / success) before you optimize for visual polish.</p>
+
+  <h3>Pick a stack and stop debating it</h3>
+  <p>For 2026, a defensible default: <b>React + TypeScript + Vite</b> for a single-page app, or <b>Next.js</b> if you want server rendering and API routes in one codebase. TypeScript is not optional at this point — it catches an entire category of bugs (wrong shapes crossing the frontend/backend boundary) before a user ever sees them.</p>
+
+  <h3>The four states every screen needs</h3>
+  <ul>
+    <li><b>Loading</b> — a skeleton or spinner, never a blank white screen.</li>
+    <li><b>Empty</b> — what a brand-new user sees with zero data; this is most people's first impression.</li>
+    <li><b>Error</b> — a message that says what happened and what to do next, not a raw stack trace.</li>
+    <li><b>Success</b> — the actual content, plus confirmation for anything destructive (delete, unfollow, cancel).</li>
+  </ul>
+
+  <h3>Where tokens live (this decision matters more than it looks)</h3>
+  <pre class="mono">// Access token: kept ONLY in memory (a module-level variable or React context).
+// Never in localStorage/sessionStorage — any XSS on the page can read those.
+let accessToken: string | null = null;
+
+// Refresh token: never touched by JS at all. The backend sets it as an
+// httpOnly + Secure + SameSite=Strict cookie, so a script on the page
+// cannot read or exfiltrate it even if XSS occurs.
+async function apiFetch(path: string, opts: RequestInit = {}) {
+  const res = await fetch(path, { ...opts, credentials: "include",
+    headers: { ...opts.headers, Authorization: `Bearer ${accessToken}` } });
+  if (res.status === 401) {
+    const r = await fetch("/api/auth/refresh", { method: "POST", credentials: "include" });
+    if (r.ok) { accessToken = (await r.json()).accessToken; return apiFetch(path, opts); }
+    window.location.href = "/login";
+  }
+  return res;
+}</pre>
+
+  <div class="security">
+    <div class="ctitle">Security checklist — frontend</div>
+    <ul>
+      <li>Never use <code>dangerouslySetInnerHTML</code> (or raw <code>innerHTML</code>) on user-generated text — rely on the framework's default escaping <span class="std">OWASP · XSS</span></li>
+      <li>Set a Content-Security-Policy header restricting script sources; it's your backstop when an escaping mistake still happens <span class="std">Mozilla Web Security</span></li>
+      <li>Treat every client-side validation rule as UX only — the backend must re-validate everything, because the client is attacker-controlled <span class="std">OWASP ASVS</span></li>
+      <li>Don't put secrets (API keys, anything sensitive) in frontend code — anything shipped to the browser is public <span class="std">CWE-798</span></li>
+      <li>Pin dependency versions and run <code>npm audit</code> / Dependabot in CI — the frontend has the deepest dependency tree in most apps <span class="std">OpenSSF</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="stage" id="s3">
+  <div class="stage-head"><span class="stage-num">03</span><h2>Backend &amp; API</h2></div>
+  <p class="dek">The part that enforces the rules the frontend merely suggests. Assume every request is hostile and check anyway.</p>
+
+  <h3>Pick a stack</h3>
+  <p>A defensible 2026 default: <b>Node.js + TypeScript + Express (or Fastify/NestJS)</b>, or <b>Python + FastAPI</b> if your team leans Python. Either is fine — what matters far more than the framework is the discipline below.</p>
+
+  <h3>Validate at the boundary, authorize on every route</h3>
+  <pre class="mono">// 1. Validate shape and reject unknown fields (zod, pydantic, whatever your
+//    language offers) — never trust a request body's shape.
+const CreatePost = z.object({ caption: z.string().max(2200), imageKey: z.string() }).strict();
+
+// 2. Authorize: can THIS user do THIS action on THIS resource?
+//    This is the single most commonly missed check in real breaches —
+//    OWASP calls it Broken Object Level Authorization (BOLA/IDOR).
+async function deletePost(req, res) {
+  const post = await db.post.findUnique({ where: { id: req.params.id } });
+  if (!post) return res.status(404).end();
+  if (post.authorId !== req.user.id) return res.status(403).end(); // <- the check
+  await db.post.delete({ where: { id: post.id } });
+  res.status(204).end();
+}</pre>
+
+  <h3>Rate-limit anything an attacker can script</h3>
+  <p>Login, signup, OTP send/verify, and password reset are the endpoints attackers automate against. Rate-limit per account <i>and</i> per IP, and lock out or slow down after repeated failures rather than returning an unlimited number of guesses.</p>
+
+  <div class="grid2">
+    <div class="card"><h4>Good error handling</h4><p>Log the real error internally with full detail; return a generic message externally ("Something went wrong") in production. Stack traces are a gift to an attacker mapping your internals.</p></div>
+    <div class="card"><h4>Pagination, always</h4><p>Any list endpoint (feed, comments, search) needs cursor- or offset-based pagination from day one — an unbounded query is a denial-of-service waiting for enough rows.</p></div>
+  </div>
+
+  <div class="security">
+    <div class="ctitle">Security checklist — backend/API</div>
+    <ul>
+      <li>Authorization check on every route that reads or writes a specific resource, not just authentication <span class="std">OWASP API Security · BOLA</span></li>
+      <li>Parameterized queries / ORM only — never string-concatenate SQL <span class="std">CWE-89 · SQL Injection</span></li>
+      <li>Rate-limit auth, OTP, and password-reset endpoints per account and per IP <span class="std">CWE-307</span></li>
+      <li>Explicit allow-list of JWT signing algorithms — never accept "none" or let the client choose the algorithm <span class="std">OWASP · Broken Authentication</span></li>
+      <li>Global request body size limits and per-route timeouts to blunt resource-exhaustion attacks <span class="std">OWASP API Security · Unrestricted Resource Consumption</span></li>
+      <li>Centralized error handler that never returns stack traces or internal identifiers in production responses <span class="std">OWASP ASVS</span></li>
+      <li>Server-Side Request Forgery guardrails on any endpoint that fetches a URL supplied by the client <span class="std">OWASP · SSRF</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="stage" id="s4">
+  <div class="stage-head"><span class="stage-num">04</span><h2>Database</h2></div>
+  <p class="dek">Get the schema and indexes right early — migrating a live table under load is the least fun afternoon in software.</p>
+
+  <h3>Relational by default</h3>
+  <p><b>PostgreSQL</b> is the right default for almost everything with users, relationships, and money-adjacent data. Reach for a document store (MongoDB) or a cache (Redis) only when you have a specific access pattern that relational modeling actively fights — not because it feels more modern.</p>
+
+  <h3>Index what you query by, constrain what must be unique</h3>
+  <pre class="mono">model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  username  String   @unique
+  passwordHash String
+  createdAt DateTime @default(now())
+}
+
+model Follow {
+  followerId  String
+  followingId String
+  @@id([followerId, followingId])   // prevents duplicate follows at the DB level
+  @@index([followingId])            // fast "who follows me" lookups
+}</pre>
+
+  <div class="callout">
+    <div class="ctitle">Migrations discipline</div>
+    <p>Every schema change is a migration file, checked into git, applied the same way in every environment (local → staging → production). Never hand-edit a production schema through a GUI — you lose the ability to reproduce it.</p>
+  </div>
+
+  <div class="security">
+    <div class="ctitle">Security checklist — database</div>
+    <ul>
+      <li>Encrypt at rest (most managed databases do this by default — verify it's actually on) <span class="std">NIST Cryptographic Standards</span></li>
+      <li>Least-privilege DB user for the app — it should not have permission to drop tables or read other databases on the instance <span class="std">CIS Benchmarks</span></li>
+      <li>Automated backups with a tested restore procedure — an untested backup is a hope, not a plan <span class="std">NIST CSF · Recover</span></li>
+      <li>Put the database in a private subnet with no public IP; only the app tier's security group can reach it <span class="std">CSA Cloud Controls Matrix</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="stage" id="s5">
+  <div class="stage-head"><span class="stage-num">05</span><h2>Auth, OTP &amp; the password wallet</h2></div>
+  <p class="dek">Two different "password wallets" get confused constantly — get the distinction straight before building either.</p>
+
+  <div class="callout">
+    <div class="ctitle">Two meanings of "password wallet" — pick the right one</div>
+    <p><b>1. End-user password management</b> — your app hashing and verifying each user's own password, optionally with a personal vault feature (like a browser password manager) if your product actually needs one.</p>
+    <p><b>2. Application secrets management</b> — <i>your infrastructure's</i> own credentials (DB password, JWT signing key, third-party API keys) held in a secrets manager (AWS Secrets Manager, HashiCorp Vault, GCP Secret Manager) instead of a <code>.env</code> file committed to git. Almost everyone building "an app with a password wallet" actually means this second one — most apps don't need a personal-vault feature at all.</p>
+  </div>
+
+  <h3>Hashing a user's password correctly</h3>
+  <pre class="mono">import argon2 from "argon2";
+// Argon2id: memory-hard, resistant to GPU-cracking — OWASP's current
+// recommendation over bcrypt/scrypt for new systems.
+const hash = await argon2.hash(plainPassword, { type: argon2.argon2id });
+const valid = await argon2.verify(hash, attempt);</pre>
+
+  <h3>OTP (one-time password) for email/phone verification</h3>
+  <pre class="mono">import crypto from "crypto";
+const code = crypto.randomInt(100000, 999999).toString(); // not Math.random()
+const codeHash = await argon2.hash(code);   // store the hash, never the plaintext
+// expire in 10 minutes, cap verify attempts at 5, cap resends at 3/hour/account
+await db.otpCode.create({ data: { userId, codeHash, expiresAt: in10Min() } });</pre>
+
+  <h3>Sessions: short-lived access token + rotating refresh token</h3>
+  <ul>
+    <li>Access token (JWT): 15-minute expiry, used on every API call, never stored anywhere persistent.</li>
+    <li>Refresh token: long-lived, opaque random value, stored <i>hashed</i> in the DB, delivered via httpOnly cookie, <b>rotated on every use</b> — reusing an old refresh token should revoke the whole session chain (a strong signal of theft).</li>
+  </ul>
+
+  <h3>The application secrets manager, done right</h3>
+  <pre class="mono">// Boot-time: fail fast if a required secret is missing — never silently
+// fall back to a default or an empty string in production.
+const Secrets = z.object({
+  DATABASE_URL: z.string().url(),
+  JWT_SIGNING_KEY: z.string().min(32),
+  SMTP_PASSWORD: z.string().min(1),
+}).parse(process.env);
+// In production these env vars are injected by the platform from
+// AWS Secrets Manager / Vault at deploy time — never committed to git,
+// never logged, rotated on a schedule.</pre>
+
+  <div class="security">
+    <div class="ctitle">Security checklist — auth &amp; secrets</div>
+    <ul>
+      <li>Argon2id (or bcrypt/scrypt as a fallback) for password hashing — never MD5/SHA-1/plain SHA-256 <span class="std">NIST Cryptographic Standards</span></li>
+      <li>OTP codes: cryptographically random, hashed at rest, short expiry, capped attempts and resends <span class="std">CWE-330 · CWE-307</span></li>
+      <li>Multi-factor / passkey support where the product warrants it — phishing-resistant beats SMS OTP long-term <span class="std">FIDO Alliance</span></li>
+      <li>No secret ever committed to git — use a secrets manager and a <code>.gitignore</code>'d <code>.env</code> locally with a `.env.example` for onboarding <span class="std">CWE-798</span></li>
+      <li>Least-privilege IAM: the app's runtime role can read only the specific secrets it needs, nothing account-wide <span class="std">CSA Cloud Controls Matrix</span></li>
+      <li>Rotate signing keys and long-lived credentials on a schedule, and immediately on suspected compromise <span class="std">NIST SSDF</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="stage" id="s6">
+  <div class="stage-head"><span class="stage-num">06</span><h2>Email / OTP delivery</h2></div>
+  <p class="dek">Generating the OTP is the easy 10%. Getting the email to actually land in an inbox instead of spam is the other 90%.</p>
+
+  <h3>Pick a transactional email provider</h3>
+  <p>AWS SES, SendGrid, Postmark, or Resend are all reasonable — SES is the cheapest at scale and pairs naturally if the rest of your infra is on AWS. Whichever you pick, you're sending through their SMTP/API, not rolling your own mail server.</p>
+
+  <h3>Deliverability is a DNS problem, not a code problem</h3>
+  <ul>
+    <li><b>SPF</b> — declares which servers are allowed to send mail for your domain.</li>
+    <li><b>DKIM</b> — cryptographically signs outgoing mail so receivers can verify it wasn't tampered with.</li>
+    <li><b>DMARC</b> — tells receiving mail servers what to do with mail that fails SPF/DKIM, and gives you reports on abuse of your domain.</li>
+  </ul>
+  <p>Skip any of the three and a meaningful fraction of your OTP emails land in spam — which, from a user's point of view, is indistinguishable from your OTP feature being broken.</p>
+
+  <div class="security">
+    <div class="ctitle">Security checklist — email/OTP delivery</div>
+    <ul>
+      <li>SPF + DKIM + DMARC configured on the sending domain before launch, not after users complain <span class="std">IETF RFCs</span></li>
+      <li>Never put the OTP code or a password-reset token verbatim in a URL query string that could end up in logs or a browser's history <span class="std">OWASP ASVS</span></li>
+      <li>Rate-limit OTP <i>send</i> and <i>verify</i> separately — sending is a cost/abuse vector, verifying is a brute-force vector <span class="std">CWE-307</span></li>
+      <li>Never reveal in an error message whether an email address exists in your system ("no account found" vs. generic "if this email exists…") <span class="std">OWASP · User Enumeration</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="stage" id="s7">
+  <div class="stage-head"><span class="stage-num">07</span><h2>File storage &amp; the CDN</h2></div>
+  <p class="dek">User-uploaded images/videos and your static frontend assets don't belong on the same server that runs your API.</p>
+
+  <h3>Object storage + presigned uploads</h3>
+  <p>Use S3 (or an S3-compatible store). The API never touches the image bytes — it hands the client a short-lived, scoped "presigned URL," the client uploads directly to storage, and the API just records the resulting object key.</p>
+  <pre class="mono">// Backend: issue a scoped, time-limited upload URL — the object key is
+// namespaced under the requesting user's own prefix so they can't
+// overwrite or reference someone else's objects.
+const key = `posts/${userId}/${crypto.randomUUID()}.jpg`;
+const uploadUrl = await s3.getSignedUrl("putObject", { Bucket, Key: key, Expires: 300 });
+res.json({ uploadUrl, objectKey: key });
+
+// Client: PUT the file straight to storage — the API server never
+// sees or holds the binary, which is both faster and removes an
+// entire class of upload-based attacks from the API surface.
+await fetch(uploadUrl, { method: "PUT", body: file });</pre>
+
+  <h3>Front the bucket with a CDN</h3>
+  <p>CloudFront (AWS), Cloudflare, or Fastly sit between users and your storage bucket: they cache images at edge locations close to the user (faster loads), absorb traffic spikes without hitting your origin, and are the only thing with public read access — the bucket itself stays private.</p>
+
+  <div class="security">
+    <div class="ctitle">Security checklist — storage &amp; CDN</div>
+    <ul>
+      <li>Bucket is private by default; only the CDN (via Origin Access Control) can read from it <span class="std">CIS Benchmarks</span></li>
+      <li>Validate file type and size server-side before issuing the presigned URL, and re-check content-type on the object once uploaded — never trust a client-declared MIME type alone <span class="std">OWASP · Unrestricted File Upload</span></li>
+      <li>Object keys scoped to the uploading user's own namespace, checked server-side, to prevent one user overwriting or referencing another's files (an IDOR variant) <span class="std">OWASP API Security · BOLA</span></li>
+      <li>HTTPS-only at the CDN edge; redirect any HTTP request <span class="std">Mozilla Web Security</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="stage" id="s8">
+  <div class="stage-head"><span class="stage-num">08</span><h2>Servers &amp; the VM</h2></div>
+  <p class="dek">No containers here by design — plain virtual machines, hardened directly, so the operating-system layer isn't a black box.</p>
+
+  <h3>Provision, then harden, before you deploy anything</h3>
+  <pre class="mono"># Key-only SSH, no passwords, no root login
+sudo sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
+sudo sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
+sudo systemctl restart sshd
+
+# Firewall: only what the app actually needs
+sudo ufw default deny incoming
+sudo ufw allow 22/tcp   # SSH (ideally restricted to a bastion/VPN IP range)
+sudo ufw allow 443/tcp  # HTTPS via the load balancer / reverse proxy
+sudo ufw enable
+
+# Automatic security patches
+sudo apt install unattended-upgrades -y</pre>
+
+  <h3>Run the app as a service, not a terminal you forgot open</h3>
+  <pre class="mono"># /etc/systemd/system/app-backend.service
+[Unit]
+Description=App backend
+After=network.target
+
+[Service]
+User=appuser              # never root
+ExecStart=/usr/bin/node /opt/app/dist/server.js
+Restart=on-failure
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target</pre>
+
+  <h3>Put Nginx in front as a reverse proxy</h3>
+  <p>Nginx terminates TLS, adds security headers, rate-limits at the edge, and forwards clean requests to your Node/Python process on localhost — your app process itself never listens directly on the public internet.</p>
+
+  <div class="security">
+    <div class="ctitle">Security checklist — VM/server</div>
+    <ul>
+      <li>SSH key-only, root login disabled, a firewall that denies by default <span class="std">CIS Benchmarks</span></li>
+      <li>App runs as an unprivileged, dedicated OS user, never root <span class="std">DISA STIGs</span></li>
+      <li>Automatic OS security patching enabled <span class="std">CIS Controls</span></li>
+      <li>TLS 1.2+ only, modern cipher suites, HSTS header from the reverse proxy <span class="std">Mozilla Web Security</span></li>
+      <li>Server identification headers (like <code>Server: nginx/1.x</code>) stripped or minimized so a scanner can't fingerprint your exact version <span class="std">CIS Benchmarks</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="stage" id="s9">
+  <div class="stage-head"><span class="stage-num">09</span><h2>Load balancers &amp; autoscaling</h2></div>
+  <p class="dek">The mechanism that turns "one VM that falls over on a busy Tuesday" into "traffic that just gets absorbed."</p>
+
+  <h3>The load balancer</h3>
+  <p>An Application Load Balancer (AWS ALB, or Nginx/HAProxy if self-managed) sits in front of multiple app VMs, terminates HTTPS, health-checks each instance, and routes traffic only to healthy ones — this is also how you deploy with zero downtime (roll instances one at a time, the LB stops sending traffic to whichever is being replaced).</p>
+
+  <h3>Autoscaling — the actual "volume increaser"</h3>
+  <p>An Auto Scaling Group watches a metric (CPU, request count, queue depth) and adds VMs when it's under load, removes them when it's quiet. This is the mechanism people mean when they say a system needs to "handle more volume" — it's not a single button, it's a policy: minimum instances, maximum instances, and the trigger metric.</p>
+  <pre class="mono"># conceptually, an autoscaling policy:
+min_instances: 2
+max_instances: 6
+scale_out_when: avg_cpu > 65% for 3 minutes
+scale_in_when:  avg_cpu < 30% for 10 minutes
+health_check: GET /health every 15s, 2 consecutive failures = unhealthy</pre>
+
+  <div class="security">
+    <div class="ctitle">Security checklist — load balancing/scaling</div>
+    <ul>
+      <li>TLS terminates at the load balancer with a managed certificate that auto-renews — never a hand-rolled cert you'll forget to renew <span class="std">IETF RFCs</span></li>
+      <li>App VMs sit in private subnets, reachable only from the load balancer's security group — no direct public IP on app instances <span class="std">CSA Cloud Controls Matrix</span></li>
+      <li>Health checks on a dedicated <code>/health</code> path that doesn't leak internal state, so scaling decisions can't be spoofed by an attacker <span class="std">OWASP ASVS</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="stage" id="s10">
+  <div class="stage-head"><span class="stage-num">10</span><h2>Domain names &amp; DNS</h2></div>
+  <p class="dek">The address people type, and the records that tell the internet where to send them.</p>
+
+  <h3>Buying and pointing a domain</h3>
+  <ol>
+    <li>Register a domain through a registrar — <b>GoDaddy India, BigRock, Namecheap, or Hostinger</b> are all common choices for developers in India; a <code>.in</code> domain works fine for an India-first product, a generic <code>.com</code>/<code>.dev</code> for a global one.</li>
+    <li>Delegate the domain's nameservers to your DNS provider (Route53, Cloudflare DNS) — this is the step that lets Terraform/your infra actually manage records.</li>
+    <li>Point an <code>A</code>/<code>ALIAS</code> record at your load balancer for the API, and a separate record at your CDN distribution for the frontend/static assets.</li>
+    <li>Issue an HTTPS certificate (AWS ACM, or Let's Encrypt via Certbot if self-managing Nginx) for every hostname you serve.</li>
+  </ol>
+
+  <div class="security">
+    <div class="ctitle">Security checklist — domain/DNS</div>
+    <ul>
+      <li>Enable registrar-level domain lock/2FA — a stolen domain login is a full takeover of your product <span class="std">CIS Controls</span></li>
+      <li>DNSSEC where your registrar/DNS provider supports it, to prevent DNS spoofing <span class="std">IETF RFCs</span></li>
+      <li>Certificates on an auto-renewal path (ACM or Certbot cron) — an expired cert is a self-inflicted outage <span class="std">Mozilla Web Security</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="stage" id="s11">
+  <div class="stage-head"><span class="stage-num">11</span><h2>CI/CD pipelines</h2></div>
+  <p class="dek">The automated path from "I pushed a commit" to "it's safely running in production."</p>
+  <ul>
+    <li><b>CI (continuous integration):</b> on every push — install deps, typecheck, lint, run the test suite, run a dependency-vulnerability scan.</li>
+    <li><b>CD (continuous deployment):</b> on merge to main — build, run database migrations, deploy to a staging environment, run a smoke test, then roll out to production instances one at a time behind the load balancer.</li>
+  </ul>
+  <pre class="mono"># conceptual pipeline (GitHub Actions / GitLab CI, either works)
+on: push
+jobs:
+  test:    npm ci && npm run typecheck && npm test
+  audit:   npm audit --audit-level=high
+  deploy:  # only on main, only if test+audit passed
+           npm run build
+           npx prisma migrate deploy
+           ssh app-server "sudo systemctl restart app-backend"
+           curl --fail https://api.example.com/health</pre>
+
+  <div class="security">
+    <div class="ctitle">Security checklist — CI/CD</div>
+    <ul>
+      <li>Dependency vulnerability scanning wired into CI, failing the build on high-severity findings <span class="std">OSV / GitHub Advisory Database</span></li>
+      <li>Deploy credentials scoped narrowly and stored as CI secrets, never in the repo <span class="std">CWE-798</span></li>
+      <li>Build provenance — know that what's deployed is exactly what was reviewed and tested, not a hand-edited artifact <span class="std">SLSA</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="stage" id="s12">
+  <div class="stage-head"><span class="stage-num">12</span><h2>Monitoring &amp; incident response</h2></div>
+  <p class="dek">You find out about most real problems from a dashboard or an alert, not a user's angry email — if you've set it up.</p>
+  <ul>
+    <li><b>Metrics:</b> CPU/memory/request-rate/error-rate per instance, and business metrics (signups, OTP failures, upload failures).</li>
+    <li><b>Structured logs:</b> JSON logs with a request ID that ties a user's request across every service it touched — and redact secrets/tokens/passwords from every log line.</li>
+    <li><b>Alerts:</b> error-rate spikes, elevated latency, failed health checks, unusual auth-failure rates (a brute-force signal).</li>
+    <li><b>A written incident runbook:</b> who gets paged, what the first three diagnostic steps are, and where the postmortem gets written afterward.</li>
+  </ul>
+
+  <div class="security">
+    <div class="ctitle">Security checklist — monitoring/IR</div>
+    <ul>
+      <li>Redact Authorization headers, passwords, and OTP codes from all logs before they're ever written <span class="std">OWASP ASVS · Logging</span></li>
+      <li>Alert on abnormal authentication-failure rates — it's usually the earliest signal of credential stuffing <span class="std">MITRE ATT&amp;CK · Credential Access</span></li>
+      <li>Keep an incident-response plan and a named contact path before you need either <span class="std">NIST CSF · Respond/Recover</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="stage" id="s13">
+  <div class="stage-head"><span class="stage-num">13</span><h2>Security hardening checklist — the consolidated view</h2></div>
+  <p class="dek">Every amber box above, gathered in one pass, organized by domain instead of by build stage — use this as your pre-launch pass.</p>
+
+  <div class="grid2">
+    <div class="card"><h4>Identity &amp; access</h4><p>Argon2id hashing · short JWTs + rotating refresh · rate-limited auth/OTP · MFA/passkeys where warranted · least-privilege IAM everywhere</p></div>
+    <div class="card"><h4>Injection &amp; input</h4><p>Parameterized queries only · strict schema validation rejecting unknown fields · output escaping, no raw HTML injection</p></div>
+    <div class="card"><h4>Access control</h4><p>Ownership checks on every mutating route · object keys scoped per user · no security decision made client-side alone</p></div>
+    <div class="card"><h4>Transport &amp; storage</h4><p>TLS 1.2+ everywhere · encryption at rest for DB/storage · private subnets for DB and app tier · public-read only through the CDN</p></div>
+    <div class="card"><h4>Secrets</h4><p>Nothing in git · a real secrets manager · least-privilege read access · scheduled rotation</p></div>
+    <div class="card"><h4>Supply chain</h4><p>Dependency scanning in CI · pinned versions · build provenance · minimal third-party JS on the frontend</p></div>
+    <div class="card"><h4>Operations</h4><p>Redacted structured logs · alerting on anomalies · tested backups · a written incident runbook</p></div>
+    <div class="card"><h4>Email/OTP integrity</h4><p>SPF/DKIM/DMARC on the sending domain · hashed, expiring, attempt-capped OTPs · no user-enumeration in error messages</p></div>
+  </div>
+  <p style="margin-top:18px" class="appendix-note">For a much deeper pass — mobile, AI/LLM features, IoT, industrial, automotive, and formal compliance frameworks — work through the <a href="security/master_cybersecurity_checks_resources.html">full 103-item resource catalog</a> (also mirrored in the appendix below), filtering to what's actually relevant to your product.</p>
+</section>
+
+<section class="stage" id="s14">
+  <div class="stage-head"><span class="stage-num">14</span><h2>Compliance &amp; governance, including India</h2></div>
+  <p class="dek">Standards you adopt voluntarily for maturity, and rules you must follow because you operate in a given market.</p>
+
+  <h3>General frameworks worth knowing</h3>
+  <ul>
+    <li><b>ISO/IEC 27001</b> — an information security management system; common ask from enterprise customers doing vendor due diligence.</li>
+    <li><b>SOC 2</b> — common ask from US-based B2B SaaS customers.</li>
+    <li><b>PCI DSS</b> — mandatory the moment you touch card data directly (most teams avoid this entirely by using a payment processor like Razorpay/Stripe that keeps card data off your servers).</li>
+  </ul>
+
+  <div class="india">
+    <div class="ctitle">India-specific rules that actually apply to most apps</div>
+    <p><b>Digital Personal Data Protection Act, 2023 (DPDP Act)</b> — India's core personal-data law. Practically: get explicit, specific consent before collecting personal data, state your purpose, let users withdraw consent and request deletion, and report significant breaches. Design your signup/consent flow and your account-deletion flow with this in mind from day one — retrofitting consent UX later is painful.</p>
+    <p><b>CERT-In directions (2022)</b> — require reporting certain categories of cyber incidents to CERT-In within 6 hours of noticing them, and mandate that ICT system logs be maintained (typically referenced as a 180-day window) within Indian jurisdiction. If your monitoring/logging stack (Stage 12) is an afterthought, this is the rule that makes it not optional.</p>
+    <p><b>RBI guidelines</b> — apply specifically if you touch payments/lending (tokenization requirements for card data, data-localization rules for certain payment data). Not relevant to a plain social app, essential if you add wallets or checkout.</p>
+    <p><b>Practical provider notes</b> — AWS (Mumbai/ap-south-1) and GCP (Delhi/asia-south1) both have India regions if data residency matters to your compliance posture; Razorpay/Cashfree are the common payment-gateway choices; most teams use an Indian registrar (BigRock, GoDaddy India) for the domain and a global DNS/CDN provider (Route53, Cloudflare) for everything downstream.</p>
+  </div>
+</section>
+
+<section class="stage" id="s15">
+  <div class="stage-head"><span class="stage-num">15</span><h2>Skill roadmap: junior → staff</h2></div>
+  <p class="dek">What "more senior" actually means in this stack, stage by stage.</p>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Level</th><th>What you own</th><th>Signal you've reached it</th></tr></thead>
+    <tbody>
+      <tr><td>Junior</td><td>A single feature, in one part of the stack, with guidance</td><td>You can implement a well-specified endpoint or screen correctly and test it</td></tr>
+      <tr><td>Mid</td><td>A full feature across frontend + backend + DB, unsupervised</td><td>You catch your own authorization/edge-case bugs before review, not after</td></tr>
+      <tr><td>Senior</td><td>A subsystem (auth, feed, uploads) end-to-end, including its failure modes</td><td>You design for the case where a dependency is slow/down/compromised, not just the happy path</td></tr>
+      <tr><td>Staff/Lead</td><td>The whole architecture: how services, data, and infra fit together and scale</td><td>You can explain a tradeoff (consistency vs. availability, cost vs. latency) and defend the choice you made</td></tr>
+      <tr><td>Principal/Architect</td><td>Cross-team technical direction and risk — security, compliance, cost, and scaling posture as one picture</td><td>Other senior engineers come to you before a decision, not after it's already made</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p style="margin-top:16px">The fastest way through this ladder isn't more frameworks — it's building one real system through every stage in this manual, then doing it again with the mistakes from the first one fixed.</p>
+</section>
+
+<section class="stage" id="s16">
+  <div class="stage-head"><span class="stage-num">16</span><h2>Glossary</h2></div>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Term</th><th>Plain-language meaning</th></tr></thead>
+    <tbody>
+      <tr><td>VM (Virtual Machine)</td><td>A rented slice of a physical server that behaves like its own computer — where your backend process actually runs.</td></tr>
+      <tr><td>Load balancer</td><td>Sits in front of several VMs and spreads incoming traffic across the healthy ones.</td></tr>
+      <tr><td>Autoscaling</td><td>A policy that adds or removes VMs automatically based on how much traffic/load there currently is.</td></tr>
+      <tr><td>CDN (Content Delivery Network)</td><td>A network of servers, geographically close to users, caching your static files and images so they load fast anywhere.</td></tr>
+      <tr><td>DNS</td><td>The system translating a domain name (example.com) into the server address it should connect to.</td></tr>
+      <tr><td>OTP (One-Time Password)</td><td>A short code, valid once and briefly, used to prove someone controls an email/phone.</td></tr>
+      <tr><td>Secrets manager / "password wallet" (infra sense)</td><td>A locked box for your app's own credentials (DB password, API keys) so they never sit in source code.</td></tr>
+      <tr><td>JWT (JSON Web Token)</td><td>A signed, compact token proving who a logged-in user is, checked on every API request.</td></tr>
+      <tr><td>Reverse proxy</td><td>A server (like Nginx) that sits in front of your app, handling TLS/headers/rate-limiting before forwarding clean requests inward.</td></tr>
+      <tr><td>IDOR / BOLA</td><td>A bug where an app checks that you're logged in, but forgets to check whether the specific record you're accessing is actually yours.</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section class="stage" id="s17">
+  <div class="stage-head"><span class="stage-num">17</span><h2>Full resource catalog</h2></div>
+  <p class="dek">The complete 103-entry standards/tooling catalog this manual draws its <span class="std" style="margin-left:0">STD</span> references from — filter it live below, or open the <a href="security/master_cybersecurity_checks_resources.html">standalone file</a>.</p>
+  <div class="search-wrap" style="padding:0 0 14px;"><input id="cat-search" type="text" placeholder="Filter the catalog… e.g. API, cloud, IoT, AI"></div>
+  <div class="tablewrap">
+    <iframe title="Full security resource catalog" src="security/master_cybersecurity_checks_resources.html" style="width:100%; height:640px; border:0; border-radius:8px;"></iframe>
+  </div>
+</section>
+
+<div class="divider"></div>
+<footer>
+  Field Manual · companion reference: <a href="security/master_cybersecurity_checks_resources.html">master_cybersecurity_checks_resources.html</a> · project memory: <a href="../CLAUDE.md">CLAUDE.md</a>
+</footer>
+
+</main>
+</div>
+
+<script>
+// Section highlighting in the rail as you scroll
+const links = Array.from(document.querySelectorAll('.toc a'));
+const sections = links.map(l => document.querySelector(l.getAttribute('href')));
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      links.forEach(l => l.classList.remove('active'));
+      const id = '#' + e.target.id;
+      const match = links.find(l => l.getAttribute('href') === id);
+      if (match) match.classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+sections.forEach(s => s && io.observe(s));
+
+// Filter the TOC by keyword (also matches section text roughly)
+const navSearch = document.getElementById('nav-search');
+navSearch.addEventListener('input', () => {
+  const q = navSearch.value.toLowerCase();
+  links.forEach(l => {
+    const parent = l.parentElement;
+    l.style.display = l.innerText.toLowerCase().includes(q) ? '' : (q ? 'none' : '');
+  });
+});
+</script>
+</body>
+</html>
