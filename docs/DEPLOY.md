@@ -47,71 +47,49 @@ ssh -p <port> vamsi@<vm-ip>
 cd ~/Documents/application && git pull
 ```
 
-## Security hardening still to apply on the VM
+## Security hardening — applied on the VM
 
-These are real findings from a security pass on the live deployment — they
-live in server config, not the git repo, so pushing code can't fix them.
-Run these once, over SSH:
+These live in server config, not the git repo, so they were applied directly
+over SSH rather than via a commit. Current state, confirmed live:
 
-1. **Restrict the GitHub Actions deploy key to only the deploy command.**
-   As set up, `~/.ssh/authorized_keys` grants that key a full interactive
-   shell as `vamsi` (who has sudo) — if the `VM_SSH_KEY` GitHub secret
-   ever leaked, whoever has it gets much more than "run git pull." Lock
-   it down to a forced command with no port/agent/X11 forwarding and no
-   pty:
-   ```bash
-   nano ~/.ssh/authorized_keys
-   ```
-   Find the line ending in `github-actions-deploy` and prefix it with:
-   ```
-   command="cd /home/vamsi/Documents/application && git fetch origin main && git reset --hard origin/main",no-port-forwarding,no-agent-forwarding,no-X11-forwarding,no-pty ssh-ed25519 AAAA...github-actions-deploy
-   ```
-   (keep the existing `ssh-ed25519 AAAA...` key material exactly as-is — only add the `command="...",no-port-forwarding,...` prefix in front of it). After this, that key can *only* ever run the deploy command, nothing else, even with full possession of the private key.
+1. **GitHub Actions deploy key is restricted to only the deploy command.**
+   `~/.ssh/authorized_keys` on the VM has a forced `command="cd
+   /home/vamsi/Documents/application && git fetch origin main && git reset
+   --hard origin/main"` prefix (plus `no-port-forwarding,no-agent-forwarding,
+   no-X11-forwarding,no-pty`) on the `github-actions-deploy` key. Even with
+   full possession of the private key, it can only ever run that one
+   command — not get an interactive shell.
 
-2. **Stop leaking the exact Nginx/OS version.** `curl -I` against the live
-   site currently returns `Server: nginx/1.24.0 (Ubuntu)` — free
-   reconnaissance for an attacker matching known CVEs to your exact
-   version. Add one line to the top of `/etc/nginx/nginx.conf`, inside
-   the `http { }` block:
-   ```bash
-   sudo nano /etc/nginx/nginx.conf
-   ```
-   ```nginx
-   http {
-       server_tokens off;
-       ...
-   }
-   ```
-   ```bash
-   sudo nginx -t && sudo systemctl reload nginx
-   ```
-   Confirm: `curl -I https://webstocking.com/application/` should now show just `Server: nginx` with no version number.
+2. **Nginx no longer leaks its exact version.** `server_tokens off;` is set
+   in `/etc/nginx/nginx.conf`. `curl -I` now returns `Server: nginx` with no
+   version number.
 
-3. **Add security headers** to the `/application/` location block (edit
-   `/etc/nginx/sites-enabled/webstocking.com`, inside the `location
-   /application/ { ... }` block added earlier):
-   ```nginx
-   location /application/ {
-       alias /home/vamsi/Documents/application/docs/;
-       index how-to-build-an-application.html;
-       try_files $uri $uri/ =404;
+3. **Security headers are live** on the `/application/` location: `X-Content-
+   Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`,
+   and a `Content-Security-Policy` scoped to `'self'` (with `'unsafe-inline'`
+   for script/style, since every page's CSS/JS is intentionally inline with
+   no build step — a stricter CSP would need per-page nonces, not worth the
+   complexity for a static site with no user input).
 
-       add_header X-Content-Type-Options "nosniff" always;
-       add_header X-Frame-Options "SAMEORIGIN" always;
-       add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-       add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
-       add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; frame-ancestors 'self'" always;
-   }
-   ```
-   (`'unsafe-inline'` is needed because every page's CSS/JS is intentionally inline with no build step — a real strict CSP would need nonces, which isn't worth the complexity for a static content site with no user input.)
+4. **HSTS is enabled** (`Strict-Transport-Security: max-age=31536000;
+   includeSubDomains`), safe since HTTP already unconditionally redirects to
+   HTTPS.
 
-4. **Enable HSTS** — HTTPS is already fully enforced (HTTP redirects to
-   HTTPS), so this is a safe addition. Add inside the `server { listen
-   443 ssl; ... }` block, near the other `ssl_*` directives:
-   ```nginx
-   add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-   ```
-   Then:
-   ```bash
-   sudo nginx -t && sudo systemctl reload nginx
-   ```
+Verify anytime with:
+```bash
+curl -sI https://webstocking.com/application/
+```
+
+### Incident note: a leaked private key, found and rotated during this pass
+
+While restricting the deploy key, a **different, unrelated private key**
+(comment `webstocking-server`, of unknown origin — predates this project)
+was discovered sitting in plaintext inside `~/.ssh/authorized_keys`, which
+should only ever contain public keys. It was removed, `authorized_keys` was
+rebuilt from scratch with only the legitimate personal key, and the
+`github-actions-deploy` keypair was regenerated fresh (old key files deleted,
+new pair generated, `VM_SSH_KEY` GitHub secret updated to match). If that
+`webstocking-server` key is ever identified as authorizing access somewhere
+else (another server, another service), treat it as compromised and rotate
+it there too — it was exposed both in the file and in a chat transcript
+during troubleshooting.
