@@ -2,10 +2,16 @@
 
 A field manual for building an application end-to-end — frontend, backend, database, auth/OTP, secrets, storage/CDN, VMs, load balancers, domains, CI/CD, monitoring — with security woven into every stage instead of bolted on at the end.
 
+## Live site
+
+**https://webstocking.com/application/**
+
+Deployed on an Ubuntu VM behind Nginx, served as plain static files (no build step). Every push to `main` auto-deploys via GitHub Actions (`.github/workflows/deploy.yml`) — see [`docs/DEPLOY.md`](docs/DEPLOY.md) for the full deployment setup, the security hardening applied on the VM (restricted deploy key, security headers, HSTS, hidden server version), and how to redeploy or rebuild from scratch.
+
 ## Contents
 
-- [`docs/how-to-build-an-application.html`](docs/how-to-build-an-application.html) — **start here.** The landing page: intro, how to use the manual, and a full directory linking to every stage below.
-- The manual is split into one page per stage (each links to the next/previous via a footer nav, and all pages share the same sidebar):
+- [`docs/how-to-build-an-application.html`](docs/how-to-build-an-application.html) — **start here.** The landing page: animated hero, intro, and a full directory linking to every stage below.
+- The manual is split into one page per stage (each links to the next/previous via a footer nav at the bottom):
   1. [`01-plan-and-threat-model.html`](docs/01-plan-and-threat-model.html)
   2. [`02-frontend.html`](docs/02-frontend.html)
   3. [`03-backend-api.html`](docs/03-backend-api.html)
@@ -25,8 +31,9 @@ A field manual for building an application end-to-end — frontend, backend, dat
   17. [`17-full-resource-catalog.html`](docs/17-full-resource-catalog.html) — all 103 catalog entries, grouped, explained, and linked (not just reprinted)
   18. [`18-worked-backend-example.html`](docs/18-worked-backend-example.html) — a real backend file tree walked through file by file, plus how to have an AI audit finished code against the catalog
 - [`docs/security/master_cybersecurity_checks_resources.html`](docs/security/master_cybersecurity_checks_resources.html) — the original standalone 103-entry catalog of security standards/frameworks (OWASP, MITRE ATT&CK/CWE/CAPEC, CIS Benchmarks, NIST, and more) that Stage 17 explains and links out to individually.
+- [`docs/DEPLOY.md`](docs/DEPLOY.md) — VM deployment steps, GitHub Actions auto-deploy setup, and applied security hardening.
 - [`CLAUDE.md`](CLAUDE.md) — notes for future work in this repo: what exists, why, and decisions made along the way.
 
 ## How to read it
 
-Open `docs/how-to-build-an-application.html` first — it's the front door, with a full directory of every stage. Each page has the same sidebar (jump to any stage, filter by keyword) and a prev/next footer nav to read straight through. Each stage ends with an amber **security checklist** box tying it to a named standard, and stages with India-specific considerations have a teal **IN** note. No build step, no server needed — every page opens directly in a browser.
+Open `docs/how-to-build-an-application.html` first (or visit the live link above) — it's the front door, with an animated hero and a full directory of every stage. Each page is full-width with a prev/next footer nav to read straight through in order, or jump to any single stage directly from the landing page's contents grid. Each stage ends with an amber **security checklist** box tying it to a named standard, and stages with India-specific considerations have a teal **IN** note. No build step, no server needed to view it locally — every page also opens directly in a browser from disk.
