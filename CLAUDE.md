@@ -4,9 +4,18 @@ Notes for whoever (human or Claude) picks this repo up next.
 
 ## What this repo is
 
-A single-page HTML "field manual" teaching how to build an application end-to-end — frontend, backend, database, auth/OTP, secrets management, email delivery, file storage/CDN, VMs, load balancers/autoscaling, domains, CI/CD, monitoring, security, and compliance (including India-specific: DPDP Act 2023, CERT-In). It is a teaching document, not a runnable app.
+A multi-page HTML "field manual" teaching how to build an application end-to-end — frontend, backend, database (structure, scaling, and attacks), auth/OTP, secrets management, email delivery, file storage/CDN, VMs, load balancers/autoscaling, domains, CI/CD, monitoring, security, and compliance (including India-specific: DPDP Act 2023, CERT-In). It is a teaching document, not a runnable app.
 
-Primary file: [`docs/how-to-build-an-application.html`](docs/how-to-build-an-application.html). Companion reference: [`docs/security/master_cybersecurity_checks_resources.html`](docs/security/master_cybersecurity_checks_resources.html) (a local copy of a 103-row security standards/tooling catalog the user supplied; the manual's checklist items cite rows from it by standard name, e.g. `OWASP API Security · BOLA`, `CWE-89`).
+Landing page: [`docs/how-to-build-an-application.html`](docs/how-to-build-an-application.html) (hero + "how to use this manual" + a full directory of every stage). Each stage is its own HTML file (`docs/01-plan-and-threat-model.html` through `docs/18-worked-backend-example.html` — see README.md for the full list), sharing one CSS/JS design system generated from a single source of truth (see "Multi-page structure" below). Companion reference: [`docs/security/master_cybersecurity_checks_resources.html`](docs/security/master_cybersecurity_checks_resources.html) (a local copy of a 103-row security standards/tooling catalog the user supplied; Stage 17 explains and links every row individually instead of just embedding this file, and the manual's inline checklist items cite rows from it by standard name, e.g. `OWASP API Security · BOLA`, `CWE-89`).
+
+## Multi-page structure — how it's generated
+
+The manual was originally one long single-page HTML file, then split into one file per stage at the user's request ("frontend on the next page, backend next page, other things to the next page"). The split was done with a Node script (not committed to the repo — it was a one-off scratch tool) that:
+1. Parsed the single-page source for its shared `<style>` block, the hero markup, and each `<section class="stage" id="sN">...</section>` block.
+2. Wrote one HTML file per section into `docs/`, each with the full shared CSS/JS inlined (progress bar, mobile drawer, scroll-reveal, back-to-top, TOC filter — same behavior as the original, minus the in-page scroll-spy since each page is now one section), a rail nav listing every page with the current page's link marked `active` at generation time (no runtime detection needed), and a prev/next footer nav computed from stage order.
+3. The landing page (`how-to-build-an-application.html`) additionally gets the hero and a generated "full contents" grid linking every stage with its number and one-line dek.
+
+If asked to regenerate all pages from a single edited source, or to add a new stage: either hand-edit each affected file directly (they're independent, self-contained HTML files — no build step, no shared included files), or rewrite a similar one-off Node script if bulk-regenerating from a merged source is easier. There is no persistent build pipeline by design — these are meant to stay plain, dependency-free HTML files.
 
 ## History / how this ended up this way
 

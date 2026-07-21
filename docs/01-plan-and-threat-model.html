@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>How to use this manual — Field Manual</title>
+<title>Plan & threat-model first — Field Manual</title>
 <style>
 
 :root{
@@ -311,11 +311,11 @@ mark{background:var(--accent-dim); color:var(--text); border-radius:2px; padding
   <div class="toc" id="toc">
     <div class="toc-group">
       <div class="toc-group-title">Orientation</div>
-      <a href="how-to-build-an-application.html" class="active"><span class="dot"></span>How to use this manual</a>
+      <a href="how-to-build-an-application.html" class=""><span class="dot"></span>How to use this manual</a>
     </div>
     <div class="toc-group">
       <div class="toc-group-title">Design the thing</div>
-      <a href="01-plan-and-threat-model.html" class=""><span class="dot"></span>Plan & threat-model first</a>
+      <a href="01-plan-and-threat-model.html" class="active"><span class="dot"></span>Plan & threat-model first</a>
     </div>
     <div class="toc-group">
       <div class="toc-group-title">Build it</div>
@@ -354,53 +354,47 @@ mark{background:var(--accent-dim); color:var(--text); border-radius:2px; padding
 
 <main>
 
-<div class="hero">
-  <div class="eyebrow">Field Manual · 2026 Edition</div>
-  <h1>Building an application, ground up</h1>
-  <p class="lede">Everything between "I have an idea" and "it's live, it scales, and it doesn't leak" — frontend, backend, database, auth, email/OTP, secrets, storage, CDN, VMs, load balancers, domains, monitoring, and the security practice threaded through all of it.</p>
-  <div class="meta">
-    <span><b>Scope:</b> web application, mobile-ready API</span>
-    <span><b>Audience:</b> first build → senior/staff level</span>
-    <span><b>Region notes:</b> India-specific compliance &amp; providers called out inline</span>
-    <span><b>Companion:</b> <a href="security/master_cybersecurity_checks_resources.html">full 103-item security resource catalog</a></span>
-  </div>
-</div>
+<section class="stage" id="s1">
+  <div class="stage-head reveal"><span class="stage-num">01</span><h2>Plan &amp; threat-model first</h2></div>
+  <p class="dek reveal">Before a line of code: what are you building, who is it for, and what happens if it's attacked or it fails?</p>
 
-<section class="stage" id="s0">
-  <div class="stage-head reveal"><span class="stage-num">00</span><h2>How to use this manual</h2></div>
-  <p class="dek reveal">This is one continuous build, told in the order you actually do it. Each stage ends with a <b>security checklist</b> (amber) tying that stage to a named standard, and — where relevant — an <b>India note</b> (teal) on providers, compliance, or market conventions. Skim top to bottom the first time; come back to individual stages as a reference once you're building for real.</p>
-  <div class="callout reveal">
-    <div class="ctitle">A rule that saves every stage below</div>
-    <p>Security is not a stage you do after building — it's a property you decide on <i>while</i> building, at the same moment you decide how a feature works. Every checklist below sits inside the stage it belongs to, not bolted on at the end, because that's the only place it's cheap to apply.</p>
-  </div>
-</section>
+  <h3 class="reveal">Define the thing in one paragraph</h3>
+  <p class="reveal">Write down: who the user is, the one core action they take (post a photo, book a slot, send money), and what "done" looks like for v1. Everything you add beyond this is scope creep until v1 ships and has real users.</p>
 
-<section class="stage reveal" id="landing-index">
-  <div class="stage-head"><h2>Full contents</h2></div>
-  <p class="dek">Every stage, in build order. Start at 01 if you're building for the first time.</p>
-  <div class="landing-grid">
-    <a class="landing-card" href="01-plan-and-threat-model.html"><span class="lc-num">01</span><h4>Plan & threat-model first</h4><p>Before a line of code: what are you building, who is it for, and what happens if it's attacked or it fails?</p></a>
-    <a class="landing-card" href="02-frontend.html"><span class="lc-num">02</span><h4>Frontend</h4><p>The part users touch. Optimize for clarity of state (loading / error / empty / success) before you optimize for visual polish.</p></a>
-    <a class="landing-card" href="03-backend-api.html"><span class="lc-num">03</span><h4>Backend & API</h4><p>The part that enforces the rules the frontend merely suggests. Assume every request is hostile and check anyway.</p></a>
-    <a class="landing-card" href="04-database.html"><span class="lc-num">04</span><h4>Database — structure, scaling, and how it actually gets hacked</h4><p>Get the schema and indexes right early — migrating a live table under load is the least fun afternoon in software. This stage also covers what happens once one database isn't enough, and how a database is actually attacked, step by step.</p></a>
-    <a class="landing-card" href="05-auth-otp-secrets.html"><span class="lc-num">05</span><h4>Auth, OTP & the password wallet</h4><p>Two different "password wallets" get confused constantly — get the distinction straight before building either.</p></a>
-    <a class="landing-card" href="06-email-otp-delivery.html"><span class="lc-num">06</span><h4>Email / OTP delivery</h4><p>Generating the OTP is the easy 10%. Getting the email to actually land in an inbox instead of spam is the other 90%.</p></a>
-    <a class="landing-card" href="07-storage-cdn.html"><span class="lc-num">07</span><h4>File storage & the CDN</h4><p>User-uploaded images/videos and your static frontend assets don't belong on the same server that runs your API.</p></a>
-    <a class="landing-card" href="08-servers-vm.html"><span class="lc-num">08</span><h4>Servers & the VM</h4><p>No containers here by design — plain virtual machines, hardened directly, so the operating-system layer isn't a black box.</p></a>
-    <a class="landing-card" href="09-load-balancing-autoscaling.html"><span class="lc-num">09</span><h4>Load balancers & autoscaling</h4><p>The mechanism that turns "one VM that falls over on a busy Tuesday" into "traffic that just gets absorbed."</p></a>
-    <a class="landing-card" href="10-domains-dns.html"><span class="lc-num">10</span><h4>Domain names & DNS</h4><p>The address people type, and the records that tell the internet where to send them.</p></a>
-    <a class="landing-card" href="11-cicd.html"><span class="lc-num">11</span><h4>CI/CD pipelines</h4><p>The automated path from "I pushed a commit" to "it's safely running in production."</p></a>
-    <a class="landing-card" href="12-monitoring-incident-response.html"><span class="lc-num">12</span><h4>Monitoring & incident response</h4><p>You find out about most real problems from a dashboard or an alert, not a user's angry email — if you've set it up.</p></a>
-    <a class="landing-card" href="13-security-checklist.html"><span class="lc-num">13</span><h4>Security hardening checklist — the consolidated view</h4><p>Every amber box above, gathered in one pass, organized by domain instead of by build stage — use this as your pre-launch pass.</p></a>
-    <a class="landing-card" href="14-compliance.html"><span class="lc-num">14</span><h4>Compliance & governance, including India</h4><p>Standards you adopt voluntarily for maturity, and rules you must follow because you operate in a given market.</p></a>
-    <a class="landing-card" href="15-skill-roadmap.html"><span class="lc-num">15</span><h4>Skill roadmap: junior → staff</h4><p>What "more senior" actually means in this stack, stage by stage.</p></a>
-    <a class="landing-card" href="16-glossary.html"><span class="lc-num">16</span><h4>Glossary</h4><p></p></a>
-    <a class="landing-card" href="17-full-resource-catalog.html"><span class="lc-num">17</span><h4>Full resource catalog, explained</h4><p>All 103 entries from the source catalog, grouped by what they're actually for, each with a plain-language explanation and a direct link — not just a reprint of the raw table. This is the reference every STD tag earlier in this manual points back to.</p></a>
-    <a class="landing-card" href="18-worked-backend-example.html"><span class="lc-num">18</span><h4>A backend, file by file — then an AI security audit</h4><p>Everything above has been explained concept-first. This stage does it code-first: one concrete backend file tree, what each file actually does and why it earns its place, then the exact process for having an AI (or a human) audit the finished code against the catalog above.</p></a>
+  <h3 class="reveal">Sketch the architecture before the code</h3>
+  <pre class="mono reveal">Browser/App  →  CDN (static assets, images)
+                 │
+                 ▼
+             Load Balancer  →  App servers (VMs, autoscaled)
+                                  │
+                    ┌─────────────┼─────────────┐
+                    ▼             ▼             ▼
+               Database      Object storage   Email/OTP
+               (Postgres)     (S3-like)        service
+                    │
+               Secrets manager (the "password wallet"
+               for the app itself, not for end users)</pre>
+
+  <h3 class="reveal">Threat-model in five questions</h3>
+  <ul class="reveal">
+    <li>What data would hurt someone if it leaked? (passwords, phone numbers, payment info, private messages)</li>
+    <li>Who can call each endpoint, and what stops them calling it for <i>someone else's</i> data?</li>
+    <li>What happens if this service gets 100x the traffic in an hour?</li>
+    <li>What happens if a dependency (npm package, cloud provider, email vendor) is compromised?</li>
+    <li>Who gets paged when something breaks at 2 a.m., and how do they know?</li>
+  </ul>
+
+  <div class="security reveal">
+    <div class="ctitle">Security checklist — planning</div>
+    <ul>
+      <li>Do a lightweight STRIDE or attacker-goal pass on your architecture sketch before writing code <span class="std">MITRE ATT&amp;CK</span></li>
+      <li>Decide your data classification (public / internal / sensitive / secret) up front — it drives every later encryption and access decision <span class="std">NIST CSF</span></li>
+      <li>Write your incident-response contact and escalation path before you need it, not during an incident <span class="std">FIRST</span></li>
+    </ul>
   </div>
 </section>
 
-<div class="page-nav reveal"><span></span><a class="page-nav-link next" href="01-plan-and-threat-model.html"><span class="page-nav-label">Next &rarr;</span><span class="page-nav-title">Plan & threat-model first</span></a></div>
+<div class="page-nav reveal"><a class="page-nav-link prev" href="how-to-build-an-application.html"><span class="page-nav-label">&larr; Previous</span><span class="page-nav-title">How to use this manual</span></a><a class="page-nav-link next" href="02-frontend.html"><span class="page-nav-label">Next &rarr;</span><span class="page-nav-title">Frontend</span></a></div>
 
 <div class="divider"></div>
 <footer>
