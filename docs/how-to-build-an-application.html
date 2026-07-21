@@ -303,7 +303,7 @@ mark{background:var(--accent-dim); color:var(--text); border-radius:2px; padding
       <div class="toc-group-title">Build it</div>
       <a href="#s2"><span class="dot"></span>Frontend</a>
       <a href="#s3"><span class="dot"></span>Backend &amp; API</a>
-      <a href="#s4"><span class="dot"></span>Database</a>
+      <a href="#s4"><span class="dot"></span>Database: structure, scaling &amp; hacking</a>
       <a href="#s5"><span class="dot"></span>Auth, OTP &amp; the password wallet</a>
       <a href="#s6"><span class="dot"></span>Email / OTP delivery</a>
       <a href="#s7"><span class="dot"></span>File storage &amp; the CDN</a>
@@ -489,13 +489,13 @@ async function deletePost(req, res) {
 </section>
 
 <section class="stage" id="s4">
-  <div class="stage-head reveal"><span class="stage-num">04</span><h2>Database</h2></div>
-  <p class="dek reveal">Get the schema and indexes right early — migrating a live table under load is the least fun afternoon in software.</p>
+  <div class="stage-head reveal"><span class="stage-num">04</span><h2>Database — structure, scaling, and how it actually gets hacked</h2></div>
+  <p class="dek reveal">Get the schema and indexes right early — migrating a live table under load is the least fun afternoon in software. This stage also covers what happens once one database isn't enough, and how a database is actually attacked, step by step.</p>
 
   <h3 class="reveal">Relational by default</h3>
   <p class="reveal"><b>PostgreSQL</b> is the right default for almost everything with users, relationships, and money-adjacent data. Reach for a document store (MongoDB) or a cache (Redis) only when you have a specific access pattern that relational modeling actively fights — not because it feels more modern.</p>
 
-  <h3 class="reveal">Index what you query by, constrain what must be unique</h3>
+  <h3 class="reveal">Structure: index what you query by, constrain what must be unique</h3>
   <pre class="mono reveal">model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -510,21 +510,85 @@ model Follow {
   @@id([followerId, followingId])   // prevents duplicate follows at the DB level
   @@index([followingId])            // fast "who follows me" lookups
 }</pre>
+  <p class="reveal">Three structural decisions matter more than the rest: normalize until duplication would cause a real bug (a user's email lives in one place, not copied onto every post), index every column you filter or sort by in a hot query path, and put a uniqueness constraint at the database level for anything that must never collide — application-code checks alone have a race-condition window between "check" and "insert" that a real database constraint closes for free.</p>
 
   <div class="callout reveal">
     <div class="ctitle">Migrations discipline</div>
     <p>Every schema change is a migration file, checked into git, applied the same way in every environment (local → staging → production). Never hand-edit a production schema through a GUI — you lose the ability to reproduce it.</p>
   </div>
 
+  <h3 class="reveal">Scaling: what happens after one database isn't enough</h3>
+  <p class="reveal">Alex Xu's <i>System Design Interview</i> lays out the standard progression clearly (Chapter 1, "Scale From Zero To Millions Of Users") — the order below is that same progression, applied to the database tier specifically:</p>
+  <ol class="reveal">
+    <li><b>Vertical scaling first</b> — a bigger machine (more CPU/RAM/IOPS). Simplest option, and the right first move; it has a ceiling and a single point of failure, but it buys time without adding architectural complexity.</li>
+    <li><b>Read replicas</b> — one writable "leader" database and one or more read-only "follower" copies kept in sync via replication. Reads (which usually outnumber writes many times over on a social app's feed) get spread across followers; only writes hit the leader. If the leader goes down, a follower can be promoted — this is also your first real answer to "what if the database dies."</li>
+    <li><b>Caching in front of the database</b> — a cache-aside pattern (check Redis/Memcached first, fall through to Postgres on a miss, populate the cache after) removes repeat reads from the database entirely. An expiration policy (TTL) plus an eviction policy (commonly LRU) keeps the cache bounded and roughly fresh.</li>
+    <li><b>Sharding (horizontal scaling)</b> — once a single leader can't hold or serve the whole dataset, split the table's rows across multiple independent databases ("shards") using a <b>sharding key</b> (e.g. <code>userId</code>) that decides which shard a given row lives on. Every shard has the same schema; the data on each is different.</li>
+  </ol>
+
+  <div class="callout reveal">
+    <div class="ctitle">What sharding costs you (also straight from Chapter 1)</div>
+    <p>Sharding is a real technique, not a free upgrade. It introduces three concrete problems: <b>resharding</b> — what happens when one shard outgrows its capacity or a bad sharding key produces an uneven split, forcing you to move data and update the routing logic while live; the <b>hotspot/celebrity problem</b> — a poorly chosen key can dump disproportionate traffic on one shard (one extremely active user's data hammering a single shard while others sit idle); and <b>cross-shard queries</b> — a join or aggregate that used to be one query across one table now has to fan out across many shards and merge results in application code.</p>
+  </div>
+
+  <p class="reveal"><b>Consistent hashing</b> (Chapter 5 of the same book) is the standard fix for the resharding problem specifically: instead of a naive <code>hash(key) % N</code> (where adding or removing one server reshuffles almost everything), servers and keys are placed on a conceptual ring by hash value, and each key belongs to the next server clockwise from it. Adding or removing a server then only affects its immediate neighbors on the ring, not the entire dataset — this is the same idea behind how a load balancer distributes requests and how a distributed cache decides which node holds which key.</p>
+
+  <h3 class="reveal">Beyond a single relational database: how distributed stores stay correct</h3>
+  <p class="reveal">If you ever move part of your data into a distributed key-value store (Cassandra, DynamoDB, Riak — the subject of Chapter 6, "Design A Key-Value Store"), a few ideas from that world explain <i>why</i> those systems behave the way they do, and they're worth recognizing even if Postgres is all you use:</p>
+  <div class="grid2 reveal">
+    <div class="card"><h4>CAP theorem</h4><p>During a network partition, a distributed system must choose between Consistency (every read sees the latest write) and Availability (every request gets a response). You can't fully have both at once — most key-value stores are tuned toward one side (CP or AP) and let you tune per-operation.</p></div>
+    <div class="card"><h4>Quorum consensus (N/W/R)</h4><p>Data is replicated to N nodes; a write must be acknowledged by W of them, a read must query R of them. Picking W+R > N guarantees every read sees at least one copy of the latest write — a tunable knob between consistency and latency.</p></div>
+    <div class="card"><h4>Vector clocks</h4><p>When two replicas accept conflicting writes during a partition, a vector clock records which version "happened before" another, so the system (or the app) can detect and resolve the conflict instead of silently picking one write and losing the other.</p></div>
+    <div class="card"><h4>Gossip protocol &amp; hinted handoff</h4><p>Nodes tell each other which peers are up or down (gossip), so the system detects a failed node without a central coordinator. If a node is briefly unreachable, another node temporarily holds ("hints at") the writes meant for it and hands them off once it's back — a temporary failure doesn't become a permanent data loss.</p></div>
+  </div>
+
+  <h3 class="reveal">The hacking side: how a database actually gets breached</h3>
+  <p class="reveal">Every step below is a real, common attack chain — not a hypothetical. Each one maps to a specific, fixable cause.</p>
+
+  <h4 style="margin:22px 0 8px; font-size:15px; color:var(--accent-2);" class="reveal mono">1. SQL injection — the classic</h4>
+  <pre class="mono reveal">// Vulnerable: user input concatenated straight into the query string
+const query = `SELECT * FROM users WHERE username = '${input}'`;
+// An attacker submits:  ' OR '1'='1
+// The query the database actually runs becomes:
+//   SELECT * FROM users WHERE username = '' OR '1'='1'
+// which matches every row in the table, not zero.</pre>
+  <p class="reveal">This is how it proceeds in a real attack: the attacker first tries a single quote in every input field and watches for a database error in the response — that error is confirmation the input reaches a raw query. From there they use <code>UNION SELECT</code> to pull columns from <i>other</i> tables (like a <code>password_hash</code> column no one meant to expose), then time-based or boolean-based blind techniques to extract data one bit at a time even when the app shows no visible error. The fix is not "sanitize the input" — it's structural: <b>parameterized queries / an ORM</b> that always sends user input as data, never as part of the SQL text, so there is no string for an attacker to break out of. Stage 03 and the worked example in Stage 18 both build on this.</p>
+
+  <h4 style="margin:22px 0 8px; font-size:15px; color:var(--accent-2);" class="reveal mono">2. Excessive privilege turns a small bug into a total breach</h4>
+  <p class="reveal">The injection above is only catastrophic if the database user the app connects as <i>can</i> read every table, drop tables, or read other databases on the same instance. A properly scoped, least-privilege app user — one that can only touch the specific tables/rows the app needs, with no <code>DROP</code>/<code>ALTER</code> permission — turns "attacker can run arbitrary SQL" into "attacker can still only see what the app itself could see," which is a much smaller blast radius. This is the single highest-leverage database security control that isn't about the query at all.</p>
+
+  <h4 style="margin:22px 0 8px; font-size:15px; color:var(--accent-2);" class="reveal mono">3. A database left reachable from the public internet</h4>
+  <p class="reveal">If a database has a public IP and its firewall allows inbound connections from anywhere, an attacker doesn't need an application bug at all — they scan for open database ports directly, then try default/leaked credentials. This is exactly why Stage 08/09 puts the database in a <b>private subnet</b> reachable only from the app tier's security group: there is no network path to attack from the outside, regardless of how the credentials leak.</p>
+
+  <h4 style="margin:22px 0 8px; font-size:15px; color:var(--accent-2);" class="reveal mono">4. Leaked credentials or a leaked backup</h4>
+  <p class="reveal">A database password committed to git, pasted into a support ticket, or sitting in an unencrypted backup file in a misconfigured public storage bucket is functionally the same breach as a successful injection attack — the attacker just connects directly with valid credentials. This is why Stage 05/13 insists secrets live in a secrets manager (never in source), and why backups need both encryption at rest and access controls at least as strict as the live database's.</p>
+
+  <h4 style="margin:22px 0 8px; font-size:15px; color:var(--accent-2);" class="reveal mono">5. NoSQL injection (the document-database version)</h4>
+  <pre class="mono reveal">// Vulnerable: a MongoDB query built from raw, unvalidated request input
+db.users.find({ username: req.body.username, password: req.body.password });
+// An attacker sends password as an OBJECT instead of a string:
+//   { "username": "alice", "password": { "$ne": null } }
+// "$ne": null means "not equal to null" — true for any real password hash,
+// so the query matches alice's account with no valid password at all.</pre>
+  <p class="reveal">The fix is the same principle as SQL injection: never let raw client input become part of a query's structure. A strict schema validator (Stage 03's zod example) that rejects a password field unless it's a plain string closes this before it ever reaches the database driver.</p>
+
+  <h4 style="margin:22px 0 8px; font-size:15px; color:var(--accent-2);" class="reveal mono">6. Lateral movement from a compromised app server</h4>
+  <p class="reveal">If an attacker compromises the app server itself (through an unrelated bug — a vulnerable dependency, an exposed debug endpoint), the database credentials sitting in that process's environment variables let them pivot straight to the database with full app-level access. Least-privilege DB users, short-lived/rotated credentials, and network segmentation (Stage 08/09) all limit what that pivot actually gains an attacker, which is why no single control on this list is sufficient alone — they're layered on purpose.</p>
+
   <div class="security reveal">
     <div class="ctitle">Security checklist — database</div>
     <ul>
-      <li>Encrypt at rest (most managed databases do this by default — verify it's actually on) <span class="std">NIST Cryptographic Standards</span></li>
-      <li>Least-privilege DB user for the app — it should not have permission to drop tables or read other databases on the instance <span class="std">CIS Benchmarks</span></li>
-      <li>Automated backups with a tested restore procedure — an untested backup is a hope, not a plan <span class="std">NIST CSF · Recover</span></li>
-      <li>Put the database in a private subnet with no public IP; only the app tier's security group can reach it <span class="std">CSA Cloud Controls Matrix</span></li>
+      <li>Parameterized queries / an ORM everywhere — never build a query by concatenating a string <span class="std">CWE-89</span></li>
+      <li>Strict schema validation on any field that reaches a query, including document-store queries — rejects operator-injection payloads like <code>$ne</code>/<code>$where</code> <span class="std">CWE-943</span></li>
+      <li>Least-privilege DB user for the app — cannot drop tables or read other databases on the instance <span class="std">CIS Benchmarks</span></li>
+      <li>Encrypt at rest, including backups/snapshots (most managed databases do this by default — verify it's actually on) <span class="std">NIST Cryptographic Standards</span></li>
+      <li>Automated backups with a <i>tested</i> restore procedure — an untested backup is a hope, not a plan <span class="std">NIST CSF · Recover</span></li>
+      <li>Database in a private subnet with no public IP; only the app tier's security group can reach it <span class="std">CSA Cloud Controls Matrix</span></li>
+      <li>Credentials in a secrets manager, rotated on a schedule — never in source, never in an unencrypted backup <span class="std">CWE-798</span></li>
     </ul>
   </div>
+
+  <p class="reveal appendix-note">Scaling and distributed-systems concepts in this stage (replication, sharding, consistent hashing, quorum/vector clocks/gossip) are referenced from Alex Xu's <i>System Design Interview: An Insider's Guide</i>, Chapters 1, 5, and 6 — read those chapters directly for the full depth (diagrams, numeric examples, and interview framing) this summary necessarily leaves out.</p>
 </section>
 
 <section class="stage" id="s5">
