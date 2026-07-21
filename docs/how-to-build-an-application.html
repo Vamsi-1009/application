@@ -6,218 +6,286 @@
 <title>Building an Application, Ground Up — A Field Manual</title>
 <style>
 :root{
-  --bg:#0b1320;
-  --bg-grid: rgba(95,212,208,0.045);
-  --panel:#101b2d;
-  --panel-2:#0d1726;
-  --line:#243349;
-  --line-soft:#1a2740;
-  --text:#e8edf5;
-  --muted:#93a2ba;
-  --muted-2:#5f7291;
+  --bg:#0a0f18;
+  --bg-grid: rgba(95,212,208,0.05);
+  --panel:#111a29;
+  --panel-2:#0d1522;
+  --line:#233047;
+  --line-soft:#182238;
+  --text:#eef2f8;
+  --muted:#a2b0c7;
+  --muted-2:#64789a;
   --accent:#ff8a3d;
+  --accent-soft: rgba(255,138,61,0.12);
   --accent-dim:#8a4c26;
   --accent-2:#5fd4d0;
+  --accent-2-soft: rgba(95,212,208,0.12);
   --accent-2-dim:#2c5b59;
-  --danger:#ff6b6b;
-  --ok:#63d99a;
-  --code-bg:#0a1220;
-  --shadow: 0 1px 0 rgba(255,255,255,0.03) inset;
+  --code-bg:#080d16;
+  --shadow-1: 0 8px 24px -12px rgba(0,0,0,0.5);
+  --dur-fast: 160ms;
+  --dur: 420ms;
+  --ease: cubic-bezier(.22,.85,.32,1);
 }
 :root[data-theme="light"]{
-  --bg:#f4f2ec;
-  --bg-grid: rgba(20,60,58,0.045);
+  --bg:#f6f3ec;
+  --bg-grid: rgba(20,60,58,0.05);
   --panel:#ffffff;
-  --panel-2:#faf8f2;
-  --line:#ddd6c4;
-  --line-soft:#e7e1d2;
-  --text:#1c2230;
-  --muted:#5a6274;
-  --muted-2:#8b8f7e;
+  --panel-2:#fbf8f1;
+  --line:#e0d9c7;
+  --line-soft:#ece6d7;
+  --text:#1d2330;
+  --muted:#565f75;
+  --muted-2:#8a8a76;
   --accent:#c85a1e;
+  --accent-soft: rgba(200,90,30,0.09);
   --accent-dim:#f0d3bb;
   --accent-2:#0e7b76;
+  --accent-2-soft: rgba(14,123,118,0.09);
   --accent-2-dim:#cfe9e7;
-  --danger:#c0392b;
-  --ok:#1f7a4d;
-  --code-bg:#efece3;
-  --shadow: 0 1px 0 rgba(0,0,0,0.03) inset;
+  --code-bg:#efece1;
+  --shadow-1: 0 8px 24px -14px rgba(30,20,10,0.25);
 }
 @media (prefers-color-scheme: light){
   :root:not([data-theme="dark"]){
-    --bg:#f4f2ec;
-    --bg-grid: rgba(20,60,58,0.045);
-    --panel:#ffffff;
-    --panel-2:#faf8f2;
-    --line:#ddd6c4;
-    --line-soft:#e7e1d2;
-    --text:#1c2230;
-    --muted:#5a6274;
-    --muted-2:#8b8f7e;
-    --accent:#c85a1e;
-    --accent-dim:#f0d3bb;
-    --accent-2:#0e7b76;
-    --accent-2-dim:#cfe9e7;
-    --danger:#c0392b;
-    --ok:#1f7a4d;
-    --code-bg:#efece3;
+    --bg:#f6f3ec; --bg-grid: rgba(20,60,58,0.05); --panel:#ffffff; --panel-2:#fbf8f1;
+    --line:#e0d9c7; --line-soft:#ece6d7; --text:#1d2330; --muted:#565f75; --muted-2:#8a8a76;
+    --accent:#c85a1e; --accent-soft: rgba(200,90,30,0.09); --accent-dim:#f0d3bb;
+    --accent-2:#0e7b76; --accent-2-soft: rgba(14,123,118,0.09); --accent-2-dim:#cfe9e7;
+    --code-bg:#efece1; --shadow-1: 0 8px 24px -14px rgba(30,20,10,0.25);
   }
 }
 
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}
+}
 body{
   margin:0;
-  background:
-    linear-gradient(var(--bg-grid) 1px, transparent 1px) 0 0/42px 42px,
-    linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px) 0 0/42px 42px,
-    var(--bg);
+  background:var(--bg);
   color:var(--text);
   font-family: "Iowan Old Style","Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;
-  line-height:1.65;
-  font-size:17px;
+  line-height:1.7;
+  font-size:17.5px;
+  -webkit-font-smoothing:antialiased;
 }
 .mono{font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;}
-h1,h2,h3,.label,.eyebrow,.tag,nav a,th, .stage-num{
+h1,h2,h3,.label,.eyebrow,nav a,th,.stage-num,#progress-fill,.rail-head .title{
   font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
 }
-h1,h2,h3{text-wrap:balance; font-weight:600; letter-spacing:-0.01em;}
+h1,h2,h3{text-wrap:balance; font-weight:600; letter-spacing:-0.01em; color:var(--text);}
 
-a{color:var(--accent-2)}
+a{color:var(--accent-2); text-decoration-color: var(--accent-2-dim); text-underline-offset:3px; transition:color var(--dur-fast) var(--ease);}
 a:hover{color:var(--accent)}
-:focus-visible{outline:2px solid var(--accent-2); outline-offset:2px}
+:focus-visible{outline:2px solid var(--accent-2); outline-offset:3px; border-radius:2px;}
+
+/* ---------- reading progress bar ---------- */
+#progress-track{position:fixed; top:0; left:0; width:100%; height:3px; background:transparent; z-index:60;}
+#progress-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--accent-2),var(--accent)); transition:width 80ms linear;}
+
+/* ---------- mobile top bar ---------- */
+.mobile-bar{
+  display:none; position:sticky; top:0; z-index:50; align-items:center; justify-content:space-between;
+  padding:12px 18px; background:var(--panel-2); border-bottom:1px solid var(--line);
+}
+.mobile-bar .title{font-size:13px; letter-spacing:0.05em; text-transform:uppercase;}
+.mobile-bar button{
+  background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:6px;
+  padding:7px 12px; font-size:12.5px; font-family:"SFMono-Regular",monospace; cursor:pointer;
+}
+@media (max-width: 980px){ .mobile-bar{display:flex;} }
 
 /* ---------- shell layout ---------- */
-.shell{display:grid; grid-template-columns: 300px minmax(0,1fr); min-height:100vh;}
-@media (max-width: 980px){ .shell{grid-template-columns: 1fr;} .rail{display:none;} }
+.shell{display:grid; grid-template-columns: 296px minmax(0,1fr); min-height:100vh; align-items:start;}
 
 .rail{
   position:sticky; top:0; height:100vh; overflow-y:auto;
   border-right:1px solid var(--line);
   background:var(--panel-2);
   padding:0 0 40px;
+  scrollbar-width:thin;
 }
-.rail-head{padding:22px 20px 14px; border-bottom:1px solid var(--line-soft);}
+
+/* Mobile overrides MUST come after the base .shell/.rail rules above so
+   they win the cascade at equal specificity (media queries don't add
+   specificity — only source order decides ties). */
+@media (max-width: 980px){
+  .shell{grid-template-columns: 1fr;}
+  .rail{
+    position:fixed; inset:0 auto 0 0; width:296px; max-width:86vw; height:100vh; z-index:55;
+    transform:translateX(-100%); transition:transform var(--dur) var(--ease);
+    box-shadow:var(--shadow-1);
+  }
+  .rail.open{transform:translateX(0);}
+  .rail-scrim{
+    position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:54; opacity:0;
+    pointer-events:none; transition:opacity var(--dur) var(--ease);
+  }
+  .rail-scrim.open{opacity:1; pointer-events:auto;}
+}
+.rail-head{padding:22px 20px 16px; border-bottom:1px solid var(--line-soft);}
 .rail-head .mark{display:flex; align-items:center; gap:10px;}
 .rail-head .mark svg{flex:none}
-.rail-head .title{font-size:13px; letter-spacing:0.06em; color:var(--text); text-transform:uppercase;}
-.rail-head .subtitle{margin-top:4px; font-size:12.5px; color:var(--muted); font-family:inherit; letter-spacing:0.02em;}
+#blueprint-path{stroke-dasharray:60; stroke-dashoffset:60; animation:draw 1100ms var(--ease) 200ms forwards;}
+#blueprint-path2{stroke-dasharray:30; stroke-dashoffset:30; animation:draw 900ms var(--ease) 700ms forwards;}
+@keyframes draw{to{stroke-dashoffset:0;}}
+.rail-head .title{font-size:13px; letter-spacing:0.08em; color:var(--text); text-transform:uppercase;}
+.rail-head .subtitle{margin-top:6px; font-size:12.5px; color:var(--muted); font-family:inherit; letter-spacing:0.01em; line-height:1.5;}
 
 .search-wrap{padding:14px 20px;}
 #nav-search{
   width:100%; padding:9px 11px; border-radius:6px; border:1px solid var(--line);
   background:var(--panel); color:var(--text); font-size:13px; font-family:"SFMono-Regular",Consolas,monospace;
+  transition:border-color var(--dur-fast) var(--ease);
 }
+#nav-search:focus{border-color:var(--accent-2);}
 #nav-search::placeholder{color:var(--muted-2)}
 
-.toc{padding:4px 10px 0;}
-.toc-group{margin-bottom:2px;}
+.toc{padding:4px 8px 0; position:relative;}
+.toc-group{margin-bottom:2px; position:relative;}
 .toc-group-title{
   font-size:10.5px; letter-spacing:0.12em; color:var(--muted-2); text-transform:uppercase;
-  padding:14px 10px 6px;
+  padding:16px 12px 6px;
 }
+.toc-line{position:absolute; left:20px; top:6px; bottom:6px; width:1px; background:var(--line);}
 .toc a{
-  display:flex; gap:9px; align-items:baseline; padding:6px 10px; border-radius:5px;
-  font-size:12.6px; color:var(--muted); text-decoration:none; letter-spacing:0.01em;
+  position:relative; display:flex; gap:10px; align-items:center; padding:7px 12px 7px 10px; border-radius:6px;
+  font-size:12.8px; color:var(--muted); text-decoration:none; letter-spacing:0.01em;
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), padding-left var(--dur-fast) var(--ease);
 }
-.toc a:hover{background:var(--panel); color:var(--text);}
-.toc a .n{color:var(--muted-2); font-size:11px; min-width:1.6em;}
+.toc a:hover{background:var(--panel); color:var(--text); padding-left:14px;}
+.toc a .dot{
+  flex:none; width:7px; height:7px; border-radius:50%; background:var(--line); border:1px solid var(--muted-2);
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
 .toc a.active{background:var(--line-soft); color:var(--accent-2);}
+.toc a.active .dot{background:var(--accent-2); border-color:var(--accent-2); box-shadow:0 0 0 3px var(--accent-2-soft); transform:scale(1.15);}
 
 /* ---------- main content ---------- */
-main{padding: 54px 8vw 100px; max-width: 900px;}
-.hero{border-bottom:1px solid var(--line); padding-bottom:32px; margin-bottom:44px;}
+main{padding: 64px 8vw 100px; max-width: 900px;}
+.hero{border-bottom:1px solid var(--line); padding-bottom:36px; margin-bottom:52px; position:relative;}
 .eyebrow{
-  display:inline-flex; align-items:center; gap:8px; font-size:11.5px; letter-spacing:0.14em;
-  color:var(--accent); text-transform:uppercase; margin-bottom:16px;
+  display:inline-flex; align-items:center; gap:10px; font-size:11.5px; letter-spacing:0.16em;
+  color:var(--accent); text-transform:uppercase; margin-bottom:18px;
+  opacity:0; animation: fade-up 700ms var(--ease) 80ms forwards;
 }
-.eyebrow::before{content:""; width:18px; height:1px; background:var(--accent);}
-.hero h1{font-size:clamp(28px,4vw,42px); margin:0 0 16px; color:var(--text);}
-.hero p.lede{color:var(--muted); font-size:18px; max-width:62ch; margin:0 0 22px;}
-.hero .meta{display:flex; flex-wrap:wrap; gap:10px 22px; font-size:12.5px; color:var(--muted-2); font-family:"SFMono-Regular",monospace;}
-.hero .meta b{color:var(--muted);}
+.eyebrow::before{content:""; width:0; height:1px; background:var(--accent); animation:grow-line 600ms var(--ease) 300ms forwards;}
+@keyframes grow-line{to{width:20px;}}
+.hero h1{font-size:clamp(30px,4.2vw,46px); margin:0 0 18px; opacity:0; animation: fade-up 800ms var(--ease) 180ms forwards;}
+.hero p.lede{color:var(--muted); font-size:18.5px; max-width:60ch; margin:0 0 24px; opacity:0; animation: fade-up 800ms var(--ease) 300ms forwards;}
+.hero .meta{display:flex; flex-wrap:wrap; gap:10px 24px; font-size:12.5px; color:var(--muted-2); font-family:"SFMono-Regular",monospace; opacity:0; animation: fade-up 800ms var(--ease) 420ms forwards;}
+.hero .meta b{color:var(--muted); font-weight:600;}
+@keyframes fade-up{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);}}
 
-section.stage{padding-top:10px; margin-bottom:64px; scroll-margin-top:24px;}
-.stage-head{display:flex; align-items:baseline; gap:16px; margin-bottom:6px;}
+section.stage{padding-top:14px; margin-bottom:76px; scroll-margin-top:24px;}
+.stage-head{display:flex; align-items:baseline; gap:16px; margin-bottom:8px;}
 .stage-num{font-size:13px; color:var(--accent-2); letter-spacing:0.04em;}
-.stage h2{font-size:26px; margin:0; color:var(--text);}
-.stage .dek{color:var(--muted); font-size:15.5px; margin:10px 0 26px; max-width:64ch;}
+.stage h2{font-size:27px; margin:0;}
+.stage .dek{color:var(--muted); font-size:16px; margin:12px 0 28px; max-width:62ch;}
 
-.stage h3{font-size:17px; color:var(--text); margin: 30px 0 10px; letter-spacing:0.01em;}
-.stage p, .stage li{color:var(--text); max-width:66ch;}
-.stage ul, .stage ol{padding-left:1.25em;}
-.stage li{margin-bottom:6px;}
-.stage li::marker{color:var(--accent-2); font-family:"SFMono-Regular",monospace; font-size:0.9em;}
+.stage h3{font-size:17.5px; margin: 34px 0 12px; letter-spacing:0.01em;}
+.stage p, .stage li{color:var(--text); max-width:64ch;}
+.stage ul, .stage ol{padding-left:1.3em;}
+.stage li{margin-bottom:7px;}
+.stage li::marker{color:var(--accent-2); font-family:"SFMono-Regular",monospace; font-size:0.88em;}
 
 pre{
-  background:var(--code-bg); border:1px solid var(--line); border-radius:8px;
-  padding:14px 16px; overflow-x:auto; font-size:13px; line-height:1.55;
-  box-shadow:var(--shadow);
+  background:var(--code-bg); border:1px solid var(--line); border-radius:9px;
+  padding:16px 18px; overflow-x:auto; font-size:13.2px; line-height:1.6;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
 }
 code{font-family:"SFMono-Regular",Consolas,Menlo,monospace;}
-p code, li code{background:var(--code-bg); border:1px solid var(--line-soft); border-radius:4px; padding:1px 6px; font-size:0.86em; color:var(--accent-2);}
+p code, li code{background:var(--code-bg); border:1px solid var(--line-soft); border-radius:4px; padding:1px 6px; font-size:0.85em; color:var(--accent-2);}
 
-.callout{
+.callout, .security, .india{
   border:1px solid var(--line); border-left:3px solid var(--accent-2);
-  background:var(--panel); border-radius:0 8px 8px 0; padding:16px 18px; margin:22px 0;
+  background:var(--panel); border-radius:0 10px 10px 0; padding:18px 20px; margin:24px 0;
+  transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
 }
-.callout .ctitle{font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent-2); margin-bottom:8px; font-family:"SFMono-Regular",monospace;}
-.callout p, .callout li{font-size:14.5px; margin:0 0 6px;}
+.callout:hover, .security:hover, .india:hover{transform:translateY(-2px); box-shadow:var(--shadow-1);}
+.callout .ctitle{font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent-2); margin-bottom:9px; font-family:"SFMono-Regular",monospace;}
+.callout p, .callout li{font-size:14.8px; margin:0 0 7px;}
 
-.security{
-  border:1px solid var(--accent-dim); border-left:3px solid var(--accent);
-  background: color-mix(in srgb, var(--accent) 6%, var(--panel));
-  border-radius:0 8px 8px 0; padding:16px 18px; margin:22px 0;
-}
-.security .ctitle{font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--accent); margin-bottom:10px; font-family:"SFMono-Regular",monospace; display:flex; align-items:center; gap:8px;}
-.security ul{margin:0; padding-left:1.1em;}
-.security li{font-size:14px; margin-bottom:7px;}
+.security{border-left-color:var(--accent); background: color-mix(in srgb, var(--accent) 5%, var(--panel));}
+.security .ctitle{color:var(--accent);}
+.security .ctitle{font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:11px; font-family:"SFMono-Regular",monospace; display:flex; align-items:center; gap:8px;}
+.security ul{margin:0; padding-left:1.15em;}
+.security li{font-size:14.3px; margin-bottom:8px;}
 .security li::marker{color:var(--accent);}
 .security .std{
   display:inline-block; font-family:"SFMono-Regular",monospace; font-size:11px; color:var(--accent);
-  border:1px solid var(--accent-dim); border-radius:4px; padding:1px 6px; margin-left:6px; white-space:nowrap;
+  border:1px solid var(--accent-dim); border-radius:4px; padding:1px 7px; margin-left:6px; white-space:nowrap;
 }
 
-.india{
-  border:1px solid var(--line); background:var(--panel-2); border-radius:8px;
-  padding:16px 18px; margin:22px 0;
-}
-.india .ctitle{font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; font-family:"SFMono-Regular",monospace;}
-.india .ctitle::before{content:"IN "; color:var(--accent-2);}
-.india p, .india li{font-size:14.5px;}
+.india{border-left-color:var(--muted-2); background:var(--panel-2);}
+.india .ctitle{font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); margin-bottom:9px; font-family:"SFMono-Regular",monospace;}
+.india .ctitle::before{content:"IN · "; color:var(--accent-2);}
+.india p, .india li{font-size:14.8px;}
 
-table{width:100%; border-collapse:collapse; font-size:13.5px;}
-th,td{padding:10px 12px; text-align:left; vertical-align:top; border-bottom:1px solid var(--line-soft);}
+table{width:100%; border-collapse:collapse; font-size:13.8px;}
+th,td{padding:11px 13px; text-align:left; vertical-align:top; border-bottom:1px solid var(--line-soft);}
 th{color:var(--muted); font-weight:600; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; background:var(--panel-2); position:sticky; top:0;}
 .tablewrap{overflow:auto; border:1px solid var(--line); border-radius:10px; max-height:520px;}
 
 .grid2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
 @media (max-width:700px){.grid2{grid-template-columns:1fr;}}
-.card{border:1px solid var(--line); border-radius:8px; padding:14px 16px; background:var(--panel);}
-.card h4{margin:0 0 6px; font-size:13.5px; color:var(--accent-2); font-family:"SFMono-Regular",monospace;}
-.card p{font-size:13.8px; margin:0; color:var(--muted);}
+.card{
+  border:1px solid var(--line); border-radius:10px; padding:16px 18px; background:var(--panel);
+  transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+.card:hover{transform:translateY(-3px); box-shadow:var(--shadow-1); border-color:var(--accent-2-dim);}
+.card h4{margin:0 0 7px; font-size:13.5px; color:var(--accent-2); font-family:"SFMono-Regular",monospace;}
+.card p{font-size:14px; margin:0; color:var(--muted);}
 
-.divider{height:1px; background:var(--line); margin:56px 0;}
-.appendix-note{color:var(--muted); font-size:14.5px;}
+.divider{height:1px; background:var(--line); margin:60px 0;}
+.appendix-note{color:var(--muted); font-size:15px;}
 
-footer{border-top:1px solid var(--line); padding:26px 0 0; color:var(--muted-2); font-size:12.5px;}
+footer{border-top:1px solid var(--line); padding:28px 0 40px; color:var(--muted-2); font-size:12.5px;}
 
 ::selection{background:var(--accent-2-dim); color:var(--text);}
 mark{background:var(--accent-dim); color:var(--text); border-radius:2px; padding:0 2px;}
+
+/* ---------- scroll reveal ---------- */
+.reveal{opacity:0; transform:translateY(16px); transition:opacity 640ms var(--ease), transform 640ms var(--ease);}
+.reveal.in{opacity:1; transform:translateY(0);}
+
+/* ---------- back to top ---------- */
+#top-btn{
+  position:fixed; right:26px; bottom:26px; width:44px; height:44px; border-radius:50%;
+  background:var(--panel); border:1px solid var(--line); color:var(--accent-2); cursor:pointer;
+  display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-1);
+  opacity:0; transform:translateY(12px) scale(0.9); pointer-events:none;
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease), border-color var(--dur-fast) var(--ease);
+  z-index:40;
+}
+#top-btn.show{opacity:1; transform:translateY(0) scale(1); pointer-events:auto;}
+#top-btn:hover{border-color:var(--accent-2);}
 
 .hidden{display:none !important;}
 </style>
 </head>
 <body>
+
+<div id="progress-track"><div id="progress-fill"></div></div>
+
+<div class="mobile-bar">
+  <span class="title">Field Manual</span>
+  <button id="menu-toggle" aria-expanded="false" aria-controls="rail">Contents</button>
+</div>
+<div class="rail-scrim" id="rail-scrim"></div>
+
 <div class="shell">
 
-<nav class="rail" aria-label="Table of contents">
+<nav class="rail" id="rail" aria-label="Table of contents">
   <div class="rail-head">
     <div class="mark">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 12 L12 4 L21 12" stroke="var(--accent-2)" stroke-width="1.6"/><path d="M6 11 V20 H18 V11" stroke="var(--accent)" stroke-width="1.6"/></svg>
-      <div>
-        <div class="title">Field Manual</div>
-      </div>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path id="blueprint-path" d="M3 12 L12 4 L21 12" stroke="var(--accent-2)" stroke-width="1.6" stroke-linecap="round"/>
+        <path id="blueprint-path2" d="M6 11 V20 H18 V11" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <div class="title">Field Manual</div>
     </div>
     <div class="subtitle">From blank folder to production, with security load-bearing at every stage.</div>
   </div>
@@ -225,39 +293,39 @@ mark{background:var(--accent-dim); color:var(--text); border-radius:2px; padding
   <div class="toc" id="toc">
     <div class="toc-group">
       <div class="toc-group-title">Orientation</div>
-      <a href="#s0"><span class="n">00</span>How to use this manual</a>
+      <a href="#s0"><span class="dot"></span>How to use this manual</a>
     </div>
     <div class="toc-group">
       <div class="toc-group-title">Design the thing</div>
-      <a href="#s1"><span class="n">01</span>Plan &amp; threat-model first</a>
+      <a href="#s1"><span class="dot"></span>Plan &amp; threat-model first</a>
     </div>
     <div class="toc-group">
       <div class="toc-group-title">Build it</div>
-      <a href="#s2"><span class="n">02</span>Frontend</a>
-      <a href="#s3"><span class="n">03</span>Backend &amp; API</a>
-      <a href="#s4"><span class="n">04</span>Database</a>
-      <a href="#s5"><span class="n">05</span>Auth, OTP &amp; the password wallet</a>
-      <a href="#s6"><span class="n">06</span>Email / OTP delivery</a>
-      <a href="#s7"><span class="n">07</span>File storage &amp; the CDN</a>
+      <a href="#s2"><span class="dot"></span>Frontend</a>
+      <a href="#s3"><span class="dot"></span>Backend &amp; API</a>
+      <a href="#s4"><span class="dot"></span>Database</a>
+      <a href="#s5"><span class="dot"></span>Auth, OTP &amp; the password wallet</a>
+      <a href="#s6"><span class="dot"></span>Email / OTP delivery</a>
+      <a href="#s7"><span class="dot"></span>File storage &amp; the CDN</a>
     </div>
     <div class="toc-group">
       <div class="toc-group-title">Ship it</div>
-      <a href="#s8"><span class="n">08</span>Servers &amp; the VM</a>
-      <a href="#s9"><span class="n">09</span>Load balancers &amp; autoscaling</a>
-      <a href="#s10"><span class="n">10</span>Domain names &amp; DNS</a>
-      <a href="#s11"><span class="n">11</span>CI/CD pipelines</a>
-      <a href="#s12"><span class="n">12</span>Monitoring &amp; incident response</a>
+      <a href="#s8"><span class="dot"></span>Servers &amp; the VM</a>
+      <a href="#s9"><span class="dot"></span>Load balancers &amp; autoscaling</a>
+      <a href="#s10"><span class="dot"></span>Domain names &amp; DNS</a>
+      <a href="#s11"><span class="dot"></span>CI/CD pipelines</a>
+      <a href="#s12"><span class="dot"></span>Monitoring &amp; incident response</a>
     </div>
     <div class="toc-group">
       <div class="toc-group-title">Govern it</div>
-      <a href="#s13"><span class="n">13</span>Security hardening checklist</a>
-      <a href="#s14"><span class="n">14</span>Compliance, incl. India (DPDP/CERT-In)</a>
-      <a href="#s15"><span class="n">15</span>Skill roadmap: junior → staff</a>
+      <a href="#s13"><span class="dot"></span>Security hardening checklist</a>
+      <a href="#s14"><span class="dot"></span>Compliance, incl. India</a>
+      <a href="#s15"><span class="dot"></span>Skill roadmap: junior → staff</a>
     </div>
     <div class="toc-group">
       <div class="toc-group-title">Reference</div>
-      <a href="#s16"><span class="n">16</span>Glossary</a>
-      <a href="#s17"><span class="n">17</span>Full resource catalog (103)</a>
+      <a href="#s16"><span class="dot"></span>Glossary</a>
+      <a href="#s17"><span class="dot"></span>Full resource catalog (103)</a>
     </div>
   </div>
 </nav>
@@ -277,23 +345,23 @@ mark{background:var(--accent-dim); color:var(--text); border-radius:2px; padding
 </div>
 
 <section class="stage" id="s0">
-  <div class="stage-head"><span class="stage-num">00</span><h2>How to use this manual</h2></div>
-  <p class="dek">This is one continuous build, told in the order you actually do it. Each stage ends with a <b>security checklist</b> (amber) tying that stage to a named standard, and — where relevant — an <b>India note</b> (teal) on providers, compliance, or market conventions. Skim top to bottom the first time; come back to individual stages as a reference once you're building for real.</p>
-  <div class="callout">
+  <div class="stage-head reveal"><span class="stage-num">00</span><h2>How to use this manual</h2></div>
+  <p class="dek reveal">This is one continuous build, told in the order you actually do it. Each stage ends with a <b>security checklist</b> (amber) tying that stage to a named standard, and — where relevant — an <b>India note</b> (teal) on providers, compliance, or market conventions. Skim top to bottom the first time; come back to individual stages as a reference once you're building for real.</p>
+  <div class="callout reveal">
     <div class="ctitle">A rule that saves every stage below</div>
     <p>Security is not a stage you do after building — it's a property you decide on <i>while</i> building, at the same moment you decide how a feature works. Every checklist below sits inside the stage it belongs to, not bolted on at the end, because that's the only place it's cheap to apply.</p>
   </div>
 </section>
 
 <section class="stage" id="s1">
-  <div class="stage-head"><span class="stage-num">01</span><h2>Plan &amp; threat-model first</h2></div>
-  <p class="dek">Before a line of code: what are you building, who is it for, and what happens if it's attacked or it fails?</p>
+  <div class="stage-head reveal"><span class="stage-num">01</span><h2>Plan &amp; threat-model first</h2></div>
+  <p class="dek reveal">Before a line of code: what are you building, who is it for, and what happens if it's attacked or it fails?</p>
 
-  <h3>Define the thing in one paragraph</h3>
-  <p>Write down: who the user is, the one core action they take (post a photo, book a slot, send money), and what "done" looks like for v1. Everything you add beyond this is scope creep until v1 ships and has real users.</p>
+  <h3 class="reveal">Define the thing in one paragraph</h3>
+  <p class="reveal">Write down: who the user is, the one core action they take (post a photo, book a slot, send money), and what "done" looks like for v1. Everything you add beyond this is scope creep until v1 ships and has real users.</p>
 
-  <h3>Sketch the architecture before the code</h3>
-  <pre class="mono">Browser/App  →  CDN (static assets, images)
+  <h3 class="reveal">Sketch the architecture before the code</h3>
+  <pre class="mono reveal">Browser/App  →  CDN (static assets, images)
                  │
                  ▼
              Load Balancer  →  App servers (VMs, autoscaled)
@@ -306,8 +374,8 @@ mark{background:var(--accent-dim); color:var(--text); border-radius:2px; padding
                Secrets manager (the "password wallet"
                for the app itself, not for end users)</pre>
 
-  <h3>Threat-model in five questions</h3>
-  <ul>
+  <h3 class="reveal">Threat-model in five questions</h3>
+  <ul class="reveal">
     <li>What data would hurt someone if it leaked? (passwords, phone numbers, payment info, private messages)</li>
     <li>Who can call each endpoint, and what stops them calling it for <i>someone else's</i> data?</li>
     <li>What happens if this service gets 100x the traffic in an hour?</li>
@@ -315,7 +383,7 @@ mark{background:var(--accent-dim); color:var(--text); border-radius:2px; padding
     <li>Who gets paged when something breaks at 2 a.m., and how do they know?</li>
   </ul>
 
-  <div class="security">
+  <div class="security reveal">
     <div class="ctitle">Security checklist — planning</div>
     <ul>
       <li>Do a lightweight STRIDE or attacker-goal pass on your architecture sketch before writing code <span class="std">MITRE ATT&amp;CK</span></li>
@@ -326,22 +394,22 @@ mark{background:var(--accent-dim); color:var(--text); border-radius:2px; padding
 </section>
 
 <section class="stage" id="s2">
-  <div class="stage-head"><span class="stage-num">02</span><h2>Frontend</h2></div>
-  <p class="dek">The part users touch. Optimize for clarity of state (loading / error / empty / success) before you optimize for visual polish.</p>
+  <div class="stage-head reveal"><span class="stage-num">02</span><h2>Frontend</h2></div>
+  <p class="dek reveal">The part users touch. Optimize for clarity of state (loading / error / empty / success) before you optimize for visual polish.</p>
 
-  <h3>Pick a stack and stop debating it</h3>
-  <p>For 2026, a defensible default: <b>React + TypeScript + Vite</b> for a single-page app, or <b>Next.js</b> if you want server rendering and API routes in one codebase. TypeScript is not optional at this point — it catches an entire category of bugs (wrong shapes crossing the frontend/backend boundary) before a user ever sees them.</p>
+  <h3 class="reveal">Pick a stack and stop debating it</h3>
+  <p class="reveal">For 2026, a defensible default: <b>React + TypeScript + Vite</b> for a single-page app, or <b>Next.js</b> if you want server rendering and API routes in one codebase. TypeScript is not optional at this point — it catches an entire category of bugs (wrong shapes crossing the frontend/backend boundary) before a user ever sees them.</p>
 
-  <h3>The four states every screen needs</h3>
-  <ul>
+  <h3 class="reveal">The four states every screen needs</h3>
+  <ul class="reveal">
     <li><b>Loading</b> — a skeleton or spinner, never a blank white screen.</li>
     <li><b>Empty</b> — what a brand-new user sees with zero data; this is most people's first impression.</li>
     <li><b>Error</b> — a message that says what happened and what to do next, not a raw stack trace.</li>
     <li><b>Success</b> — the actual content, plus confirmation for anything destructive (delete, unfollow, cancel).</li>
   </ul>
 
-  <h3>Where tokens live (this decision matters more than it looks)</h3>
-  <pre class="mono">// Access token: kept ONLY in memory (a module-level variable or React context).
+  <h3 class="reveal">Where tokens live (this decision matters more than it looks)</h3>
+  <pre class="mono reveal">// Access token: kept ONLY in memory (a module-level variable or React context).
 // Never in localStorage/sessionStorage — any XSS on the page can read those.
 let accessToken: string | null = null;
 
@@ -359,7 +427,7 @@ async function apiFetch(path: string, opts: RequestInit = {}) {
   return res;
 }</pre>
 
-  <div class="security">
+  <div class="security reveal">
     <div class="ctitle">Security checklist — frontend</div>
     <ul>
       <li>Never use <code>dangerouslySetInnerHTML</code> (or raw <code>innerHTML</code>) on user-generated text — rely on the framework's default escaping <span class="std">OWASP · XSS</span></li>
@@ -372,14 +440,14 @@ async function apiFetch(path: string, opts: RequestInit = {}) {
 </section>
 
 <section class="stage" id="s3">
-  <div class="stage-head"><span class="stage-num">03</span><h2>Backend &amp; API</h2></div>
-  <p class="dek">The part that enforces the rules the frontend merely suggests. Assume every request is hostile and check anyway.</p>
+  <div class="stage-head reveal"><span class="stage-num">03</span><h2>Backend &amp; API</h2></div>
+  <p class="dek reveal">The part that enforces the rules the frontend merely suggests. Assume every request is hostile and check anyway.</p>
 
-  <h3>Pick a stack</h3>
-  <p>A defensible 2026 default: <b>Node.js + TypeScript + Express (or Fastify/NestJS)</b>, or <b>Python + FastAPI</b> if your team leans Python. Either is fine — what matters far more than the framework is the discipline below.</p>
+  <h3 class="reveal">Pick a stack</h3>
+  <p class="reveal">A defensible 2026 default: <b>Node.js + TypeScript + Express (or Fastify/NestJS)</b>, or <b>Python + FastAPI</b> if your team leans Python. Either is fine — what matters far more than the framework is the discipline below.</p>
 
-  <h3>Validate at the boundary, authorize on every route</h3>
-  <pre class="mono">// 1. Validate shape and reject unknown fields (zod, pydantic, whatever your
+  <h3 class="reveal">Validate at the boundary, authorize on every route</h3>
+  <pre class="mono reveal">// 1. Validate shape and reject unknown fields (zod, pydantic, whatever your
 //    language offers) — never trust a request body's shape.
 const CreatePost = z.object({ caption: z.string().max(2200), imageKey: z.string() }).strict();
 
@@ -394,15 +462,15 @@ async function deletePost(req, res) {
   res.status(204).end();
 }</pre>
 
-  <h3>Rate-limit anything an attacker can script</h3>
-  <p>Login, signup, OTP send/verify, and password reset are the endpoints attackers automate against. Rate-limit per account <i>and</i> per IP, and lock out or slow down after repeated failures rather than returning an unlimited number of guesses.</p>
+  <h3 class="reveal">Rate-limit anything an attacker can script</h3>
+  <p class="reveal">Login, signup, OTP send/verify, and password reset are the endpoints attackers automate against. Rate-limit per account <i>and</i> per IP, and lock out or slow down after repeated failures rather than returning an unlimited number of guesses.</p>
 
-  <div class="grid2">
+  <div class="grid2 reveal">
     <div class="card"><h4>Good error handling</h4><p>Log the real error internally with full detail; return a generic message externally ("Something went wrong") in production. Stack traces are a gift to an attacker mapping your internals.</p></div>
     <div class="card"><h4>Pagination, always</h4><p>Any list endpoint (feed, comments, search) needs cursor- or offset-based pagination from day one — an unbounded query is a denial-of-service waiting for enough rows.</p></div>
   </div>
 
-  <div class="security">
+  <div class="security reveal">
     <div class="ctitle">Security checklist — backend/API</div>
     <ul>
       <li>Authorization check on every route that reads or writes a specific resource, not just authentication <span class="std">OWASP API Security · BOLA</span></li>
@@ -417,14 +485,14 @@ async function deletePost(req, res) {
 </section>
 
 <section class="stage" id="s4">
-  <div class="stage-head"><span class="stage-num">04</span><h2>Database</h2></div>
-  <p class="dek">Get the schema and indexes right early — migrating a live table under load is the least fun afternoon in software.</p>
+  <div class="stage-head reveal"><span class="stage-num">04</span><h2>Database</h2></div>
+  <p class="dek reveal">Get the schema and indexes right early — migrating a live table under load is the least fun afternoon in software.</p>
 
-  <h3>Relational by default</h3>
-  <p><b>PostgreSQL</b> is the right default for almost everything with users, relationships, and money-adjacent data. Reach for a document store (MongoDB) or a cache (Redis) only when you have a specific access pattern that relational modeling actively fights — not because it feels more modern.</p>
+  <h3 class="reveal">Relational by default</h3>
+  <p class="reveal"><b>PostgreSQL</b> is the right default for almost everything with users, relationships, and money-adjacent data. Reach for a document store (MongoDB) or a cache (Redis) only when you have a specific access pattern that relational modeling actively fights — not because it feels more modern.</p>
 
-  <h3>Index what you query by, constrain what must be unique</h3>
-  <pre class="mono">model User {
+  <h3 class="reveal">Index what you query by, constrain what must be unique</h3>
+  <pre class="mono reveal">model User {
   id        String   @id @default(uuid())
   email     String   @unique
   username  String   @unique
@@ -439,12 +507,12 @@ model Follow {
   @@index([followingId])            // fast "who follows me" lookups
 }</pre>
 
-  <div class="callout">
+  <div class="callout reveal">
     <div class="ctitle">Migrations discipline</div>
     <p>Every schema change is a migration file, checked into git, applied the same way in every environment (local → staging → production). Never hand-edit a production schema through a GUI — you lose the ability to reproduce it.</p>
   </div>
 
-  <div class="security">
+  <div class="security reveal">
     <div class="ctitle">Security checklist — database</div>
     <ul>
       <li>Encrypt at rest (most managed databases do this by default — verify it's actually on) <span class="std">NIST Cryptographic Standards</span></li>
@@ -456,37 +524,37 @@ model Follow {
 </section>
 
 <section class="stage" id="s5">
-  <div class="stage-head"><span class="stage-num">05</span><h2>Auth, OTP &amp; the password wallet</h2></div>
-  <p class="dek">Two different "password wallets" get confused constantly — get the distinction straight before building either.</p>
+  <div class="stage-head reveal"><span class="stage-num">05</span><h2>Auth, OTP &amp; the password wallet</h2></div>
+  <p class="dek reveal">Two different "password wallets" get confused constantly — get the distinction straight before building either.</p>
 
-  <div class="callout">
+  <div class="callout reveal">
     <div class="ctitle">Two meanings of "password wallet" — pick the right one</div>
     <p><b>1. End-user password management</b> — your app hashing and verifying each user's own password, optionally with a personal vault feature (like a browser password manager) if your product actually needs one.</p>
     <p><b>2. Application secrets management</b> — <i>your infrastructure's</i> own credentials (DB password, JWT signing key, third-party API keys) held in a secrets manager (AWS Secrets Manager, HashiCorp Vault, GCP Secret Manager) instead of a <code>.env</code> file committed to git. Almost everyone building "an app with a password wallet" actually means this second one — most apps don't need a personal-vault feature at all.</p>
   </div>
 
-  <h3>Hashing a user's password correctly</h3>
-  <pre class="mono">import argon2 from "argon2";
+  <h3 class="reveal">Hashing a user's password correctly</h3>
+  <pre class="mono reveal">import argon2 from "argon2";
 // Argon2id: memory-hard, resistant to GPU-cracking — OWASP's current
 // recommendation over bcrypt/scrypt for new systems.
 const hash = await argon2.hash(plainPassword, { type: argon2.argon2id });
 const valid = await argon2.verify(hash, attempt);</pre>
 
-  <h3>OTP (one-time password) for email/phone verification</h3>
-  <pre class="mono">import crypto from "crypto";
+  <h3 class="reveal">OTP (one-time password) for email/phone verification</h3>
+  <pre class="mono reveal">import crypto from "crypto";
 const code = crypto.randomInt(100000, 999999).toString(); // not Math.random()
 const codeHash = await argon2.hash(code);   // store the hash, never the plaintext
 // expire in 10 minutes, cap verify attempts at 5, cap resends at 3/hour/account
 await db.otpCode.create({ data: { userId, codeHash, expiresAt: in10Min() } });</pre>
 
-  <h3>Sessions: short-lived access token + rotating refresh token</h3>
-  <ul>
+  <h3 class="reveal">Sessions: short-lived access token + rotating refresh token</h3>
+  <ul class="reveal">
     <li>Access token (JWT): 15-minute expiry, used on every API call, never stored anywhere persistent.</li>
     <li>Refresh token: long-lived, opaque random value, stored <i>hashed</i> in the DB, delivered via httpOnly cookie, <b>rotated on every use</b> — reusing an old refresh token should revoke the whole session chain (a strong signal of theft).</li>
   </ul>
 
-  <h3>The application secrets manager, done right</h3>
-  <pre class="mono">// Boot-time: fail fast if a required secret is missing — never silently
+  <h3 class="reveal">The application secrets manager, done right</h3>
+  <pre class="mono reveal">// Boot-time: fail fast if a required secret is missing — never silently
 // fall back to a default or an empty string in production.
 const Secrets = z.object({
   DATABASE_URL: z.string().url(),
@@ -497,7 +565,7 @@ const Secrets = z.object({
 // AWS Secrets Manager / Vault at deploy time — never committed to git,
 // never logged, rotated on a schedule.</pre>
 
-  <div class="security">
+  <div class="security reveal">
     <div class="ctitle">Security checklist — auth &amp; secrets</div>
     <ul>
       <li>Argon2id (or bcrypt/scrypt as a fallback) for password hashing — never MD5/SHA-1/plain SHA-256 <span class="std">NIST Cryptographic Standards</span></li>
@@ -511,21 +579,21 @@ const Secrets = z.object({
 </section>
 
 <section class="stage" id="s6">
-  <div class="stage-head"><span class="stage-num">06</span><h2>Email / OTP delivery</h2></div>
-  <p class="dek">Generating the OTP is the easy 10%. Getting the email to actually land in an inbox instead of spam is the other 90%.</p>
+  <div class="stage-head reveal"><span class="stage-num">06</span><h2>Email / OTP delivery</h2></div>
+  <p class="dek reveal">Generating the OTP is the easy 10%. Getting the email to actually land in an inbox instead of spam is the other 90%.</p>
 
-  <h3>Pick a transactional email provider</h3>
-  <p>AWS SES, SendGrid, Postmark, or Resend are all reasonable — SES is the cheapest at scale and pairs naturally if the rest of your infra is on AWS. Whichever you pick, you're sending through their SMTP/API, not rolling your own mail server.</p>
+  <h3 class="reveal">Pick a transactional email provider</h3>
+  <p class="reveal">AWS SES, SendGrid, Postmark, or Resend are all reasonable — SES is the cheapest at scale and pairs naturally if the rest of your infra is on AWS. Whichever you pick, you're sending through their SMTP/API, not rolling your own mail server.</p>
 
-  <h3>Deliverability is a DNS problem, not a code problem</h3>
-  <ul>
+  <h3 class="reveal">Deliverability is a DNS problem, not a code problem</h3>
+  <ul class="reveal">
     <li><b>SPF</b> — declares which servers are allowed to send mail for your domain.</li>
     <li><b>DKIM</b> — cryptographically signs outgoing mail so receivers can verify it wasn't tampered with.</li>
     <li><b>DMARC</b> — tells receiving mail servers what to do with mail that fails SPF/DKIM, and gives you reports on abuse of your domain.</li>
   </ul>
-  <p>Skip any of the three and a meaningful fraction of your OTP emails land in spam — which, from a user's point of view, is indistinguishable from your OTP feature being broken.</p>
+  <p class="reveal">Skip any of the three and a meaningful fraction of your OTP emails land in spam — which, from a user's point of view, is indistinguishable from your OTP feature being broken.</p>
 
-  <div class="security">
+  <div class="security reveal">
     <div class="ctitle">Security checklist — email/OTP delivery</div>
     <ul>
       <li>SPF + DKIM + DMARC configured on the sending domain before launch, not after users complain <span class="std">IETF RFCs</span></li>
@@ -537,12 +605,12 @@ const Secrets = z.object({
 </section>
 
 <section class="stage" id="s7">
-  <div class="stage-head"><span class="stage-num">07</span><h2>File storage &amp; the CDN</h2></div>
-  <p class="dek">User-uploaded images/videos and your static frontend assets don't belong on the same server that runs your API.</p>
+  <div class="stage-head reveal"><span class="stage-num">07</span><h2>File storage &amp; the CDN</h2></div>
+  <p class="dek reveal">User-uploaded images/videos and your static frontend assets don't belong on the same server that runs your API.</p>
 
-  <h3>Object storage + presigned uploads</h3>
-  <p>Use S3 (or an S3-compatible store). The API never touches the image bytes — it hands the client a short-lived, scoped "presigned URL," the client uploads directly to storage, and the API just records the resulting object key.</p>
-  <pre class="mono">// Backend: issue a scoped, time-limited upload URL — the object key is
+  <h3 class="reveal">Object storage + presigned uploads</h3>
+  <p class="reveal">Use S3 (or an S3-compatible store). The API never touches the image bytes — it hands the client a short-lived, scoped "presigned URL," the client uploads directly to storage, and the API just records the resulting object key.</p>
+  <pre class="mono reveal">// Backend: issue a scoped, time-limited upload URL — the object key is
 // namespaced under the requesting user's own prefix so they can't
 // overwrite or reference someone else's objects.
 const key = `posts/${userId}/${crypto.randomUUID()}.jpg`;
@@ -554,10 +622,10 @@ res.json({ uploadUrl, objectKey: key });
 // entire class of upload-based attacks from the API surface.
 await fetch(uploadUrl, { method: "PUT", body: file });</pre>
 
-  <h3>Front the bucket with a CDN</h3>
-  <p>CloudFront (AWS), Cloudflare, or Fastly sit between users and your storage bucket: they cache images at edge locations close to the user (faster loads), absorb traffic spikes without hitting your origin, and are the only thing with public read access — the bucket itself stays private.</p>
+  <h3 class="reveal">Front the bucket with a CDN</h3>
+  <p class="reveal">CloudFront (AWS), Cloudflare, or Fastly sit between users and your storage bucket: they cache images at edge locations close to the user (faster loads), absorb traffic spikes without hitting your origin, and are the only thing with public read access — the bucket itself stays private.</p>
 
-  <div class="security">
+  <div class="security reveal">
     <div class="ctitle">Security checklist — storage &amp; CDN</div>
     <ul>
       <li>Bucket is private by default; only the CDN (via Origin Access Control) can read from it <span class="std">CIS Benchmarks</span></li>
@@ -569,11 +637,11 @@ await fetch(uploadUrl, { method: "PUT", body: file });</pre>
 </section>
 
 <section class="stage" id="s8">
-  <div class="stage-head"><span class="stage-num">08</span><h2>Servers &amp; the VM</h2></div>
-  <p class="dek">No containers here by design — plain virtual machines, hardened directly, so the operating-system layer isn't a black box.</p>
+  <div class="stage-head reveal"><span class="stage-num">08</span><h2>Servers &amp; the VM</h2></div>
+  <p class="dek reveal">No containers here by design — plain virtual machines, hardened directly, so the operating-system layer isn't a black box.</p>
 
-  <h3>Provision, then harden, before you deploy anything</h3>
-  <pre class="mono"># Key-only SSH, no passwords, no root login
+  <h3 class="reveal">Provision, then harden, before you deploy anything</h3>
+  <pre class="mono reveal"># Key-only SSH, no passwords, no root login
 sudo sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
 sudo sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
 sudo systemctl restart sshd
@@ -587,8 +655,8 @@ sudo ufw enable
 # Automatic security patches
 sudo apt install unattended-upgrades -y</pre>
 
-  <h3>Run the app as a service, not a terminal you forgot open</h3>
-  <pre class="mono"># /etc/systemd/system/app-backend.service
+  <h3 class="reveal">Run the app as a service, not a terminal you forgot open</h3>
+  <pre class="mono reveal"># /etc/systemd/system/app-backend.service
 [Unit]
 Description=App backend
 After=network.target
@@ -604,10 +672,10 @@ ProtectHome=true
 [Install]
 WantedBy=multi-user.target</pre>
 
-  <h3>Put Nginx in front as a reverse proxy</h3>
-  <p>Nginx terminates TLS, adds security headers, rate-limits at the edge, and forwards clean requests to your Node/Python process on localhost — your app process itself never listens directly on the public internet.</p>
+  <h3 class="reveal">Put Nginx in front as a reverse proxy</h3>
+  <p class="reveal">Nginx terminates TLS, adds security headers, rate-limits at the edge, and forwards clean requests to your Node/Python process on localhost — your app process itself never listens directly on the public internet.</p>
 
-  <div class="security">
+  <div class="security reveal">
     <div class="ctitle">Security checklist — VM/server</div>
     <ul>
       <li>SSH key-only, root login disabled, a firewall that denies by default <span class="std">CIS Benchmarks</span></li>
@@ -620,22 +688,22 @@ WantedBy=multi-user.target</pre>
 </section>
 
 <section class="stage" id="s9">
-  <div class="stage-head"><span class="stage-num">09</span><h2>Load balancers &amp; autoscaling</h2></div>
-  <p class="dek">The mechanism that turns "one VM that falls over on a busy Tuesday" into "traffic that just gets absorbed."</p>
+  <div class="stage-head reveal"><span class="stage-num">09</span><h2>Load balancers &amp; autoscaling</h2></div>
+  <p class="dek reveal">The mechanism that turns "one VM that falls over on a busy Tuesday" into "traffic that just gets absorbed."</p>
 
-  <h3>The load balancer</h3>
-  <p>An Application Load Balancer (AWS ALB, or Nginx/HAProxy if self-managed) sits in front of multiple app VMs, terminates HTTPS, health-checks each instance, and routes traffic only to healthy ones — this is also how you deploy with zero downtime (roll instances one at a time, the LB stops sending traffic to whichever is being replaced).</p>
+  <h3 class="reveal">The load balancer</h3>
+  <p class="reveal">An Application Load Balancer (AWS ALB, or Nginx/HAProxy if self-managed) sits in front of multiple app VMs, terminates HTTPS, health-checks each instance, and routes traffic only to healthy ones — this is also how you deploy with zero downtime (roll instances one at a time, the LB stops sending traffic to whichever is being replaced).</p>
 
-  <h3>Autoscaling — the actual "volume increaser"</h3>
-  <p>An Auto Scaling Group watches a metric (CPU, request count, queue depth) and adds VMs when it's under load, removes them when it's quiet. This is the mechanism people mean when they say a system needs to "handle more volume" — it's not a single button, it's a policy: minimum instances, maximum instances, and the trigger metric.</p>
-  <pre class="mono"># conceptually, an autoscaling policy:
+  <h3 class="reveal">Autoscaling — the actual "volume increaser"</h3>
+  <p class="reveal">An Auto Scaling Group watches a metric (CPU, request count, queue depth) and adds VMs when it's under load, removes them when it's quiet. This is the mechanism people mean when they say a system needs to "handle more volume" — it's not a single button, it's a policy: minimum instances, maximum instances, and the trigger metric.</p>
+  <pre class="mono reveal"># conceptually, an autoscaling policy:
 min_instances: 2
 max_instances: 6
 scale_out_when: avg_cpu > 65% for 3 minutes
 scale_in_when:  avg_cpu < 30% for 10 minutes
 health_check: GET /health every 15s, 2 consecutive failures = unhealthy</pre>
 
-  <div class="security">
+  <div class="security reveal">
     <div class="ctitle">Security checklist — load balancing/scaling</div>
     <ul>
       <li>TLS terminates at the load balancer with a managed certificate that auto-renews — never a hand-rolled cert you'll forget to renew <span class="std">IETF RFCs</span></li>
@@ -646,18 +714,18 @@ health_check: GET /health every 15s, 2 consecutive failures = unhealthy</pre>
 </section>
 
 <section class="stage" id="s10">
-  <div class="stage-head"><span class="stage-num">10</span><h2>Domain names &amp; DNS</h2></div>
-  <p class="dek">The address people type, and the records that tell the internet where to send them.</p>
+  <div class="stage-head reveal"><span class="stage-num">10</span><h2>Domain names &amp; DNS</h2></div>
+  <p class="dek reveal">The address people type, and the records that tell the internet where to send them.</p>
 
-  <h3>Buying and pointing a domain</h3>
-  <ol>
+  <h3 class="reveal">Buying and pointing a domain</h3>
+  <ol class="reveal">
     <li>Register a domain through a registrar — <b>GoDaddy India, BigRock, Namecheap, or Hostinger</b> are all common choices for developers in India; a <code>.in</code> domain works fine for an India-first product, a generic <code>.com</code>/<code>.dev</code> for a global one.</li>
     <li>Delegate the domain's nameservers to your DNS provider (Route53, Cloudflare DNS) — this is the step that lets Terraform/your infra actually manage records.</li>
     <li>Point an <code>A</code>/<code>ALIAS</code> record at your load balancer for the API, and a separate record at your CDN distribution for the frontend/static assets.</li>
     <li>Issue an HTTPS certificate (AWS ACM, or Let's Encrypt via Certbot if self-managing Nginx) for every hostname you serve.</li>
   </ol>
 
-  <div class="security">
+  <div class="security reveal">
     <div class="ctitle">Security checklist — domain/DNS</div>
     <ul>
       <li>Enable registrar-level domain lock/2FA — a stolen domain login is a full takeover of your product <span class="std">CIS Controls</span></li>
@@ -668,13 +736,13 @@ health_check: GET /health every 15s, 2 consecutive failures = unhealthy</pre>
 </section>
 
 <section class="stage" id="s11">
-  <div class="stage-head"><span class="stage-num">11</span><h2>CI/CD pipelines</h2></div>
-  <p class="dek">The automated path from "I pushed a commit" to "it's safely running in production."</p>
-  <ul>
+  <div class="stage-head reveal"><span class="stage-num">11</span><h2>CI/CD pipelines</h2></div>
+  <p class="dek reveal">The automated path from "I pushed a commit" to "it's safely running in production."</p>
+  <ul class="reveal">
     <li><b>CI (continuous integration):</b> on every push — install deps, typecheck, lint, run the test suite, run a dependency-vulnerability scan.</li>
     <li><b>CD (continuous deployment):</b> on merge to main — build, run database migrations, deploy to a staging environment, run a smoke test, then roll out to production instances one at a time behind the load balancer.</li>
   </ul>
-  <pre class="mono"># conceptual pipeline (GitHub Actions / GitLab CI, either works)
+  <pre class="mono reveal"># conceptual pipeline (GitHub Actions / GitLab CI, either works)
 on: push
 jobs:
   test:    npm ci && npm run typecheck && npm test
@@ -685,7 +753,7 @@ jobs:
            ssh app-server "sudo systemctl restart app-backend"
            curl --fail https://api.example.com/health</pre>
 
-  <div class="security">
+  <div class="security reveal">
     <div class="ctitle">Security checklist — CI/CD</div>
     <ul>
       <li>Dependency vulnerability scanning wired into CI, failing the build on high-severity findings <span class="std">OSV / GitHub Advisory Database</span></li>
@@ -696,16 +764,16 @@ jobs:
 </section>
 
 <section class="stage" id="s12">
-  <div class="stage-head"><span class="stage-num">12</span><h2>Monitoring &amp; incident response</h2></div>
-  <p class="dek">You find out about most real problems from a dashboard or an alert, not a user's angry email — if you've set it up.</p>
-  <ul>
+  <div class="stage-head reveal"><span class="stage-num">12</span><h2>Monitoring &amp; incident response</h2></div>
+  <p class="dek reveal">You find out about most real problems from a dashboard or an alert, not a user's angry email — if you've set it up.</p>
+  <ul class="reveal">
     <li><b>Metrics:</b> CPU/memory/request-rate/error-rate per instance, and business metrics (signups, OTP failures, upload failures).</li>
     <li><b>Structured logs:</b> JSON logs with a request ID that ties a user's request across every service it touched — and redact secrets/tokens/passwords from every log line.</li>
     <li><b>Alerts:</b> error-rate spikes, elevated latency, failed health checks, unusual auth-failure rates (a brute-force signal).</li>
     <li><b>A written incident runbook:</b> who gets paged, what the first three diagnostic steps are, and where the postmortem gets written afterward.</li>
   </ul>
 
-  <div class="security">
+  <div class="security reveal">
     <div class="ctitle">Security checklist — monitoring/IR</div>
     <ul>
       <li>Redact Authorization headers, passwords, and OTP codes from all logs before they're ever written <span class="std">OWASP ASVS · Logging</span></li>
@@ -716,10 +784,10 @@ jobs:
 </section>
 
 <section class="stage" id="s13">
-  <div class="stage-head"><span class="stage-num">13</span><h2>Security hardening checklist — the consolidated view</h2></div>
-  <p class="dek">Every amber box above, gathered in one pass, organized by domain instead of by build stage — use this as your pre-launch pass.</p>
+  <div class="stage-head reveal"><span class="stage-num">13</span><h2>Security hardening checklist — the consolidated view</h2></div>
+  <p class="dek reveal">Every amber box above, gathered in one pass, organized by domain instead of by build stage — use this as your pre-launch pass.</p>
 
-  <div class="grid2">
+  <div class="grid2 reveal">
     <div class="card"><h4>Identity &amp; access</h4><p>Argon2id hashing · short JWTs + rotating refresh · rate-limited auth/OTP · MFA/passkeys where warranted · least-privilege IAM everywhere</p></div>
     <div class="card"><h4>Injection &amp; input</h4><p>Parameterized queries only · strict schema validation rejecting unknown fields · output escaping, no raw HTML injection</p></div>
     <div class="card"><h4>Access control</h4><p>Ownership checks on every mutating route · object keys scoped per user · no security decision made client-side alone</p></div>
@@ -729,21 +797,21 @@ jobs:
     <div class="card"><h4>Operations</h4><p>Redacted structured logs · alerting on anomalies · tested backups · a written incident runbook</p></div>
     <div class="card"><h4>Email/OTP integrity</h4><p>SPF/DKIM/DMARC on the sending domain · hashed, expiring, attempt-capped OTPs · no user-enumeration in error messages</p></div>
   </div>
-  <p style="margin-top:18px" class="appendix-note">For a much deeper pass — mobile, AI/LLM features, IoT, industrial, automotive, and formal compliance frameworks — work through the <a href="security/master_cybersecurity_checks_resources.html">full 103-item resource catalog</a> (also mirrored in the appendix below), filtering to what's actually relevant to your product.</p>
+  <p class="reveal" style="margin-top:18px" class="appendix-note">For a much deeper pass — mobile, AI/LLM features, IoT, industrial, automotive, and formal compliance frameworks — work through the <a href="security/master_cybersecurity_checks_resources.html">full 103-item resource catalog</a> (also mirrored in the appendix below), filtering to what's actually relevant to your product.</p>
 </section>
 
 <section class="stage" id="s14">
-  <div class="stage-head"><span class="stage-num">14</span><h2>Compliance &amp; governance, including India</h2></div>
-  <p class="dek">Standards you adopt voluntarily for maturity, and rules you must follow because you operate in a given market.</p>
+  <div class="stage-head reveal"><span class="stage-num">14</span><h2>Compliance &amp; governance, including India</h2></div>
+  <p class="dek reveal">Standards you adopt voluntarily for maturity, and rules you must follow because you operate in a given market.</p>
 
-  <h3>General frameworks worth knowing</h3>
-  <ul>
+  <h3 class="reveal">General frameworks worth knowing</h3>
+  <ul class="reveal">
     <li><b>ISO/IEC 27001</b> — an information security management system; common ask from enterprise customers doing vendor due diligence.</li>
     <li><b>SOC 2</b> — common ask from US-based B2B SaaS customers.</li>
     <li><b>PCI DSS</b> — mandatory the moment you touch card data directly (most teams avoid this entirely by using a payment processor like Razorpay/Stripe that keeps card data off your servers).</li>
   </ul>
 
-  <div class="india">
+  <div class="india reveal">
     <div class="ctitle">India-specific rules that actually apply to most apps</div>
     <p><b>Digital Personal Data Protection Act, 2023 (DPDP Act)</b> — India's core personal-data law. Practically: get explicit, specific consent before collecting personal data, state your purpose, let users withdraw consent and request deletion, and report significant breaches. Design your signup/consent flow and your account-deletion flow with this in mind from day one — retrofitting consent UX later is painful.</p>
     <p><b>CERT-In directions (2022)</b> — require reporting certain categories of cyber incidents to CERT-In within 6 hours of noticing them, and mandate that ICT system logs be maintained (typically referenced as a 180-day window) within Indian jurisdiction. If your monitoring/logging stack (Stage 12) is an afterthought, this is the rule that makes it not optional.</p>
@@ -753,9 +821,9 @@ jobs:
 </section>
 
 <section class="stage" id="s15">
-  <div class="stage-head"><span class="stage-num">15</span><h2>Skill roadmap: junior → staff</h2></div>
-  <p class="dek">What "more senior" actually means in this stack, stage by stage.</p>
-  <div class="tablewrap">
+  <div class="stage-head reveal"><span class="stage-num">15</span><h2>Skill roadmap: junior → staff</h2></div>
+  <p class="dek reveal">What "more senior" actually means in this stack, stage by stage.</p>
+  <div class="tablewrap reveal">
   <table>
     <thead><tr><th>Level</th><th>What you own</th><th>Signal you've reached it</th></tr></thead>
     <tbody>
@@ -767,12 +835,12 @@ jobs:
     </tbody>
   </table>
   </div>
-  <p style="margin-top:16px">The fastest way through this ladder isn't more frameworks — it's building one real system through every stage in this manual, then doing it again with the mistakes from the first one fixed.</p>
+  <p class="reveal" style="margin-top:16px">The fastest way through this ladder isn't more frameworks — it's building one real system through every stage in this manual, then doing it again with the mistakes from the first one fixed.</p>
 </section>
 
 <section class="stage" id="s16">
-  <div class="stage-head"><span class="stage-num">16</span><h2>Glossary</h2></div>
-  <div class="tablewrap">
+  <div class="stage-head reveal"><span class="stage-num">16</span><h2>Glossary</h2></div>
+  <div class="tablewrap reveal">
   <table>
     <thead><tr><th>Term</th><th>Plain-language meaning</th></tr></thead>
     <tbody>
@@ -792,10 +860,9 @@ jobs:
 </section>
 
 <section class="stage" id="s17">
-  <div class="stage-head"><span class="stage-num">17</span><h2>Full resource catalog</h2></div>
-  <p class="dek">The complete 103-entry standards/tooling catalog this manual draws its <span class="std" style="margin-left:0">STD</span> references from — filter it live below, or open the <a href="security/master_cybersecurity_checks_resources.html">standalone file</a>.</p>
-  <div class="search-wrap" style="padding:0 0 14px;"><input id="cat-search" type="text" placeholder="Filter the catalog… e.g. API, cloud, IoT, AI"></div>
-  <div class="tablewrap">
+  <div class="stage-head reveal"><span class="stage-num">17</span><h2>Full resource catalog</h2></div>
+  <p class="dek reveal">The complete 103-entry standards/tooling catalog this manual draws its <span class="std" style="margin-left:0">STD</span> references from — filter it live below, or open the <a href="security/master_cybersecurity_checks_resources.html">standalone file</a>.</p>
+  <div class="tablewrap reveal">
     <iframe title="Full security resource catalog" src="security/master_cybersecurity_checks_resources.html" style="width:100%; height:640px; border:0; border-radius:8px;"></iframe>
   </div>
 </section>
@@ -808,31 +875,84 @@ jobs:
 </main>
 </div>
 
-<script>
-// Section highlighting in the rail as you scroll
-const links = Array.from(document.querySelectorAll('.toc a'));
-const sections = links.map(l => document.querySelector(l.getAttribute('href')));
-const io = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      links.forEach(l => l.classList.remove('active'));
-      const id = '#' + e.target.id;
-      const match = links.find(l => l.getAttribute('href') === id);
-      if (match) match.classList.add('active');
-    }
-  });
-}, { rootMargin: '-20% 0px -70% 0px' });
-sections.forEach(s => s && io.observe(s));
+<button id="top-btn" aria-label="Back to top" title="Back to top">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
 
-// Filter the TOC by keyword (also matches section text roughly)
-const navSearch = document.getElementById('nav-search');
-navSearch.addEventListener('input', () => {
-  const q = navSearch.value.toLowerCase();
-  links.forEach(l => {
-    const parent = l.parentElement;
-    l.style.display = l.innerText.toLowerCase().includes(q) ? '' : (q ? 'none' : '');
+<script>
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- reading progress bar ---- */
+  var fill = document.getElementById('progress-fill');
+  function updateProgress(){
+    var h = document.documentElement;
+    var scrolled = h.scrollTop;
+    var max = h.scrollHeight - h.clientHeight;
+    fill.style.width = (max > 0 ? (scrolled / max) * 100 : 0) + '%';
+  }
+  document.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  /* ---- mobile drawer ---- */
+  var rail = document.getElementById('rail');
+  var scrim = document.getElementById('rail-scrim');
+  var toggle = document.getElementById('menu-toggle');
+  function closeDrawer(){ rail.classList.remove('open'); scrim.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); }
+  function openDrawer(){ rail.classList.add('open'); scrim.classList.add('open'); toggle.setAttribute('aria-expanded','true'); }
+  toggle.addEventListener('click', function(){ rail.classList.contains('open') ? closeDrawer() : openDrawer(); });
+  scrim.addEventListener('click', closeDrawer);
+
+  /* ---- TOC section highlighting ---- */
+  var links = Array.from(document.querySelectorAll('.toc a'));
+  var sections = links.map(function(l){ return document.querySelector(l.getAttribute('href')); });
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (e.isIntersecting) {
+        links.forEach(function(l){ l.classList.remove('active'); });
+        var id = '#' + e.target.id;
+        var match = links.find(function(l){ return l.getAttribute('href') === id; });
+        if (match) match.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(function(s){ if (s) io.observe(s); });
+
+  /* close the mobile drawer once a link is tapped */
+  links.forEach(function(l){ l.addEventListener('click', function(){ if (window.innerWidth <= 980) closeDrawer(); }); });
+
+  /* ---- filter the TOC by keyword ---- */
+  var navSearch = document.getElementById('nav-search');
+  navSearch.addEventListener('input', function(){
+    var q = navSearch.value.toLowerCase();
+    links.forEach(function(l){ l.style.display = l.innerText.toLowerCase().includes(q) ? '' : (q ? 'none' : ''); });
   });
-});
+
+  /* ---- scroll reveal ---- */
+  if (reduced) {
+    document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('in'); });
+  } else {
+    var revealIo = new IntersectionObserver(function(entries){
+      entries.forEach(function(e, i){
+        if (e.isIntersecting) {
+          e.target.style.transitionDelay = (i % 4) * 60 + 'ms';
+          e.target.classList.add('in');
+          revealIo.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -6% 0px' });
+    document.querySelectorAll('.reveal').forEach(function(el){ revealIo.observe(el); });
+  }
+
+  /* ---- back-to-top button ---- */
+  var topBtn = document.getElementById('top-btn');
+  document.addEventListener('scroll', function(){
+    topBtn.classList.toggle('show', document.documentElement.scrollTop > 800);
+  }, { passive: true });
+  topBtn.addEventListener('click', function(){
+    window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+  });
+})();
 </script>
 </body>
 </html>
