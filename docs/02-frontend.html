@@ -283,6 +283,63 @@ mark{background:var(--accent-dim); color:var(--text); border-radius:2px; padding
 .landing-card p{margin:0; font-size:13.5px; color:var(--muted); font-family:"Iowan Old Style","Palatino Linotype",Georgia,serif;}
 
 </style>
+<style id="anim-pack">
+/* ===== additive learning-animation pack (does not alter any content) ===== */
+#progress-fill{ background-size:200% 100%; animation:ap-shimmer 3s linear infinite; }
+@keyframes ap-shimmer{ to{ background-position:-200% 0; } }
+
+/* flowing light along the accent edge of info/security/india boxes */
+.callout, .security, .india{ position:relative; }
+.callout::after, .security::after, .india::after{
+  content:""; position:absolute; left:-1px; top:10px; bottom:10px; width:3px; border-radius:3px;
+  background:linear-gradient(180deg, transparent, var(--accent-2), transparent);
+  background-size:100% 240%; animation:ap-edge 3.4s ease-in-out infinite; opacity:.75; pointer-events:none;
+}
+.security::after{ background:linear-gradient(180deg, transparent, var(--accent), transparent); background-size:100% 240%; }
+@keyframes ap-edge{ 0%{ background-position:0 -120%; } 100%{ background-position:0 120%; } }
+
+/* active sidebar dot: gentle radar pulse */
+.toc a.active .dot{ animation:ap-pulse 2.1s ease-in-out infinite; }
+@keyframes ap-pulse{ 0%,100%{ box-shadow:0 0 0 3px var(--accent-2-soft); } 50%{ box-shadow:0 0 0 7px transparent; } }
+
+/* section subheadings draw a short underline when they scroll in */
+.stage h3{ position:relative; }
+.stage h3.reveal.in::after{
+  content:""; position:absolute; left:0; bottom:-5px; height:2px; width:0; border-radius:2px;
+  background:linear-gradient(90deg, var(--accent-2), transparent);
+  animation:ap-underline .7s var(--ease) .12s forwards;
+}
+@keyframes ap-underline{ to{ width:46px; } }
+
+/* std standard-tags gently lift on hover */
+.std{ transition:transform .15s var(--ease); }
+.std:hover{ transform:translateY(-1px) scale(1.05); }
+
+/* cards get an animated top sheen on hover */
+.card{ position:relative; overflow:hidden; }
+.card::before{
+  content:""; position:absolute; top:0; left:-60%; width:60%; height:2px;
+  background:linear-gradient(90deg, transparent, var(--accent-2), transparent); opacity:0;
+}
+.card:hover::before{ animation:ap-sheen 1.1s var(--ease) forwards; opacity:1; }
+@keyframes ap-sheen{ from{ left:-60%; } to{ left:120%; } }
+
+/* ===== animated explainer figures ===== */
+.anim-fig{ margin:28px 0; border:1px solid var(--line); border-radius:14px; background:var(--panel-2); padding:20px 20px 14px; }
+.anim-fig svg{ width:100%; height:auto; display:block; }
+.anim-fig figcaption{ margin-top:12px; font-size:12.5px; color:var(--muted); font-family:"SFMono-Regular",Consolas,monospace; text-align:center; letter-spacing:.01em; }
+.anim-fig .fig-tag{ display:inline-block; font-family:"SFMono-Regular",Consolas,monospace; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent-2); margin-bottom:12px; }
+.af-box{ fill:var(--panel); stroke:var(--line); stroke-width:1.5; }
+.af-title{ fill:var(--text); font:600 12.5px 'SFMono-Regular',monospace; }
+.af-sub{ fill:var(--muted); font:11px 'SFMono-Regular',monospace; }
+.af-lbl{ fill:var(--muted-2); font:10.5px 'SFMono-Regular',monospace; }
+.af-line{ stroke:var(--line); stroke-width:2; }
+.af-flow{ stroke:var(--accent-2); stroke-width:2; stroke-dasharray:5 7; animation:af-dash 1s linear infinite; opacity:.7; }
+@keyframes af-dash{ to{ stroke-dashoffset:-12; } }
+.af-pkt{ fill:var(--accent); }
+.af-pkt2{ fill:var(--accent-2); }
+.af-ok{ fill:var(--ok, #63d99a); }
+</style>
 </head>
 <body>
 
@@ -357,6 +414,29 @@ mark{background:var(--accent-dim); color:var(--text); border-radius:2px; padding
 <section class="stage" id="s2">
   <div class="stage-head reveal"><span class="stage-num">02</span><h2>Frontend</h2></div>
   <p class="dek reveal">The part users touch. Optimize for clarity of state (loading / error / empty / success) before you optimize for visual polish.</p>
+
+<figure class="anim-fig reveal">
+  <span class="fig-tag">Animated · token refresh cycle</span>
+  <svg viewBox="0 0 820 200" role="img" aria-label="Animation: an API call with an expired token returns 401, triggers a silent refresh, then the original request is retried and succeeds">
+    <style>
+      .tok-n{ animation:tok-blink 5.2s linear infinite; }
+      .tok-n2{ animation-delay:1.3s; } .tok-n3{ animation-delay:2.6s; } .tok-n4{ animation-delay:3.9s; }
+      @keyframes tok-blink{ 0%,6%{ stroke:var(--accent-2); stroke-width:2.6; } 16%,100%{ stroke:var(--line); stroke-width:1.5; } }
+      .tok-ret{ stroke:var(--accent); stroke-width:2; fill:none; stroke-dasharray:6 7; animation:tok-dash 1s linear infinite; opacity:.8; }
+      @keyframes tok-dash{ to{ stroke-dashoffset:-13; } }
+      .tok-g{ animation:tok-move 5.2s ease-in-out infinite; }
+      @keyframes tok-move{ 0%{ transform:translateX(115px);} 78%{ transform:translateX(705px);} 100%{ transform:translateX(705px);} }
+    </style>
+    <line class="af-flow" x1="115" y1="95" x2="705" y2="95"/>
+    <g><rect class="af-box tok-n"  x="35"  y="70" width="160" height="52" rx="11"/><text class="af-title" x="115" y="92" text-anchor="middle">API call</text><text class="af-sub" x="115" y="110" text-anchor="middle">+ access token</text></g>
+    <g><rect class="af-box tok-n tok-n2" x="245" y="70" width="150" height="52" rx="11"/><text class="af-title" x="320" y="92" text-anchor="middle">401</text><text class="af-sub" x="320" y="110" text-anchor="middle">token expired</text></g>
+    <g><rect class="af-box tok-n tok-n3" x="445" y="70" width="150" height="52" rx="11"/><text class="af-title" x="520" y="92" text-anchor="middle">/refresh</text><text class="af-sub" x="520" y="110" text-anchor="middle">httpOnly cookie</text></g>
+    <g><rect class="af-box tok-n tok-n4" x="645" y="70" width="150" height="52" rx="11"/><text class="af-title" x="720" y="92" text-anchor="middle">retry OK</text><text class="af-sub" x="720" y="110" text-anchor="middle">new token</text></g>
+    <path class="tok-ret" d="M720 66 C 720 30, 115 30, 115 66"/>
+    <g class="tok-g"><circle class="af-pkt2" cx="0" cy="95" r="6"/></g>
+  </svg>
+  <figcaption>Access token lives in memory only; on a 401 the app silently refreshes and retries — the user never notices.</figcaption>
+</figure>
 
   <h3 class="reveal">Pick a stack and stop debating it</h3>
   <p class="reveal">For 2026, a defensible default: <b>React + TypeScript + Vite</b> for a single-page app, or <b>Next.js</b> if you want server rendering and API routes in one codebase. TypeScript is not optional at this point — it catches an entire category of bugs (wrong shapes crossing the frontend/backend boundary) before a user ever sees them.</p>
