@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://webstocking.com/application/how-to-build-an-application.html</loc><priority>1.0</priority></url>
+  <url><loc>https://webstocking.com/application/01-plan-and-threat-model.html</loc><priority>0.8</priority></url>
+  <url><loc>https://webstocking.com/application/02-frontend.html</loc><priority>0.8</priority></url>
+  <url><loc>https://webstocking.com/application/03-backend-api.html</loc><priority>0.8</priority></url>
+  <url><loc>https://webstocking.com/application/04-database.html</loc><priority>0.8</priority></url>
+  <url><loc>https://webstocking.com/application/05-auth-otp-secrets.html</loc><priority>0.8</priority></url>
+  <url><loc>https://webstocking.com/application/06-email-otp-delivery.html</loc><priority>0.8</priority></url>
+  <url><loc>https://webstocking.com/application/07-storage-cdn.html</loc><priority>0.8</priority></url>
+  <url><loc>https://webstocking.com/application/08-servers-vm.html</loc><priority>0.8</priority></url>
+  <url><loc>https://webstocking.com/application/09-load-balancing-autoscaling.html</loc><priority>0.8</priority></url>
+  <url><loc>https://webstocking.com/application/10-domains-dns.html</loc><priority>0.8</priority></url>
+  <url><loc>https://webstocking.com/application/11-cicd.html</loc><priority>0.8</priority></url>
+  <url><loc>https://webstocking.com/application/12-monitoring-incident-response.html</loc><priority>0.8</priority></url>
+  <url><loc>https://webstocking.com/application/13-security-checklist.html</loc><priority>0.8</priority></url>
+  <url><loc>https://webstocking.com/application/14-compliance.html</loc><priority>0.8</priority></url>
+  <url><loc>https://webstocking.com/application/15-skill-roadmap.html</loc><priority>0.8</priority></url>
+  <url><loc>https://webstocking.com/application/16-glossary.html</loc><priority>0.6</priority></url>
+  <url><loc>https://webstocking.com/application/17-full-resource-catalog.html</loc><priority>0.7</priority></url>
+  <url><loc>https://webstocking.com/application/18-worked-backend-example.html</loc><priority>0.8</priority></url>
+  <url><loc>https://webstocking.com/application/19-reliability-and-disaster-recovery.html</loc><priority>0.8</priority></url>
+</urlset>

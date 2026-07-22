@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /application/
+
+Sitemap: https://webstocking.com/application/sitemap.xml

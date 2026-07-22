@@ -3,7 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%A7%AD%3C/text%3E%3C/svg%3E">
 <title>Database — structure, scaling, and how it actually gets hacked — Field Manual</title>
+<meta property="og:title" content="Database — structure, scaling, and how it actually gets hacked">
+<meta property="og:description" content="Get the schema and indexes right early — migrating a live table under load is the least fun afternoon in software. This stage also covers what happens once one database isn't enough, and how a database is actually attacked, step by step.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://webstocking.com/application/04-database.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Database — structure, scaling, and how it actually gets hacked">
+<meta name="twitter:description" content="Get the schema and indexes right early — migrating a live table under load is the least fun afternoon in software. This stage also covers what happens once one database isn't enough, and how a database is actually attacked, step by step.">
 <style>
 :root{
   --bg:#060910; --bg2:#0a0f1a;
@@ -250,6 +258,39 @@ footer{ border-top:1px solid var(--line); padding:28px 0 40px; color:var(--muted
 .af-flow{ stroke:var(--accent); stroke-width:2; stroke-dasharray:5 7; animation:af-dash 1s linear infinite; opacity:.75; }
 @keyframes af-dash{ to{ stroke-dashoffset:-12; } }
 .af-pkt{ fill:var(--warn); } .af-pkt2{ fill:var(--accent); } .af-ok{ fill:var(--ok); }
+
+/* heading anchors */
+.h-anchor{ opacity:0; margin-left:9px; font-size:.78em; color:var(--muted-2); text-decoration:none; font-family:var(--f-mono); transition:opacity .15s var(--ease), color .15s var(--ease); }
+.stage h3:hover .h-anchor{ opacity:1; }
+.h-anchor:hover{ color:var(--accent); }
+
+/* code copy button */
+pre{ position:relative; }
+.copy-btn{ position:absolute; top:10px; right:10px; background:var(--glass-strong); border:1px solid var(--line); color:var(--muted); font-family:var(--f-mono); font-size:11px; padding:5px 10px; border-radius:7px; cursor:pointer; opacity:0; transition:opacity .15s var(--ease), border-color .15s var(--ease), color .15s var(--ease); }
+pre:hover .copy-btn{ opacity:1; }
+.copy-btn:hover{ border-color:var(--accent); color:var(--accent); }
+.copy-btn.copied{ opacity:1; color:var(--ok); border-color:var(--ok); }
+
+/* search */
+#search-btn{ position:fixed; right:26px; top:26px; width:46px; height:46px; border-radius:50%; background:var(--glass-strong); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px solid var(--line); color:var(--accent); cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow); transition:transform var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease); z-index:40; }
+#search-btn:hover{ border-color:var(--accent); transform:translateY(-2px); }
+#search-overlay{ position:fixed; inset:0; background:rgba(3,6,12,.6); backdrop-filter:blur(3px); z-index:70; display:flex; align-items:flex-start; justify-content:center; padding-top:12vh; opacity:0; pointer-events:none; transition:opacity .2s var(--ease); }
+#search-overlay.open{ opacity:1; pointer-events:auto; }
+#search-modal{ width:min(560px,90vw); max-height:70vh; display:flex; flex-direction:column; background:var(--glass-strong); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); overflow:hidden; transform:translateY(-12px); transition:transform .2s var(--ease); }
+#search-overlay.open #search-modal{ transform:none; }
+#search-input{ width:100%; padding:18px 20px; border:0; border-bottom:1px solid var(--line); background:transparent; color:var(--text); font-size:16px; font-family:var(--f-body); outline:none; }
+#search-input::placeholder{ color:var(--muted-2); }
+#search-results{ overflow-y:auto; padding:8px; }
+.search-result{ display:flex; gap:13px; align-items:baseline; padding:11px 14px; border-radius:10px; text-decoration:none; color:var(--text); }
+.search-result:hover{ background:var(--accent-soft); }
+.search-result .sr-num{ font-family:var(--f-mono); color:var(--accent); font-size:12px; flex:none; }
+.search-result .sr-title{ font-size:14.5px; }
+.search-empty{ padding:20px; text-align:center; color:var(--muted); font-size:13.5px; }
+
+/* progress tracking */
+.complete-toggle{ margin:6px 0 4px; font-family:var(--f-mono); }
+.complete-toggle svg{ flex:none; }
+.complete-toggle.done{ border-color:var(--ok); color:var(--ok); }
 </style>
 </head>
 <body>
@@ -260,7 +301,23 @@ footer{ border-top:1px solid var(--line); padding:28px 0 40px; color:var(--muted
 
 <section class="stage" id="s4">
   <div class="stage-head reveal"><span class="stage-num">04</span><h2>Database — structure, scaling, and how it actually gets hacked</h2></div>
+  <button class="btn complete-toggle reveal" id="complete-toggle" data-page="04-database.html" type="button">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="ct-label">Mark this stage complete</span>
+  </button>
+
   <p class="dek reveal">Get the schema and indexes right early — migrating a live table under load is the least fun afternoon in software. This stage also covers what happens once one database isn't enough, and how a database is actually attacked, step by step.</p>
+  <div class="callout reveal" id="in-page-toc">
+    <div class="ctitle">On this page</div>
+    <ul style="columns:2; column-gap:28px; margin:0; padding-left:1.1em;">
+      <li><a href="#relational-by-default">Relational by default</a></li>
+      <li><a href="#structure-index-what-you-query-by-constrain-what-must-be-unique">Structure: index what you query by, constrain what must be unique</a></li>
+      <li><a href="#scaling-what-happens-after-one-database-isnt-enough">Scaling: what happens after one database isn't enough</a></li>
+      <li><a href="#beyond-a-single-relational-database-how-distributed-stores-stay-correct">Beyond a single relational database: how distributed stores stay correct</a></li>
+      <li><a href="#the-hacking-side-how-a-database-actually-gets-breached">The hacking side: how a database actually gets breached</a></li>
+    </ul>
+  </div>
+
 
 <figure class="anim-fig reveal">
   <span class="fig-tag">Animated · cache-aside (hit vs. miss)</span>
@@ -300,10 +357,10 @@ footer{ border-top:1px solid var(--line); padding:28px 0 40px; color:var(--muted
   <figcaption>Check the cache first; on a miss, read the database and populate the cache so the next read is a hit.</figcaption>
 </figure>
 
-  <h3 class="reveal">Relational by default</h3>
+  <h3 class="reveal" id="relational-by-default">Relational by default<a class="h-anchor" href="#relational-by-default" aria-label="Link to this section">#</a></h3>
   <p class="reveal"><b>PostgreSQL</b> is the right default for almost everything with users, relationships, and money-adjacent data. Reach for a document store (MongoDB) or a cache (Redis) only when you have a specific access pattern that relational modeling actively fights — not because it feels more modern.</p>
 
-  <h3 class="reveal">Structure: index what you query by, constrain what must be unique</h3>
+  <h3 class="reveal" id="structure-index-what-you-query-by-constrain-what-must-be-unique">Structure: index what you query by, constrain what must be unique<a class="h-anchor" href="#structure-index-what-you-query-by-constrain-what-must-be-unique" aria-label="Link to this section">#</a></h3>
   <pre class="mono reveal">model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -325,7 +382,7 @@ model Follow {
     <p>Every schema change is a migration file, checked into git, applied the same way in every environment (local → staging → production). Never hand-edit a production schema through a GUI — you lose the ability to reproduce it.</p>
   </div>
 
-  <h3 class="reveal">Scaling: what happens after one database isn't enough</h3>
+  <h3 class="reveal" id="scaling-what-happens-after-one-database-isnt-enough">Scaling: what happens after one database isn't enough<a class="h-anchor" href="#scaling-what-happens-after-one-database-isnt-enough" aria-label="Link to this section">#</a></h3>
   <p class="reveal">Alex Xu's <i>System Design Interview</i> lays out the standard progression clearly (Chapter 1, "Scale From Zero To Millions Of Users") — the order below is that same progression, applied to the database tier specifically:</p>
   <ol class="reveal">
     <li><b>Vertical scaling first</b> — a bigger machine (more CPU/RAM/IOPS). Simplest option, and the right first move; it has a ceiling and a single point of failure, but it buys time without adding architectural complexity.</li>
@@ -341,7 +398,7 @@ model Follow {
 
   <p class="reveal"><b>Consistent hashing</b> (Chapter 5 of the same book) is the standard fix for the resharding problem specifically: instead of a naive <code>hash(key) % N</code> (where adding or removing one server reshuffles almost everything), servers and keys are placed on a conceptual ring by hash value, and each key belongs to the next server clockwise from it. Adding or removing a server then only affects its immediate neighbors on the ring, not the entire dataset — this is the same idea behind how a load balancer distributes requests and how a distributed cache decides which node holds which key.</p>
 
-  <h3 class="reveal">Beyond a single relational database: how distributed stores stay correct</h3>
+  <h3 class="reveal" id="beyond-a-single-relational-database-how-distributed-stores-stay-correct">Beyond a single relational database: how distributed stores stay correct<a class="h-anchor" href="#beyond-a-single-relational-database-how-distributed-stores-stay-correct" aria-label="Link to this section">#</a></h3>
   <p class="reveal">If you ever move part of your data into a distributed key-value store (Cassandra, DynamoDB, Riak — the subject of Chapter 6, "Design A Key-Value Store"), a few ideas from that world explain <i>why</i> those systems behave the way they do, and they're worth recognizing even if Postgres is all you use:</p>
   <div class="grid2 reveal">
     <div class="card"><h4>CAP theorem</h4><p>During a network partition, a distributed system must choose between Consistency (every read sees the latest write) and Availability (every request gets a response). You can't fully have both at once — most key-value stores are tuned toward one side (CP or AP) and let you tune per-operation.</p></div>
@@ -350,7 +407,7 @@ model Follow {
     <div class="card"><h4>Gossip protocol &amp; hinted handoff</h4><p>Nodes tell each other which peers are up or down (gossip), so the system detects a failed node without a central coordinator. If a node is briefly unreachable, another node temporarily holds ("hints at") the writes meant for it and hands them off once it's back — a temporary failure doesn't become a permanent data loss.</p></div>
   </div>
 
-  <h3 class="reveal">The hacking side: how a database actually gets breached</h3>
+  <h3 class="reveal" id="the-hacking-side-how-a-database-actually-gets-breached">The hacking side: how a database actually gets breached<a class="h-anchor" href="#the-hacking-side-how-a-database-actually-gets-breached" aria-label="Link to this section">#</a></h3>
   <p class="reveal">Every step below is a real, common attack chain — not a hypothetical. Each one maps to a specific, fixable cause.</p>
 
   <h4 style="margin:22px 0 8px; font-size:15px; color:var(--accent-2);" class="reveal mono">1. SQL injection — the classic</h4>
@@ -403,10 +460,17 @@ db.users.find({ username: req.body.username, password: req.body.password });
 
 <div class="divider"></div>
 <footer>
-  Vamsi <span style="color:var(--accent)">·</span> <span style="color:var(--accent)">Application Builder</span>
+  Vamsi <span style="color:var(--accent)">·</span> <span style="color:var(--accent)">Application Builder</span> · Last updated 22 Jul 2026
 </footer>
 
 </main>
+</div>
+<button id="search-btn" aria-label="Search" title="Search (Ctrl+K)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+<div id="search-overlay">
+  <div id="search-modal">
+    <input id="search-input" type="text" placeholder="Search all 20 stages…" autocomplete="off">
+    <div id="search-results"></div>
+  </div>
 </div>
 <a id="home-btn" href="how-to-build-an-application.html" aria-label="Back to contents" title="Back to contents"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-8 9 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10v10h14V10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
 <button id="top-btn" aria-label="Back to top" title="Back to top"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -475,7 +539,7 @@ db.users.find({ username: req.body.username, password: req.body.password });
   function accent(){ return getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||'#5eead4'; }
   function accent2(){ return getComputedStyle(document.documentElement).getPropertyValue('--accent-2').trim()||'#4aa8ff'; }
   function size(){ DPR=Math.min(window.devicePixelRatio||1,2); W=cv.width=Math.floor(innerWidth*DPR); H=cv.height=Math.floor(innerHeight*DPR); cv.style.width=innerWidth+'px'; cv.style.height=innerHeight+'px'; }
-  function init(){ var n=Math.max(20,Math.min(52,Math.floor(innerWidth/32))); nodes=[]; for(var i=0;i<n;i++){ nodes.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.14*DPR,vy:(Math.random()-.5)*.14*DPR}); } packets=[]; for(var k=0;k<7;k++){ packets.push(newPkt()); } }
+  function init(){ var mobile=innerWidth<600; var n=Math.max(mobile?10:20,Math.min(mobile?28:52,Math.floor(innerWidth/32))); nodes=[]; for(var i=0;i<n;i++){ nodes.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.14*DPR,vy:(Math.random()-.5)*.14*DPR}); } packets=[]; var pktN=mobile?4:7; for(var k=0;k<pktN;k++){ packets.push(newPkt()); } }
   function newPkt(){ var a=(Math.random()*nodes.length)|0, b=(Math.random()*nodes.length)|0; return {a:a,b:b,t:Math.random(),sp:.004+Math.random()*.006}; }
   function draw(){
     ctx.clearRect(0,0,W,H); var A=accent(), A2=accent2(); var max=155*DPR;
@@ -489,6 +553,73 @@ db.users.find({ username: req.body.username, password: req.body.password });
   window.addEventListener('resize',function(){ size(); init(); if(reduce) draw(); });
   document.addEventListener('visibilitychange',function(){ if(document.hidden){ cancelAnimationFrame(raf); } else if(!reduce){ draw(); } });
   start();
+
+  /* code copy buttons */
+  document.querySelectorAll('pre').forEach(function(p){
+    var codeText = p.innerText;
+    var btn=document.createElement('button');
+    btn.className='copy-btn'; btn.type='button'; btn.textContent='Copy';
+    btn.addEventListener('click',function(){
+      navigator.clipboard.writeText(codeText).then(function(){
+        btn.textContent='Copied'; btn.classList.add('copied');
+        setTimeout(function(){ btn.textContent='Copy'; btn.classList.remove('copied'); },1400);
+      });
+    });
+    p.appendChild(btn);
+  });
+
+
+  /* site-wide search */
+  var SEARCH_INDEX = [{"n": "01", "t": "Plan & threat-model first", "f": "01-plan-and-threat-model.html"}, {"n": "02", "t": "Frontend", "f": "02-frontend.html"}, {"n": "03", "t": "Backend & API", "f": "03-backend-api.html"}, {"n": "04", "t": "Database — structure, scaling, and how it actually gets hacked", "f": "04-database.html"}, {"n": "05", "t": "Auth, OTP & the password wallet", "f": "05-auth-otp-secrets.html"}, {"n": "06", "t": "Email / OTP delivery", "f": "06-email-otp-delivery.html"}, {"n": "07", "t": "File storage & the CDN", "f": "07-storage-cdn.html"}, {"n": "08", "t": "Servers & the VM", "f": "08-servers-vm.html"}, {"n": "09", "t": "Load balancers & autoscaling", "f": "09-load-balancing-autoscaling.html"}, {"n": "10", "t": "Domain names & DNS", "f": "10-domains-dns.html"}, {"n": "11", "t": "CI/CD pipelines", "f": "11-cicd.html"}, {"n": "12", "t": "Monitoring & incident response", "f": "12-monitoring-incident-response.html"}, {"n": "13", "t": "Security hardening checklist — the consolidated view", "f": "13-security-checklist.html"}, {"n": "14", "t": "Compliance & governance, including India", "f": "14-compliance.html"}, {"n": "15", "t": "Skill roadmap: junior → staff", "f": "15-skill-roadmap.html"}, {"n": "16", "t": "Glossary", "f": "16-glossary.html"}, {"n": "17", "t": "Full resource catalog, explained", "f": "17-full-resource-catalog.html"}, {"n": "18", "t": "A backend, file by file — then an AI security audit", "f": "18-worked-backend-example.html"}, {"n": "19", "t": "Reliability & resilience — redundancy, backups, DDoS, and disaster recovery", "f": "19-reliability-and-disaster-recovery.html"}, {"n": "00", "t": "How to use this manual", "f": "how-to-build-an-application.html"}];
+  var searchBtn=document.getElementById('search-btn'), searchOverlay=document.getElementById('search-overlay'),
+      searchInput=document.getElementById('search-input'), searchResults=document.getElementById('search-results');
+  function renderResults(q){
+    var ql=q.toLowerCase();
+    var matches = q ? SEARCH_INDEX.filter(function(e){ return e.t.toLowerCase().indexOf(ql)>-1; }) : SEARCH_INDEX;
+    searchResults.innerHTML='';
+    if(!matches.length){ var d=document.createElement('div'); d.className='search-empty'; d.textContent='No matching stage.'; searchResults.appendChild(d); return; }
+    matches.forEach(function(e){
+      var a=document.createElement('a'); a.className='search-result'; a.href=e.f;
+      var n=document.createElement('span'); n.className='sr-num'; n.textContent=e.n;
+      var t=document.createElement('span'); t.className='sr-title'; t.textContent=e.t;
+      a.appendChild(n); a.appendChild(t); searchResults.appendChild(a);
+    });
+  }
+  function openSearch(){ searchOverlay.classList.add('open'); searchInput.value=''; renderResults(''); setTimeout(function(){ searchInput.focus(); },60); }
+  function closeSearch(){ searchOverlay.classList.remove('open'); }
+  if(searchBtn){
+    searchBtn.addEventListener('click', openSearch);
+    searchOverlay.addEventListener('click', function(e){ if(e.target===searchOverlay) closeSearch(); });
+    searchInput.addEventListener('input', function(){ renderResults(searchInput.value); });
+    document.addEventListener('keydown', function(e){
+      if((e.ctrlKey||e.metaKey) && e.key==='k'){ e.preventDefault(); openSearch(); }
+      if(e.key==='Escape') closeSearch();
+    });
+  }
+
+
+  /* progress tracking (this stage) */
+  (function(){
+    var KEY='manual-progress';
+    function getProgress(){ try{ return JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){ return {}; } }
+    function setProgress(p){ try{ localStorage.setItem(KEY, JSON.stringify(p)); }catch(e){} }
+    var ctBtn=document.getElementById('complete-toggle');
+    if(!ctBtn) return;
+    var page=ctBtn.getAttribute('data-page');
+    var progress=getProgress();
+    var label=ctBtn.querySelector('.ct-label');
+    function refresh(){
+      if(progress[page]){ ctBtn.classList.add('done'); label.textContent='Stage complete'; }
+      else{ ctBtn.classList.remove('done'); label.textContent='Mark this stage complete'; }
+    }
+    refresh();
+    ctBtn.addEventListener('click', function(){
+      progress[page] = !progress[page];
+      setProgress(progress);
+      refresh();
+    });
+  })();
+
 })();
 </script>
 </body>
