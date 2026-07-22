@@ -34,6 +34,7 @@ Deployed on an Ubuntu VM behind Nginx, served as plain static files (no build st
   20. [`20-your-first-build.html`](docs/20-your-first-build.html) — a linear, checkable build-order checklist through every stage, plus a capstone project (TinyLink) that touches all of them
 - [`docs/security/master_cybersecurity_checks_resources.html`](docs/security/master_cybersecurity_checks_resources.html) — the original standalone 103-entry catalog of security standards/frameworks (OWASP, MITRE ATT&CK/CWE/CAPEC, CIS Benchmarks, NIST, and more) that Stage 17 explains and links out to individually.
 - [`docs/DEPLOY.md`](docs/DEPLOY.md) — VM deployment steps, GitHub Actions auto-deploy setup, and applied security hardening.
+- [`starter/`](starter) — **TinyLink**, a real runnable companion codebase implementing the Stage 20 capstone project: Node.js/TypeScript/Express/Prisma/PostgreSQL backend + React/TypeScript/Vite frontend, verified to install (0 known vulnerabilities), type-check, build, and pass its test suite. Separate from `docs/` — not part of the deployed manual, a local project you clone and run yourself.
 - [`CLAUDE.md`](CLAUDE.md) — notes for future work in this repo: what exists, why, and decisions made along the way.
 
 ## How to read it

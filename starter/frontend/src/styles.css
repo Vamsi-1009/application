@@ -1,0 +1,122 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #0b0f16;
+  color: #e8edf5;
+}
+
+.auth-page, .dashboard {
+  max-width: 480px;
+  margin: 60px auto;
+  padding: 0 20px;
+}
+
+.dashboard {
+  max-width: 720px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 20px 0;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+
+input {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #2b3650;
+  background: #101826;
+  color: inherit;
+  font-size: 14px;
+}
+
+button {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #2b3650;
+  background: #5eead4;
+  color: #04231f;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.link-button {
+  background: none;
+  color: #5eead4;
+  border: none;
+  font-weight: 500;
+  padding: 4px 0;
+}
+
+.error {
+  color: #ff6b6b;
+  font-size: 14px;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.create-link-form {
+  flex-direction: row;
+}
+
+.create-link-form input {
+  flex: 1;
+}
+
+.link-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.link-list li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px solid #2b3650;
+  border-radius: 10px;
+}
+
+.link-list a {
+  color: #5eead4;
+  font-weight: 600;
+}
+
+.target-url {
+  color: #93a2ba;
+  font-size: 13px;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.click-count {
+  font-size: 12px;
+  color: #93a2ba;
+}

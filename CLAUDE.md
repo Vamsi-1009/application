@@ -48,7 +48,16 @@ The user then corrected: they wanted a **teaching page**, not a built project. I
 - **Mini in-page TOCs**: pages `04`, `17`, `18`, `19` (the longest ones) get an "On this page" callout linking to that page's own heading anchors, inserted right after the stage's dek paragraph.
 - **"Real mistake" callouts**: a new `.mistake` box style (danger-red accent, same visual family as `.callout`/`.security`/`.india`) documents two genuine incidents hit while building and deploying this exact site — the Nginx `sites-enabled` backup-file crash (Stage 08) and the SSH deploy-key naming collision that made GitHub Actions silently deploy the wrong project while still showing green (Stage 11). Authentic, not hypothetical — the CSS/JS is baked into all pages for reuse, but only these two currently have content.
 - **Cumulative architecture diagram**: on the landing page's Stage 00 section, one animated figure showing the system's components appearing in build order (Browser → Load Balancer → Backend → Database → Storage/CDN → Monitoring), each staying "lit" once activated rather than fading out — reinforces that this is one system built incrementally, distinct from the seven per-stage explainer figures which each illustrate a single isolated concept.
-- **Mini in-page TOCs**: pages `04`, `17`, `18`, `19` (the longest ones) get an "On this page" callout linking to that page's own heading anchors, inserted right after the stage's dek paragraph.
+
+## The starter repo (`starter/`)
+
+After the second "any suggestions?" pass, the user explicitly asked for a real runnable companion codebase (a reversal of the earlier "teaching page, not a built project" decision from this repo's history — confirmed deliberately this time via an explicit question, not assumed). Scoped down to exactly the Stage 20 capstone (TinyLink, a link shortener) rather than another Instagram-style clone, since it's small enough to actually finish and still touches auth/OTP, ownership checks, rate limiting, and the DB/frontend patterns from Stages 02-06 and 18.
+
+**Lives at `starter/`, sibling to `docs/`, not inside it** — the VM's Nginx config only serves `docs/`, so nothing here can accidentally go live by being in the wrong folder.
+
+- `starter/backend/` — Node.js + TypeScript + Express + Prisma + PostgreSQL. `npm install` (0 vulnerabilities after bumping `nodemailer` to `^9.0.3` and `vitest` to `^4.1.10` past flagged CVEs from what were initially more "obvious" version picks), `npm run typecheck`, `npm run build`, and `npm test` all verified passing before commit — a real bug was caught and fixed in this pass (`jwt.SignOptions["expiresIn"]` type mismatch with the zod-validated env string) and a real test-setup gap (`vitest.config.ts` needed dummy env vars so `config/secrets.ts`'s intentional fail-fast validation doesn't block test runs).
+- `starter/frontend/` — React + TypeScript + Vite. Same install/typecheck/build verification. Implements the exact in-memory-token + refresh-on-401 pattern Stage 02 teaches, not a simplified version of it.
+- If asked to extend the starter (e.g. the per-link preview image mentioned in the Stage 20 capstone brief), treat it like any other real codebase change: run `npm run typecheck`/`build`/`test` before considering it done, the same rigor already applied here.
 
 ## Deployment
 
