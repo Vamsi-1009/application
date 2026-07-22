@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reliability & resilience — redundancy, backups, DDoS, and disaster recovery — Field Manual</title>
+<style>
+:root{
+  --bg:#060910; --bg2:#0a0f1a;
+  --glass: rgba(255,255,255,0.035);
+  --glass-strong: rgba(255,255,255,0.06);
+  --line: rgba(255,255,255,0.09);
+  --line-soft: rgba(255,255,255,0.055);
+  --text:#e9eef6; --muted:#93a3ba; --muted-2:#5f7391;
+  --accent:#5eead4; --accent-2:#4aa8ff;
+  --accent-soft: rgba(94,234,212,0.12); --accent-glow: rgba(94,234,212,0.45);
+  --warn:#ffb45e; --warn-soft: rgba(255,180,94,0.10); --warn-dim: rgba(255,180,94,0.4);
+  --ok:#63d99a; --danger:#ff6b6b;
+  --code-bg: rgba(3,7,14,0.72);
+  --f-display: system-ui,"Segoe UI","Helvetica Neue",Roboto,-apple-system,Arial,sans-serif;
+  --f-body: "Iowan Old Style","Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;
+  --f-mono: "SFMono-Regular",ui-monospace,Consolas,"Liberation Mono",Menlo,monospace;
+  --dur-fast:160ms; --dur:460ms; --ease:cubic-bezier(.22,.9,.3,1);
+  --shadow: 0 20px 50px -24px rgba(0,0,0,0.7);
+}
+:root[data-theme="light"]{
+  --bg:#eef1ec; --bg2:#e7ebe4;
+  --glass: rgba(255,255,255,0.6); --glass-strong: rgba(255,255,255,0.82);
+  --line: rgba(20,35,45,0.14); --line-soft: rgba(20,35,45,0.08);
+  --text:#12181f; --muted:#4b5666; --muted-2:#7d8896;
+  --accent:#0d9488; --accent-2:#0369a1;
+  --accent-soft: rgba(13,148,136,0.12); --accent-glow: rgba(13,148,136,0.35);
+  --warn:#b4651a; --warn-soft: rgba(180,101,26,0.1); --warn-dim: rgba(180,101,26,0.4);
+  --ok:#1f7a4d; --danger:#c0392b;
+  --code-bg: rgba(255,255,255,0.7);
+  --shadow: 0 20px 50px -26px rgba(30,40,30,0.35);
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#eef1ec; --bg2:#e7ebe4;
+    --glass: rgba(255,255,255,0.6); --glass-strong: rgba(255,255,255,0.82);
+    --line: rgba(20,35,45,0.14); --line-soft: rgba(20,35,45,0.08);
+    --text:#12181f; --muted:#4b5666; --muted-2:#7d8896;
+    --accent:#0d9488; --accent-2:#0369a1;
+    --accent-soft: rgba(13,148,136,0.12); --accent-glow: rgba(13,148,136,0.35);
+    --warn:#b4651a; --warn-soft: rgba(180,101,26,0.1); --warn-dim: rgba(180,101,26,0.4);
+    --ok:#1f7a4d; --danger:#c0392b;
+    --code-bg: rgba(255,255,255,0.7);
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important;}
+}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:var(--f-body); line-height:1.72; font-size:17.5px; -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+#bg-net{ position:fixed; inset:0; width:100vw; height:100vh; z-index:0; pointer-events:none; opacity:.9; }
+body::after{
+  content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:radial-gradient(120% 80% at 50% -10%, transparent 40%, var(--bg) 100%);
+}
+.shell, .mobile-bar, #progress-track, #top-btn, .rail-scrim{ position:relative; z-index:2; }
+.mono,code{ font-family:var(--f-mono); }
+h1,h2,h3,h4,.eyebrow,.stage-num,nav a,th,.rail-head .title,.fig-tag,.btn,.lc-num,.page-nav-label{ font-family:var(--f-display); }
+.eyebrow,.stage-num,nav a,th,.rail-head .title,.fig-tag,.lc-num,.page-nav-label{ font-family:var(--f-mono); }
+h1,h2,h3,h4{ text-wrap:balance; font-weight:750; letter-spacing:-0.02em; color:var(--text); }
+a{ color:var(--accent); text-underline-offset:3px; text-decoration-color:color-mix(in srgb,var(--accent) 40%, transparent); transition:color var(--dur-fast) var(--ease); }
+a:hover{ color:var(--accent-2); }
+:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; border-radius:3px; }
+
+#progress-track{ position:fixed; top:0; left:0; width:100%; height:3px; background:transparent; z-index:60; }
+#progress-fill{ height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--accent-2)); box-shadow:0 0 12px var(--accent-glow); background-size:200% 100%; animation:shimmer 3s linear infinite; }
+@keyframes shimmer{ to{ background-position:-200% 0; } }
+
+.mobile-bar{ display:none; position:sticky; top:0; z-index:50; align-items:center; justify-content:space-between; padding:12px 18px; background:var(--glass-strong); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-bottom:1px solid var(--line); }
+.mobile-bar .title{ font-family:var(--f-mono); font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--text); text-decoration:none; }
+.mobile-bar button{ background:var(--glass); color:var(--text); border:1px solid var(--line); border-radius:8px; padding:8px 13px; font-size:12.5px; font-family:var(--f-mono); cursor:pointer; }
+@media (max-width:980px){ .mobile-bar{ display:flex; } }
+
+.shell{ display:block; min-height:100vh; }
+main{ padding:70px 7vw 110px; max-width:960px; margin:0 auto; }
+@media (max-width:980px){ main{ padding:40px 6vw 90px; } }
+
+section.stage{ padding-top:16px; margin-bottom:78px; scroll-margin-top:24px; }
+.stage-head{ display:flex; align-items:baseline; gap:16px; margin-bottom:8px; }
+.stage-num{ font-size:13px; color:var(--accent); letter-spacing:.05em; }
+.stage h2{ font-size:clamp(26px,3.4vw,34px); margin:0; }
+.stage .dek{ color:var(--muted); font-size:16.5px; margin:12px 0 30px; max-width:62ch; }
+.stage h3{ position:relative; font-size:19px; margin:38px 0 12px; letter-spacing:-0.01em; }
+.stage h3.reveal.in::after{ content:""; position:absolute; left:0; bottom:-6px; height:2px; width:0; border-radius:2px; background:linear-gradient(90deg,var(--accent),transparent); animation:underline .7s var(--ease) .1s forwards; }
+@keyframes underline{ to{ width:52px; } }
+.stage p,.stage li{ color:var(--text); max-width:64ch; }
+.stage ul,.stage ol{ padding-left:1.3em; }
+.stage li{ margin-bottom:7px; }
+.stage li::marker{ color:var(--accent); font-family:var(--f-mono); font-size:.88em; }
+
+pre{ background:var(--code-bg); border:1px solid var(--line); border-radius:12px; padding:17px 19px; overflow-x:auto; font-size:13.2px; line-height:1.62; backdrop-filter:blur(6px); box-shadow:inset 0 1px 0 rgba(255,255,255,.03); }
+code{ font-family:var(--f-mono); }
+p code,li code{ background:var(--code-bg); border:1px solid var(--line-soft); border-radius:5px; padding:1px 6px; font-size:.85em; color:var(--accent); }
+
+.callout,.security,.india{ position:relative; border:1px solid var(--line); border-radius:14px; background:var(--glass); backdrop-filter:blur(10px); padding:19px 22px; margin:26px 0; transition:transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease); overflow:hidden; }
+.callout::before,.security::before,.india::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:linear-gradient(180deg,transparent,var(--accent),transparent); background-size:100% 240%; animation:edge 3.4s ease-in-out infinite; }
+.security::before{ background:linear-gradient(180deg,transparent,var(--warn),transparent); background-size:100% 240%; }
+.india::before{ background:linear-gradient(180deg,transparent,var(--accent-2),transparent); background-size:100% 240%; }
+@keyframes edge{ 0%{ background-position:0 -120%; } 100%{ background-position:0 120%; } }
+.callout:hover,.security:hover,.india:hover{ transform:translateY(-3px); box-shadow:var(--shadow); border-color:var(--accent-soft); }
+.callout .ctitle,.security .ctitle,.india .ctitle{ font-family:var(--f-mono); font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; margin-bottom:10px; }
+.callout .ctitle{ color:var(--accent); } .security .ctitle{ color:var(--warn); display:flex; align-items:center; gap:8px; } .india .ctitle{ color:var(--muted); } .india .ctitle::before{ content:"IN · "; color:var(--accent-2); }
+.callout p,.callout li{ font-size:14.8px; margin:0 0 7px; }
+.security ul{ margin:0; padding-left:1.15em; } .security li{ font-size:14.3px; margin-bottom:8px; } .security li::marker{ color:var(--warn); }
+.india p,.india li{ font-size:14.8px; }
+.std{ display:inline-block; font-family:var(--f-mono); font-size:11px; color:var(--warn); border:1px solid var(--warn-dim); border-radius:5px; padding:1px 7px; margin-left:6px; white-space:nowrap; transition:transform var(--dur-fast) var(--ease); }
+.std:hover{ transform:translateY(-1px) scale(1.05); }
+
+table{ width:100%; border-collapse:collapse; font-size:13.8px; }
+th,td{ padding:11px 13px; text-align:left; vertical-align:top; border-bottom:1px solid var(--line-soft); }
+th{ font-family:var(--f-mono); color:var(--muted); font-weight:600; font-size:11px; letter-spacing:.06em; text-transform:uppercase; background:var(--glass-strong); position:sticky; top:0; backdrop-filter:blur(8px); }
+tbody tr{ transition:background var(--dur-fast) var(--ease); }
+tbody tr:hover{ background:var(--accent-soft); }
+.tablewrap{ overflow:auto; border:1px solid var(--line); border-radius:14px; max-height:540px; background:var(--glass); }
+
+.grid2{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media (max-width:700px){ .grid2{ grid-template-columns:1fr; } }
+.card{ position:relative; border:1px solid var(--line); border-radius:14px; padding:17px 19px; background:var(--glass); backdrop-filter:blur(10px); overflow:hidden; transition:transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease); transform-style:preserve-3d; will-change:transform; }
+.card::before{ content:""; position:absolute; top:0; left:-60%; width:60%; height:2px; background:linear-gradient(90deg,transparent,var(--accent),transparent); opacity:0; }
+.card:hover{ border-color:var(--accent-soft); box-shadow:var(--shadow); }
+.card:hover::before{ animation:sheen 1.1s var(--ease) forwards; opacity:1; }
+@keyframes sheen{ from{ left:-60%; } to{ left:120%; } }
+.card h4{ margin:0 0 7px; font-family:var(--f-mono); font-size:13.5px; color:var(--accent); font-weight:600; }
+.card p{ font-size:14px; margin:0; color:var(--muted); }
+
+.divider{ height:1px; background:var(--line); margin:60px 0; }
+.appendix-note{ color:var(--muted); font-size:15px; }
+footer{ border-top:1px solid var(--line); padding:28px 0 40px; color:var(--muted-2); font-size:12.5px; font-family:var(--f-mono); }
+
+.reveal{ opacity:0; transform:translateY(20px); filter:blur(8px); transition:opacity .7s var(--ease), transform .7s var(--ease), filter .7s var(--ease); }
+.reveal.in{ opacity:1; transform:none; filter:none; }
+
+#top-btn{ position:fixed; right:26px; bottom:26px; width:46px; height:46px; border-radius:50%; background:var(--glass-strong); backdrop-filter:blur(10px); border:1px solid var(--line); color:var(--accent); cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow); opacity:0; transform:translateY(12px) scale(.9); pointer-events:none; transition:opacity var(--dur) var(--ease), transform var(--dur) var(--ease), border-color var(--dur-fast) var(--ease); z-index:40; }
+#top-btn.show{ opacity:1; transform:none; pointer-events:auto; }
+#top-btn:hover{ border-color:var(--accent); }
+
+.page-nav{ display:flex; justify-content:space-between; gap:16px; margin-top:10px; padding-top:34px; border-top:1px solid var(--line); }
+.page-nav-link{ display:flex; flex-direction:column; gap:5px; padding:16px 20px; border:1px solid var(--line); border-radius:14px; max-width:46%; text-decoration:none; background:var(--glass); backdrop-filter:blur(8px); transition:transform var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease); }
+.page-nav-link:hover{ transform:translateY(-3px); border-color:var(--accent); box-shadow:var(--shadow); }
+.page-nav-link.next{ margin-left:auto; text-align:right; align-items:flex-end; }
+.page-nav-label{ font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); }
+.page-nav-title{ font-size:15.5px; color:var(--text); font-family:var(--f-body); }
+@media (max-width:640px){ .page-nav{ flex-direction:column; } .page-nav-link{ max-width:100%; } .page-nav-link.next{ align-items:flex-start; text-align:left; } }
+</style>
+</head>
+<body>
+<canvas id="bg-net" aria-hidden="true"></canvas>
+<div id="progress-track"><div id="progress-fill"></div></div>
+<div class="shell">
+<main>
+
+<section class="stage" id="s19">
+  <div class="stage-head reveal"><span class="stage-num">19</span><h2>Reliability &amp; resilience — redundancy, backups, DDoS, and disaster recovery</h2></div>
+  <p class="dek reveal">Everything so far assumes things work. This stage is about what you put in place so a single failure — a dead server, a corrupted disk, a flood of bad traffic, a whole datacenter going dark — becomes a non-event instead of an outage that costs you customers or data.</p>
+
+  <h3 class="reveal">Redundancy: the one idea behind everything below</h3>
+  <p class="reveal">Every technique on this page is a variant of the same rule: <b>never have exactly one of anything that can fail.</b> One server, one database, one availability zone, one region, one person who knows how to restore a backup — each of these is a single point of failure, and a single point of failure eventually fails. Redundancy means there's always a second one ready to take over, and a way for the system (or a person) to notice and switch to it.</p>
+
+  <h3 class="reveal">Multiple servers behind a load balancer</h3>
+  <p class="reveal">Covered mechanically in Stage 09 — but the reliability framing matters as much as the scaling framing. The floor for a production system is <b>two app instances, minimum</b>, behind a load balancer that health-checks both. One instance is not "simple," it's a guaranteed outage the day that one VM has a bad disk, a kernel panic, or just needs a security patch reboot.</p>
+
+  <h3 class="reveal">Database replication and automatic failover</h3>
+  <p class="reveal">Stage 04 covered replication for read scaling (leader + read replicas). For reliability specifically, the detail that matters is <i>how fast a replica becomes the new leader</i> when the original dies. A self-managed replica needs a human to notice and manually promote it — minutes to hours, depending who's awake. A managed database with Multi-AZ enabled (RDS Multi-AZ, Cloud SQL high availability, etc.) does this automatically, typically within one to two minutes, at a real but usually worthwhile cost premium for anything customers depend on.</p>
+
+  <h3 class="reveal">Backups: the discipline, not the checkbox</h3>
+  <p class="reveal">Stage 04's checklist already says "an untested backup is a hope, not a plan" — here's what actually turning that into a plan looks like:</p>
+  <ul class="reveal">
+    <li><b>Automated, not manual.</b> A human remembering to run a backup script is not a backup strategy.</li>
+    <li><b>Encrypted at rest</b>, same as the live data.</li>
+    <li><b>Stored somewhere separate</b> from the production account/region — if an attacker (or a mistake) can delete your live database, they should not also be able to delete its backups with the same credentials.</li>
+    <li><b>Retention matches a real requirement</b>, not a guess — this is a different clock than Stage 14's CERT-In log-retention window; decide backup retention based on how far back the business actually needs to restore from, and document why.</li>
+    <li><b>Restore-tested on a schedule</b> — a quarterly "restore this backup into a scratch environment and confirm the app boots against it" drill, with the time it took written down. That number is the closest real measurement you have of your actual recovery time, not the one on a slide.</li>
+  </ul>
+
+  <h3 class="reveal">Auto-restart &amp; self-healing</h3>
+  <p class="reveal">Stage 08's <code>systemd</code> unit (<code>Restart=on-failure</code>) and Stage 09's load-balancer health checks (an Auto Scaling Group terminates and replaces an instance that stops responding) are both instances of the same principle: <b>a common failure should recover with zero human paged.</b> Reserve people for the failures that are genuinely novel — a process crash or a hung instance shouldn't be one of them.</p>
+
+  <h3 class="reveal">Rate limiting as a resilience control, not just an auth feature</h3>
+  <p class="reveal">Stages 03 and 06 covered rate limiting to slow down brute-force and OTP abuse. The same mechanism, applied at the edge (load balancer or CDN/WAF) rather than just on auth routes, protects the whole app's capacity from being consumed — by an abusive user, a broken client stuck in a retry loop, or the opening minutes of a DDoS attempt before dedicated mitigation kicks in.</p>
+
+  <h3 class="reveal">DDoS protection</h3>
+  <p class="reveal">A Distributed Denial-of-Service attack throws far more traffic at you than any real user base would — either raw volume (flooding your network link), protocol-level tricks (exhausting connection tables), or targeted application-layer floods (hammering one expensive endpoint, like search or login, with traffic that looks legitimate). None of the techniques above are built to survive this on their own — autoscaling absorbs a legitimate traffic spike, but adding servers faster than an attacker can request them is a losing, expensive race.</p>
+  <div class="grid2 reveal">
+    <div class="card"><h4>Layer 1 — the CDN</h4><p>Stage 07's CDN already absorbs a large share of volumetric traffic at the edge, far from your origin, simply by design.</p></div>
+    <div class="card"><h4>Layer 2 — a managed DDoS service</h4><p>AWS Shield Standard (free, automatic, always-on for every AWS customer) is the minimum baseline. Shield Advanced, or Cloudflare in front of the stack, adds active mitigation and support for business-critical traffic.</p></div>
+    <div class="card"><h4>Layer 3 — WAF + rate limiting</h4><p>Blocks application-layer floods that a network-level service can't distinguish from real traffic — rate-based WAF rules on your most expensive endpoints (search, login, checkout).</p></div>
+    <div class="card"><h4>Layer 4 — autoscaling</h4><p>Handles the legitimate spike that rides in alongside — a product launch, a viral post — once the actual attack traffic has been filtered out upstream.</p></div>
+  </div>
+
+  <h3 class="reveal">Disaster recovery: planning for the day everything breaks</h3>
+  <p class="reveal">Disaster recovery is Stage 12's incident response, extended to the worst case: not "one server is slow," but "the primary region is gone." Two numbers decide the whole plan, and they need deciding <i>before</i> an incident, not during one:</p>
+  <ul class="reveal">
+    <li><b>RTO (Recovery Time Objective)</b> — how long can the business tolerate being down? An hour? A day?</li>
+    <li><b>RPO (Recovery Point Objective)</b> — how much data can you afford to lose? Five minutes of writes? A full day's?</li>
+  </ul>
+  <p class="reveal">Multi-AZ protects against a single datacenter failing. Multi-region protects against an entire region or cloud provider having a bad day — a real but rare event, and meaningfully more expensive and complex to run continuously. Most teams don't need full multi-region active-active; they do need a <b>written, versioned DR runbook</b> — the exact commands to restore from backup into a fresh environment — and a "game day" where someone actually runs it end to end and times it, rather than only having it exist as an assumption.</p>
+
+  <h3 class="reveal">Reliability at a glance</h3>
+  <div class="tablewrap reveal">
+  <table>
+    <thead><tr><th>Control</th><th>What it protects against</th><th>Covered in</th></tr></thead>
+    <tbody>
+      <tr><td>Multiple servers + load balancer</td><td>One server dying or needing a restart</td><td>Stage 09, recapped here</td></tr>
+      <tr><td>Database replication + automatic failover</td><td>The database server dying</td><td>Stage 04, recapped here</td></tr>
+      <tr><td>Automated, encrypted, restore-tested backups</td><td>Data loss or corruption</td><td>This stage</td></tr>
+      <tr><td>Auto-restart / health-checked autoscaling</td><td>Process crashes, transient failures</td><td>Stage 08 / 09</td></tr>
+      <tr><td>Rate limiting (edge + per-endpoint)</td><td>Abuse, resource exhaustion</td><td>Stage 03 / 06, extended here</td></tr>
+      <tr><td>DDoS protection (Shield/Cloudflare/WAF)</td><td>Traffic floods, availability attacks</td><td>This stage</td></tr>
+      <tr><td>Disaster recovery plan (RTO/RPO, runbook, drills)</td><td>Catastrophic or regional loss</td><td>This stage</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="security reveal">
+    <div class="ctitle">Security checklist — reliability &amp; resilience</div>
+    <ul>
+      <li>Database failover has been tested at least once — not just configured <span class="std">NIST CSF · Recover</span></li>
+      <li>Backups are encrypted, stored separately from production, and restore-tested on a schedule <span class="std">NIST CSF · Recover</span></li>
+      <li>A managed DDoS protection service is enabled at the edge, at minimum the free automatic tier your cloud provider offers <span class="std">OWASP API Security · Unrestricted Resource Consumption</span></li>
+      <li>A written, versioned DR runbook exists with defined RTO/RPO and has been run end-to-end at least once <span class="std">NIST CSF · Recover</span></li>
+      <li>No single person is the only one who knows how to execute recovery <span class="std">NIST CSF · Respond</span></li>
+    </ul>
+  </div>
+
+  <p class="reveal appendix-note">This stage intentionally recaps Stages 03, 04, 06, 08, 09, and 12 through a single lens — resilience — because in practice these controls are designed and reviewed together, not as unrelated checklist items scattered across a build.</p>
+</section>
+
+<div class="page-nav reveal"><a class="page-nav-link prev" href="18-worked-backend-example.html"><span class="page-nav-label">&larr; Previous</span><span class="page-nav-title">A backend, file by file — then an AI security audit</span></a><span></span></div>
+
+<div class="divider"></div>
+<footer>
+  Field Manual · companion reference: <a href="security/master_cybersecurity_checks_resources.html">master_cybersecurity_checks_resources.html</a> · project memory: <a href="../CLAUDE.md">CLAUDE.md</a>
+</footer>
+
+</main>
+</div>
+<button id="top-btn" aria-label="Back to top" title="Back to top"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var fill=document.getElementById('progress-fill');
+  function prog(){ var h=document.documentElement; var m=h.scrollHeight-h.clientHeight; fill.style.width=(m>0?(h.scrollTop/m)*100:0)+'%'; }
+  document.addEventListener('scroll',prog,{passive:true}); prog();
+
+  var revs=document.querySelectorAll('.reveal');
+  if(reduce){ revs.forEach(function(el){ el.classList.add('in'); }); }
+  else{
+    var io=new IntersectionObserver(function(es){ es.forEach(function(e,i){ if(e.isIntersecting){ e.target.style.transitionDelay=(i%4)*60+'ms'; e.target.classList.add('in'); io.unobserve(e.target); } }); },{threshold:.08, rootMargin:'0px 0px -6% 0px'});
+    revs.forEach(function(el){ io.observe(el); });
+  }
+
+  var top=document.getElementById('top-btn');
+  document.addEventListener('scroll',function(){ top.classList.toggle('show',document.documentElement.scrollTop>800); },{passive:true});
+  top.addEventListener('click',function(){ window.scrollTo({top:0,behavior:reduce?'auto':'smooth'}); });
+
+  if(!reduce && window.matchMedia('(pointer:fine)').matches){
+    document.querySelectorAll('.card,.landing-card').forEach(function(c){
+      c.addEventListener('pointermove',function(e){ var r=c.getBoundingClientRect(); var px=(e.clientX-r.left)/r.width-.5, py=(e.clientY-r.top)/r.height-.5; c.style.transform='perspective(760px) rotateX('+(-py*4.5)+'deg) rotateY('+(px*4.5)+'deg) translateY(-3px)'; });
+      c.addEventListener('pointerleave',function(){ c.style.transform=''; });
+    });
+  }
+
+  var cv=document.getElementById('bg-net'); if(!cv) return; var ctx=cv.getContext('2d');
+  var W,H,DPR,nodes,packets,raf;
+  function accent(){ return getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||'#5eead4'; }
+  function accent2(){ return getComputedStyle(document.documentElement).getPropertyValue('--accent-2').trim()||'#4aa8ff'; }
+  function size(){ DPR=Math.min(window.devicePixelRatio||1,2); W=cv.width=Math.floor(innerWidth*DPR); H=cv.height=Math.floor(innerHeight*DPR); cv.style.width=innerWidth+'px'; cv.style.height=innerHeight+'px'; }
+  function init(){ var n=Math.max(20,Math.min(52,Math.floor(innerWidth/32))); nodes=[]; for(var i=0;i<n;i++){ nodes.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.14*DPR,vy:(Math.random()-.5)*.14*DPR}); } packets=[]; for(var k=0;k<7;k++){ packets.push(newPkt()); } }
+  function newPkt(){ var a=(Math.random()*nodes.length)|0, b=(Math.random()*nodes.length)|0; return {a:a,b:b,t:Math.random(),sp:.004+Math.random()*.006}; }
+  function draw(){
+    ctx.clearRect(0,0,W,H); var A=accent(), A2=accent2(); var max=155*DPR;
+    for(var i=0;i<nodes.length;i++){ for(var j=i+1;j<nodes.length;j++){ var a=nodes[i],b=nodes[j]; var dx=a.x-b.x,dy=a.y-b.y; var d=Math.sqrt(dx*dx+dy*dy); if(d<max){ ctx.globalAlpha=(1-d/max)*0.16; ctx.strokeStyle=A; ctx.lineWidth=1*DPR; ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke(); } } }
+    ctx.globalAlpha=.55; ctx.fillStyle=A;
+    for(var p=0;p<nodes.length;p++){ var nd=nodes[p]; ctx.beginPath(); ctx.arc(nd.x,nd.y,1.7*DPR,0,7); ctx.fill(); if(!reduce){ nd.x+=nd.vx; nd.y+=nd.vy; if(nd.x<0||nd.x>W)nd.vx*=-1; if(nd.y<0||nd.y>H)nd.vy*=-1; } }
+    for(var q=0;q<packets.length;q++){ var pk=packets[q]; var na=nodes[pk.a], nb=nodes[pk.b]; if(!na||!nb){ packets[q]=newPkt(); continue; } var x=na.x+(nb.x-na.x)*pk.t, y=na.y+(nb.y-na.y)*pk.t; ctx.globalAlpha=.9; ctx.fillStyle=A2; ctx.beginPath(); ctx.arc(x,y,2.4*DPR,0,7); ctx.fill(); ctx.globalAlpha=.25; ctx.beginPath(); ctx.arc(x,y,5*DPR,0,7); ctx.fill(); if(!reduce){ pk.t+=pk.sp; if(pk.t>=1) packets[q]=newPkt(); } }
+    ctx.globalAlpha=1; if(!reduce) raf=requestAnimationFrame(draw);
+  }
+  function start(){ size(); init(); cancelAnimationFrame(raf); draw(); }
+  window.addEventListener('resize',function(){ size(); init(); if(reduce) draw(); });
+  document.addEventListener('visibilitychange',function(){ if(document.hidden){ cancelAnimationFrame(raf); } else if(!reduce){ draw(); } });
+  start();
+})();
+</script>
+</body>
+</html>

@@ -30,6 +30,7 @@ Deployed on an Ubuntu VM behind Nginx, served as plain static files (no build st
   16. [`16-glossary.html`](docs/16-glossary.html)
   17. [`17-full-resource-catalog.html`](docs/17-full-resource-catalog.html) — all 103 catalog entries, grouped, explained, and linked (not just reprinted)
   18. [`18-worked-backend-example.html`](docs/18-worked-backend-example.html) — a real backend file tree walked through file by file, plus how to have an AI audit finished code against the catalog
+  19. [`19-reliability-and-disaster-recovery.html`](docs/19-reliability-and-disaster-recovery.html) — redundancy, database failover, backups done properly, DDoS protection, and disaster recovery (RTO/RPO, runbooks, tested drills)
 - [`docs/security/master_cybersecurity_checks_resources.html`](docs/security/master_cybersecurity_checks_resources.html) — the original standalone 103-entry catalog of security standards/frameworks (OWASP, MITRE ATT&CK/CWE/CAPEC, CIS Benchmarks, NIST, and more) that Stage 17 explains and links out to individually.
 - [`docs/DEPLOY.md`](docs/DEPLOY.md) — VM deployment steps, GitHub Actions auto-deploy setup, and applied security hardening.
 - [`CLAUDE.md`](CLAUDE.md) — notes for future work in this repo: what exists, why, and decisions made along the way.
