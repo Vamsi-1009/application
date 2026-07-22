@@ -179,17 +179,21 @@ code{ font-family:var(--f-mono); }
 p code,li code{ background:var(--code-bg); border:1px solid var(--line-soft); border-radius:5px; padding:1px 6px; font-size:.85em; color:var(--accent); }
 
 /* info boxes (glass) */
-.callout,.security,.india{ position:relative; border:1px solid var(--line); border-radius:14px; background:var(--glass); backdrop-filter:blur(10px); padding:19px 22px; margin:26px 0; transition:transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease); overflow:hidden; }
-.callout::before,.security::before,.india::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:linear-gradient(180deg,transparent,var(--accent),transparent); background-size:100% 240%; animation:edge 3.4s ease-in-out infinite; }
+.callout,.security,.india,.mistake{ position:relative; border:1px solid var(--line); border-radius:14px; background:var(--glass); backdrop-filter:blur(10px); padding:19px 22px; margin:26px 0; transition:transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease); overflow:hidden; }
+.callout::before,.security::before,.india::before,.mistake::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:linear-gradient(180deg,transparent,var(--accent),transparent); background-size:100% 240%; animation:edge 3.4s ease-in-out infinite; }
 .security::before{ background:linear-gradient(180deg,transparent,var(--warn),transparent); background-size:100% 240%; }
 .india::before{ background:linear-gradient(180deg,transparent,var(--accent-2),transparent); background-size:100% 240%; }
 @keyframes edge{ 0%{ background-position:0 -120%; } 100%{ background-position:0 120%; } }
-.callout:hover,.security:hover,.india:hover{ transform:translateY(-3px); box-shadow:var(--shadow); border-color:var(--accent-soft); }
-.callout .ctitle,.security .ctitle,.india .ctitle{ font-family:var(--f-mono); font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; margin-bottom:10px; }
+.callout:hover,.security:hover,.india:hover,.mistake:hover{ transform:translateY(-3px); box-shadow:var(--shadow); border-color:var(--accent-soft); }
+.callout .ctitle,.security .ctitle,.india .ctitle,.mistake .ctitle{ font-family:var(--f-mono); font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; margin-bottom:10px; }
 .callout .ctitle{ color:var(--accent); } .security .ctitle{ color:var(--warn); display:flex; align-items:center; gap:8px; } .india .ctitle{ color:var(--muted); } .india .ctitle::before{ content:"IN · "; color:var(--accent-2); }
 .callout p,.callout li{ font-size:14.8px; margin:0 0 7px; }
 .security ul{ margin:0; padding-left:1.15em; } .security li{ font-size:14.3px; margin-bottom:8px; } .security li::marker{ color:var(--warn); }
 .india p,.india li{ font-size:14.8px; }
+.mistake{ border-left-color:var(--danger); background: color-mix(in srgb, var(--danger) 5%, var(--panel, var(--glass))); }
+.mistake::before{ background:linear-gradient(180deg,transparent,var(--danger),transparent); background-size:100% 240%; }
+.mistake .ctitle{ color:var(--danger); } .mistake .ctitle::before{ content:"A0  "; }
+.mistake p,.mistake li{ font-size:14.8px; margin:0; }
 .std{ display:inline-block; font-family:var(--f-mono); font-size:11px; color:var(--warn); border:1px solid var(--warn-dim); border-radius:5px; padding:1px 7px; margin-left:6px; white-space:nowrap; transition:transform var(--dur-fast) var(--ease); }
 .std:hover{ transform:translateY(-1px) scale(1.05); }
 
@@ -304,7 +308,7 @@ pre:hover .copy-btn{ opacity:1; }
       <a class="btn" href="18-worked-backend-example.html">See a real backend &rarr;</a>
     </div>
     <div class="hero-stats">
-      <div class="stat"><span class="num" data-to="19">0</span><span class="lbl">build stages</span></div>
+      <div class="stat"><span class="num" data-to="20">0</span><span class="lbl">build stages</span></div>
       <div class="stat"><span class="num" data-to="103">0</span><span class="lbl">security standards</span></div>
       <div class="stat"><span class="num zero">0</span><span class="lbl">&rarr; production</span></div>
     </div>
@@ -319,6 +323,49 @@ pre:hover .copy-btn{ opacity:1; }
     <div class="ctitle">A rule that saves every stage below</div>
     <p>Security is not a stage you do after building — it's a property you decide on <i>while</i> building, at the same moment you decide how a feature works. Every checklist below sits inside the stage it belongs to, not bolted on at the end, because that's the only place it's cheap to apply.</p>
   </div>
+
+  <figure class="anim-fig reveal">
+    <span class="fig-tag">Animated · the system, building itself</span>
+    <svg viewBox="0 0 820 240" role="img" aria-label="Animation: the architecture grows one piece at a time in build order - browser, then backend, then database, then storage and CDN, then a load balancer with a second backend instance, then monitoring watching the whole thing">
+      <style>
+        .cum-browser{ stroke:var(--accent); }
+        .cum-lb{ animation:cum-lb 9s linear infinite; }
+        @keyframes cum-lb{ 0%,59%{ opacity:.3; stroke:var(--line); stroke-dasharray:4 4; } 63%,100%{ opacity:1; stroke:var(--accent); stroke-dasharray:none; } }
+        .cum-backend-a{ animation:cum-ba 9s linear infinite; }
+        @keyframes cum-ba{ 0%,14%{ opacity:.3; stroke:var(--line); stroke-dasharray:4 4; } 18%,100%{ opacity:1; stroke:var(--accent); stroke-dasharray:none; } }
+        .cum-backend-b{ animation:cum-lb 9s linear infinite; }
+        .cum-db{ animation:cum-db 9s linear infinite; }
+        @keyframes cum-db{ 0%,29%{ opacity:.3; stroke:var(--line); stroke-dasharray:4 4; } 33%,100%{ opacity:1; stroke:var(--accent); stroke-dasharray:none; } }
+        .cum-storage{ animation:cum-storage 9s linear infinite; }
+        @keyframes cum-storage{ 0%,44%{ opacity:.3; stroke:var(--line); stroke-dasharray:4 4; } 48%,100%{ opacity:1; stroke:var(--accent-2); stroke-dasharray:none; } }
+        .cum-mon{ opacity:0; animation:cum-mon 9s linear infinite; }
+        @keyframes cum-mon{ 0%,74%{ opacity:0; } 78%,100%{ opacity:1; } }
+        .cum-line{ stroke:var(--line); stroke-width:1.5; }
+        .cum-line.on-early{ stroke:var(--accent); }
+        .cum-line.on-db{ animation:cum-db-line 9s linear infinite; }
+        @keyframes cum-db-line{ 0%,29%{ stroke:var(--line); } 33%,100%{ stroke:var(--accent); } }
+        .cum-line.on-storage{ animation:cum-storage-line 9s linear infinite; }
+        @keyframes cum-storage-line{ 0%,44%{ stroke:var(--line); opacity:.3; } 48%,100%{ stroke:var(--accent-2); opacity:1; } }
+        .cum-line.on-lb{ animation:cum-lb-line 9s linear infinite; }
+        @keyframes cum-lb-line{ 0%,59%{ stroke:var(--line); opacity:.3; } 63%,100%{ stroke:var(--accent); opacity:1; } }
+        .cum-tag{ font-family:'SFMono-Regular',monospace; font-size:10px; fill:var(--muted-2); }
+      </style>
+      <line class="cum-line on-early" x1="130" y1="115" x2="185" y2="115"/>
+      <line class="cum-line on-lb" x1="285" y1="115" x2="335" y2="90"/>
+      <line class="cum-line on-lb" x1="285" y1="115" x2="335" y2="155"/>
+      <line class="cum-line on-db" x1="475" y1="90" x2="555" y2="105"/>
+      <line class="cum-line on-storage" x1="475" y1="90" x2="555" y2="45"/>
+
+      <g><rect class="af-box cum-browser" x="20" y="90" width="110" height="50" rx="11" stroke-width="2"/><text class="af-title" x="75" y="119" text-anchor="middle">Browser</text></g>
+      <g><rect class="af-box cum-lb" x="185" y="90" width="100" height="50" rx="11" stroke-width="1.5"/><text class="af-title" x="235" y="112" text-anchor="middle">Load</text><text class="af-title" x="235" y="128" text-anchor="middle">Balancer</text><text class="cum-tag" x="235" y="150" text-anchor="middle">09</text></g>
+      <g><rect class="af-box cum-backend-a" x="335" y="65" width="140" height="50" rx="11" stroke-width="1.5"/><text class="af-title" x="405" y="94" text-anchor="middle">Backend API</text><text class="cum-tag" x="405" y="128" text-anchor="middle">03</text></g>
+      <g><rect class="af-box cum-backend-b" x="335" y="130" width="140" height="50" rx="11" stroke-width="1.5"/><text class="af-title" x="405" y="159" text-anchor="middle">Backend API #2</text><text class="cum-tag" x="405" y="178" text-anchor="middle">09</text></g>
+      <g><rect class="af-box cum-db" x="555" y="80" width="120" height="50" rx="11" stroke-width="1.5"/><text class="af-title" x="615" y="109" text-anchor="middle">Database</text><text class="cum-tag" x="615" y="143" text-anchor="middle">04</text></g>
+      <g><rect class="af-box cum-storage" x="555" y="18" width="120" height="42" rx="11" stroke-width="1.5"/><text class="af-title" x="615" y="43" text-anchor="middle">Storage + CDN</text><text class="cum-tag" x="615" y="12" text-anchor="middle">07</text></g>
+      <g class="cum-mon"><circle cx="750" cy="35" r="16" fill="none" stroke="var(--warn)" stroke-width="1.5"/><text x="750" y="40" text-anchor="middle" font-size="13" fill="var(--warn)">◎</text><text class="cum-tag" x="750" y="65" text-anchor="middle" fill="var(--warn)">12 Monitoring</text></g>
+    </svg>
+    <figcaption>One system, built one stage at a time — by the time you reach Stage 12, this is roughly what you're running.</figcaption>
+  </figure>
 </section>
 
 <section class="stage reveal" id="landing-index"><a id="contents"></a>
@@ -352,6 +399,7 @@ pre:hover .copy-btn{ opacity:1; }
     <a class="landing-card" href="17-full-resource-catalog.html"><span class="lc-num">17</span><h4>Full resource catalog, explained</h4><p>All 103 entries from the source catalog, grouped by what they're actually for, each with a plain-language explanation and a direct link — not just a reprint of the raw table. This is the reference every STD tag earlier in this manual points back to.</p></a>
     <a class="landing-card" href="18-worked-backend-example.html"><span class="lc-num">18</span><h4>A backend, file by file — then an AI security audit</h4><p>Everything above has been explained concept-first. This stage does it code-first: one concrete backend file tree, what each file actually does and why it earns its place, then the exact process for having an AI (or a human) audit the finished code against the catalog above.</p></a>
     <a class="landing-card" href="19-reliability-and-disaster-recovery.html"><span class="lc-num">19</span><h4>Reliability &amp; resilience</h4><p>Redundancy, database failover, backups done properly, DDoS protection, and disaster recovery (RTO/RPO, runbooks, tested drills) — what turns a single failure into a non-event instead of an outage.</p></a>
+    <a class="landing-card" href="20-your-first-build.html"><span class="lc-num">20</span><h4>Your first build: checklist &amp; capstone</h4><p>A linear, checkable path through every stage above, plus a capstone project spec (TinyLink) that touches all 19 of them — so finishing this ends in shipping something real.</p></a>
   </div>
 </section>
 
@@ -468,7 +516,7 @@ pre:hover .copy-btn{ opacity:1; }
 
 
   /* site-wide search */
-  var SEARCH_INDEX = [{"n": "01", "t": "Plan & threat-model first", "f": "01-plan-and-threat-model.html"}, {"n": "02", "t": "Frontend", "f": "02-frontend.html"}, {"n": "03", "t": "Backend & API", "f": "03-backend-api.html"}, {"n": "04", "t": "Database — structure, scaling, and how it actually gets hacked", "f": "04-database.html"}, {"n": "05", "t": "Auth, OTP & the password wallet", "f": "05-auth-otp-secrets.html"}, {"n": "06", "t": "Email / OTP delivery", "f": "06-email-otp-delivery.html"}, {"n": "07", "t": "File storage & the CDN", "f": "07-storage-cdn.html"}, {"n": "08", "t": "Servers & the VM", "f": "08-servers-vm.html"}, {"n": "09", "t": "Load balancers & autoscaling", "f": "09-load-balancing-autoscaling.html"}, {"n": "10", "t": "Domain names & DNS", "f": "10-domains-dns.html"}, {"n": "11", "t": "CI/CD pipelines", "f": "11-cicd.html"}, {"n": "12", "t": "Monitoring & incident response", "f": "12-monitoring-incident-response.html"}, {"n": "13", "t": "Security hardening checklist — the consolidated view", "f": "13-security-checklist.html"}, {"n": "14", "t": "Compliance & governance, including India", "f": "14-compliance.html"}, {"n": "15", "t": "Skill roadmap: junior → staff", "f": "15-skill-roadmap.html"}, {"n": "16", "t": "Glossary", "f": "16-glossary.html"}, {"n": "17", "t": "Full resource catalog, explained", "f": "17-full-resource-catalog.html"}, {"n": "18", "t": "A backend, file by file — then an AI security audit", "f": "18-worked-backend-example.html"}, {"n": "19", "t": "Reliability & resilience — redundancy, backups, DDoS, and disaster recovery", "f": "19-reliability-and-disaster-recovery.html"}, {"n": "00", "t": "How to use this manual", "f": "how-to-build-an-application.html"}];
+  var SEARCH_INDEX = [{"n": "01", "t": "Plan & threat-model first", "f": "01-plan-and-threat-model.html"}, {"n": "02", "t": "Frontend", "f": "02-frontend.html"}, {"n": "03", "t": "Backend & API", "f": "03-backend-api.html"}, {"n": "04", "t": "Database — structure, scaling, and how it actually gets hacked", "f": "04-database.html"}, {"n": "05", "t": "Auth, OTP & the password wallet", "f": "05-auth-otp-secrets.html"}, {"n": "06", "t": "Email / OTP delivery", "f": "06-email-otp-delivery.html"}, {"n": "07", "t": "File storage & the CDN", "f": "07-storage-cdn.html"}, {"n": "08", "t": "Servers & the VM", "f": "08-servers-vm.html"}, {"n": "09", "t": "Load balancers & autoscaling", "f": "09-load-balancing-autoscaling.html"}, {"n": "10", "t": "Domain names & DNS", "f": "10-domains-dns.html"}, {"n": "11", "t": "CI/CD pipelines", "f": "11-cicd.html"}, {"n": "12", "t": "Monitoring & incident response", "f": "12-monitoring-incident-response.html"}, {"n": "13", "t": "Security hardening checklist — the consolidated view", "f": "13-security-checklist.html"}, {"n": "14", "t": "Compliance & governance, including India", "f": "14-compliance.html"}, {"n": "15", "t": "Skill roadmap: junior → staff", "f": "15-skill-roadmap.html"}, {"n": "16", "t": "Glossary", "f": "16-glossary.html"}, {"n": "17", "t": "Full resource catalog, explained", "f": "17-full-resource-catalog.html"}, {"n": "18", "t": "A backend, file by file — then an AI security audit", "f": "18-worked-backend-example.html"}, {"n": "19", "t": "Reliability & resilience — redundancy, backups, DDoS, and disaster recovery", "f": "19-reliability-and-disaster-recovery.html"}, {"n": "20", "t": "Your first build: checklist & capstone project", "f": "20-your-first-build.html"}, {"n": "00", "t": "How to use this manual", "f": "how-to-build-an-application.html"}];
   var searchBtn=document.getElementById('search-btn'), searchOverlay=document.getElementById('search-overlay'),
       searchInput=document.getElementById('search-input'), searchResults=document.getElementById('search-results');
   function renderResults(q){

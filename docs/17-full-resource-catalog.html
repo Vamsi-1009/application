@@ -178,17 +178,21 @@ code{ font-family:var(--f-mono); }
 p code,li code{ background:var(--code-bg); border:1px solid var(--line-soft); border-radius:5px; padding:1px 6px; font-size:.85em; color:var(--accent); }
 
 /* info boxes (glass) */
-.callout,.security,.india{ position:relative; border:1px solid var(--line); border-radius:14px; background:var(--glass); backdrop-filter:blur(10px); padding:19px 22px; margin:26px 0; transition:transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease); overflow:hidden; }
-.callout::before,.security::before,.india::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:linear-gradient(180deg,transparent,var(--accent),transparent); background-size:100% 240%; animation:edge 3.4s ease-in-out infinite; }
+.callout,.security,.india,.mistake{ position:relative; border:1px solid var(--line); border-radius:14px; background:var(--glass); backdrop-filter:blur(10px); padding:19px 22px; margin:26px 0; transition:transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease); overflow:hidden; }
+.callout::before,.security::before,.india::before,.mistake::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:linear-gradient(180deg,transparent,var(--accent),transparent); background-size:100% 240%; animation:edge 3.4s ease-in-out infinite; }
 .security::before{ background:linear-gradient(180deg,transparent,var(--warn),transparent); background-size:100% 240%; }
 .india::before{ background:linear-gradient(180deg,transparent,var(--accent-2),transparent); background-size:100% 240%; }
 @keyframes edge{ 0%{ background-position:0 -120%; } 100%{ background-position:0 120%; } }
-.callout:hover,.security:hover,.india:hover{ transform:translateY(-3px); box-shadow:var(--shadow); border-color:var(--accent-soft); }
-.callout .ctitle,.security .ctitle,.india .ctitle{ font-family:var(--f-mono); font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; margin-bottom:10px; }
+.callout:hover,.security:hover,.india:hover,.mistake:hover{ transform:translateY(-3px); box-shadow:var(--shadow); border-color:var(--accent-soft); }
+.callout .ctitle,.security .ctitle,.india .ctitle,.mistake .ctitle{ font-family:var(--f-mono); font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; margin-bottom:10px; }
 .callout .ctitle{ color:var(--accent); } .security .ctitle{ color:var(--warn); display:flex; align-items:center; gap:8px; } .india .ctitle{ color:var(--muted); } .india .ctitle::before{ content:"IN · "; color:var(--accent-2); }
 .callout p,.callout li{ font-size:14.8px; margin:0 0 7px; }
 .security ul{ margin:0; padding-left:1.15em; } .security li{ font-size:14.3px; margin-bottom:8px; } .security li::marker{ color:var(--warn); }
 .india p,.india li{ font-size:14.8px; }
+.mistake{ border-left-color:var(--danger); background: color-mix(in srgb, var(--danger) 5%, var(--panel, var(--glass))); }
+.mistake::before{ background:linear-gradient(180deg,transparent,var(--danger),transparent); background-size:100% 240%; }
+.mistake .ctitle{ color:var(--danger); } .mistake .ctitle::before{ content:"A0  "; }
+.mistake p,.mistake li{ font-size:14.8px; margin:0; }
 .std{ display:inline-block; font-family:var(--f-mono); font-size:11px; color:var(--warn); border:1px solid var(--warn-dim); border-radius:5px; padding:1px 7px; margin-left:6px; white-space:nowrap; transition:transform var(--dur-fast) var(--ease); }
 .std:hover{ transform:translateY(-1px) scale(1.05); }
 
@@ -291,6 +295,8 @@ pre:hover .copy-btn{ opacity:1; }
 .complete-toggle{ margin:6px 0 4px; font-family:var(--f-mono); }
 .complete-toggle svg{ flex:none; }
 .complete-toggle.done{ border-color:var(--ok); color:var(--ok); }
+
+.stage-badge{ font-family:var(--f-mono); font-size:11px; color:var(--muted); border:1px solid var(--line); border-radius:6px; padding:2px 9px; white-space:nowrap; }
 </style>
 </head>
 <body>
@@ -300,7 +306,7 @@ pre:hover .copy-btn{ opacity:1; }
 <main>
 
 <section class="stage" id="s17">
-  <div class="stage-head reveal"><span class="stage-num">17</span><h2>Full resource catalog, explained</h2></div>
+  <div class="stage-head reveal"><span class="stage-num">17</span><h2>Full resource catalog, explained</h2><span class="stage-badge">~20 min &middot; Reference</span></div>
   <button class="btn complete-toggle reveal" id="complete-toggle" data-page="17-full-resource-catalog.html" type="button">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <span class="ct-label">Mark this stage complete</span>
@@ -637,7 +643,7 @@ pre:hover .copy-btn{ opacity:1; }
 
 
   /* site-wide search */
-  var SEARCH_INDEX = [{"n": "01", "t": "Plan & threat-model first", "f": "01-plan-and-threat-model.html"}, {"n": "02", "t": "Frontend", "f": "02-frontend.html"}, {"n": "03", "t": "Backend & API", "f": "03-backend-api.html"}, {"n": "04", "t": "Database — structure, scaling, and how it actually gets hacked", "f": "04-database.html"}, {"n": "05", "t": "Auth, OTP & the password wallet", "f": "05-auth-otp-secrets.html"}, {"n": "06", "t": "Email / OTP delivery", "f": "06-email-otp-delivery.html"}, {"n": "07", "t": "File storage & the CDN", "f": "07-storage-cdn.html"}, {"n": "08", "t": "Servers & the VM", "f": "08-servers-vm.html"}, {"n": "09", "t": "Load balancers & autoscaling", "f": "09-load-balancing-autoscaling.html"}, {"n": "10", "t": "Domain names & DNS", "f": "10-domains-dns.html"}, {"n": "11", "t": "CI/CD pipelines", "f": "11-cicd.html"}, {"n": "12", "t": "Monitoring & incident response", "f": "12-monitoring-incident-response.html"}, {"n": "13", "t": "Security hardening checklist — the consolidated view", "f": "13-security-checklist.html"}, {"n": "14", "t": "Compliance & governance, including India", "f": "14-compliance.html"}, {"n": "15", "t": "Skill roadmap: junior → staff", "f": "15-skill-roadmap.html"}, {"n": "16", "t": "Glossary", "f": "16-glossary.html"}, {"n": "17", "t": "Full resource catalog, explained", "f": "17-full-resource-catalog.html"}, {"n": "18", "t": "A backend, file by file — then an AI security audit", "f": "18-worked-backend-example.html"}, {"n": "19", "t": "Reliability & resilience — redundancy, backups, DDoS, and disaster recovery", "f": "19-reliability-and-disaster-recovery.html"}, {"n": "00", "t": "How to use this manual", "f": "how-to-build-an-application.html"}];
+  var SEARCH_INDEX = [{"n": "01", "t": "Plan & threat-model first", "f": "01-plan-and-threat-model.html"}, {"n": "02", "t": "Frontend", "f": "02-frontend.html"}, {"n": "03", "t": "Backend & API", "f": "03-backend-api.html"}, {"n": "04", "t": "Database — structure, scaling, and how it actually gets hacked", "f": "04-database.html"}, {"n": "05", "t": "Auth, OTP & the password wallet", "f": "05-auth-otp-secrets.html"}, {"n": "06", "t": "Email / OTP delivery", "f": "06-email-otp-delivery.html"}, {"n": "07", "t": "File storage & the CDN", "f": "07-storage-cdn.html"}, {"n": "08", "t": "Servers & the VM", "f": "08-servers-vm.html"}, {"n": "09", "t": "Load balancers & autoscaling", "f": "09-load-balancing-autoscaling.html"}, {"n": "10", "t": "Domain names & DNS", "f": "10-domains-dns.html"}, {"n": "11", "t": "CI/CD pipelines", "f": "11-cicd.html"}, {"n": "12", "t": "Monitoring & incident response", "f": "12-monitoring-incident-response.html"}, {"n": "13", "t": "Security hardening checklist — the consolidated view", "f": "13-security-checklist.html"}, {"n": "14", "t": "Compliance & governance, including India", "f": "14-compliance.html"}, {"n": "15", "t": "Skill roadmap: junior → staff", "f": "15-skill-roadmap.html"}, {"n": "16", "t": "Glossary", "f": "16-glossary.html"}, {"n": "17", "t": "Full resource catalog, explained", "f": "17-full-resource-catalog.html"}, {"n": "18", "t": "A backend, file by file — then an AI security audit", "f": "18-worked-backend-example.html"}, {"n": "19", "t": "Reliability & resilience — redundancy, backups, DDoS, and disaster recovery", "f": "19-reliability-and-disaster-recovery.html"}, {"n": "20", "t": "Your first build: checklist & capstone project", "f": "20-your-first-build.html"}, {"n": "00", "t": "How to use this manual", "f": "how-to-build-an-application.html"}];
   var searchBtn=document.getElementById('search-btn'), searchOverlay=document.getElementById('search-overlay'),
       searchInput=document.getElementById('search-input'), searchResults=document.getElementById('search-results');
   function renderResults(q){

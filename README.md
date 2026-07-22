@@ -31,6 +31,7 @@ Deployed on an Ubuntu VM behind Nginx, served as plain static files (no build st
   17. [`17-full-resource-catalog.html`](docs/17-full-resource-catalog.html) — all 103 catalog entries, grouped, explained, and linked (not just reprinted)
   18. [`18-worked-backend-example.html`](docs/18-worked-backend-example.html) — a real backend file tree walked through file by file, plus how to have an AI audit finished code against the catalog
   19. [`19-reliability-and-disaster-recovery.html`](docs/19-reliability-and-disaster-recovery.html) — redundancy, database failover, backups done properly, DDoS protection, and disaster recovery (RTO/RPO, runbooks, tested drills)
+  20. [`20-your-first-build.html`](docs/20-your-first-build.html) — a linear, checkable build-order checklist through every stage, plus a capstone project (TinyLink) that touches all of them
 - [`docs/security/master_cybersecurity_checks_resources.html`](docs/security/master_cybersecurity_checks_resources.html) — the original standalone 103-entry catalog of security standards/frameworks (OWASP, MITRE ATT&CK/CWE/CAPEC, CIS Benchmarks, NIST, and more) that Stage 17 explains and links out to individually.
 - [`docs/DEPLOY.md`](docs/DEPLOY.md) — VM deployment steps, GitHub Actions auto-deploy setup, and applied security hardening.
 - [`CLAUDE.md`](CLAUDE.md) — notes for future work in this repo: what exists, why, and decisions made along the way.
@@ -38,3 +39,5 @@ Deployed on an Ubuntu VM behind Nginx, served as plain static files (no build st
 ## How to read it
 
 Open `docs/how-to-build-an-application.html` first (or visit the live link above) — it's the front door, with an animated hero and a full directory of every stage. Each page is full-width with a prev/next footer nav to read straight through in order, or jump to any single stage directly from the landing page's contents grid. Each stage ends with an amber **security checklist** box tying it to a named standard, and stages with India-specific considerations have a teal **IN** note. No build step, no server needed to view it locally — every page also opens directly in a browser from disk.
+
+Also available on every page: a floating search button (or `Ctrl/Cmd-K`) to jump to any stage, a home button to get back to the landing page, hover-revealed anchor links on every subheading, and a "mark this stage complete" toggle that feeds a progress bar back on the landing page (all client-side, no account needed).
