@@ -72,7 +72,7 @@ body::after{
   content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
   background:radial-gradient(120% 80% at 50% -10%, transparent 40%, var(--bg) 100%);
 }
-.shell, .mobile-bar, #progress-track, #top-btn, .rail-scrim{ position:relative; z-index:2; }
+.shell, #progress-track, #top-btn, .rail-scrim{ position:relative; z-index:2; }
 .mono,code{ font-family:var(--f-mono); }
 h1,h2,h3,h4,.eyebrow,.stage-num,nav a,th,.rail-head .title,.fig-tag,.btn,.lc-num,.page-nav-label{ font-family:var(--f-display); }
 .eyebrow,.stage-num,nav a,th,.rail-head .title,.fig-tag,.lc-num,.page-nav-label{ font-family:var(--f-mono); }
@@ -85,10 +85,6 @@ a:hover{ color:var(--accent-2); }
 #progress-fill{ height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--accent-2)); box-shadow:0 0 12px var(--accent-glow); background-size:200% 100%; animation:shimmer 3s linear infinite; }
 @keyframes shimmer{ to{ background-position:-200% 0; } }
 
-.mobile-bar{ display:none; position:sticky; top:0; z-index:50; align-items:center; justify-content:space-between; padding:12px 18px; background:var(--glass-strong); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-bottom:1px solid var(--line); }
-.mobile-bar .title{ font-family:var(--f-mono); font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--text); text-decoration:none; }
-.mobile-bar button{ background:var(--glass); color:var(--text); border:1px solid var(--line); border-radius:8px; padding:8px 13px; font-size:12.5px; font-family:var(--f-mono); cursor:pointer; }
-@media (max-width:980px){ .mobile-bar{ display:flex; } }
 
 .shell{ display:block; min-height:100vh; }
 main{ padding:70px 7vw 110px; max-width:960px; margin:0 auto; }
