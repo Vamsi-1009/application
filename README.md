@@ -46,4 +46,4 @@ Open `docs/how-to-build-an-application.html` first (or visit the live link above
 
 Also available on every page: a floating search button (or `Ctrl/Cmd-K`) to jump to any stage, a home button to get back to the landing page, hover-revealed anchor links on every subheading, and a "mark this stage complete" toggle that feeds a progress bar back on the landing page (all client-side, no account needed).
 
-Fully responsive — tested from 320px phones up through 2560px ultra-wide monitors: fluid type, tables and code blocks that scroll internally instead of breaking the layout, and content capped and centered on large screens.
+Fully responsive — tested from 320px phones up through 2560px ultra-wide monitors: fluid type, tables and code blocks that scroll internally instead of breaking the layout, and a centered content column that widens on large desktop screens (1400px+) instead of staying narrow with empty margins.
