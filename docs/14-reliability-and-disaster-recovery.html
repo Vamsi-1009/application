@@ -67,7 +67,7 @@ body{
   font-family:var(--f-body); line-height:1.72; font-size:17.5px; -webkit-font-smoothing:antialiased;
   overflow-x:hidden;
 }
-#bg-net{ position:fixed; inset:0; width:100vw; height:100vh; z-index:0; pointer-events:none; opacity:.9; }
+#bg-net{ position:fixed; inset:0; width:100vw; height:100vh; max-width:100vw; max-height:100vh; z-index:0; pointer-events:none; opacity:.9; }
 body::after{
   content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
   background:radial-gradient(120% 80% at 50% -10%, transparent 40%, var(--bg) 100%);
