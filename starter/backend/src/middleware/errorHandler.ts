@@ -27,6 +27,9 @@ export function errorHandler(err: unknown, req: Request, res: Response, _next: N
     return res.status(err.status).json({ error: err.code ?? "error", message: err.message });
   }
   logger.error({ err }, "unhandled error");
-  const isProd = process.env.NODE_ENV === "production";
-  res.status(500).json({ error: "internal_error", message: isProd ? "Something went wrong." : String(err) });
+  // Redact by default - only show the real error when NODE_ENV is explicitly
+  // "development", not just when it isn't exactly "production" (fail closed
+  // if the env var is ever unset or misconfigured in a real deployment).
+  const isDev = process.env.NODE_ENV === "development";
+  res.status(500).json({ error: "internal_error", message: isDev ? String(err) : "Something went wrong." });
 }
