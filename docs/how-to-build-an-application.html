@@ -308,7 +308,7 @@ pre:hover .copy-btn{ opacity:1; }
       <a class="btn" href="18-worked-backend-example.html">See a real backend &rarr;</a>
     </div>
     <div class="hero-stats">
-      <div class="stat"><span class="num" data-to="20">0</span><span class="lbl">build stages</span></div>
+      <div class="stat"><span class="num" data-to="21">0</span><span class="lbl">build stages</span></div>
       <div class="stat"><span class="num" data-to="103">0</span><span class="lbl">security standards</span></div>
       <div class="stat"><span class="num zero">0</span><span class="lbl">&rarr; production</span></div>
     </div>
@@ -366,11 +366,21 @@ pre:hover .copy-btn{ opacity:1; }
     </svg>
     <figcaption>One system, built one stage at a time — by the time you reach Stage 12, this is roughly what you're running.</figcaption>
   </figure>
+
+  <h3 class="reveal" id="recommended-order">Recommended order — where to start, where to stop</h3>
+  <p class="reveal">The stages are numbered in build order, with one exception: <b>Stage 21, Linux fundamentals</b>, is filed last because it's a reference, but it teaches the terminal skills every stage from 02 onward quietly assumes. If you've never used a Linux shell before, read it out of number order — right after Stage 01. Everyone else can treat it as a reference and jump to it only when a command looks unfamiliar.</p>
+  <ol class="order-list reveal">
+    <li class="start"><a href="01-plan-and-threat-model.html">Stage 01 — Plan &amp; threat-model first</a> — always start here.</li>
+    <li><a href="21-linux-fundamentals.html">Stage 21 — Linux fundamentals</a> — read now if the terminal is new to you; skip to Stage 02 if it isn't.</li>
+    <li><a href="02-frontend.html">Stage 02</a> through <a href="19-reliability-and-disaster-recovery.html">Stage 19</a> — straight through, in number order. Each ends with a security checklist that belongs to that stage, not a later one.</li>
+    <li><a href="20-your-first-build.html">Stage 20 — Your first build</a> — the checklist and capstone project that turns everything above into something you actually ship.</li>
+    <li class="stop"><a href="20-your-first-build.html">Stop here</a> once the capstone is deployed. Stages 13, 16, and 17 stay useful as references after that — revisit them, don't re-read them front to back.</li>
+  </ol>
 </section>
 
 <section class="stage reveal" id="landing-index"><a id="contents"></a>
   <div class="stage-head"><h2>Full contents</h2></div>
-  <p class="dek">Every stage, in build order. Start at 01 if you're building for the first time.</p>
+  <p class="dek">Every stage, in build order. Start at 01 if you're building for the first time — new to the terminal? Read 21 right after it. See the recommended order above.</p>
   <div id="progress-summary-wrap" class="reveal" style="margin:4px 0 20px;">
     <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;">
       <span id="progress-summary" style="font-family:var(--f-mono); font-size:12.5px; color:var(--muted);">0 of 19 stages marked complete</span>
@@ -400,6 +410,7 @@ pre:hover .copy-btn{ opacity:1; }
     <a class="landing-card" href="18-worked-backend-example.html"><span class="lc-num">18</span><h4>A backend, file by file — then an AI security audit</h4><p>Everything above has been explained concept-first. This stage does it code-first: one concrete backend file tree, what each file actually does and why it earns its place, then the exact process for having an AI (or a human) audit the finished code against the catalog above.</p></a>
     <a class="landing-card" href="19-reliability-and-disaster-recovery.html"><span class="lc-num">19</span><h4>Reliability &amp; resilience</h4><p>Redundancy, database failover, backups done properly, DDoS protection, and disaster recovery (RTO/RPO, runbooks, tested drills) — what turns a single failure into a non-event instead of an outage.</p></a>
     <a class="landing-card" href="20-your-first-build.html"><span class="lc-num">20</span><h4>Your first build: checklist &amp; capstone</h4><p>A linear, checkable path through every stage above, plus a capstone project spec (TinyLink) that touches all 19 of them — so finishing this ends in shipping something real.</p></a>
+    <a class="landing-card" href="21-linux-fundamentals.html"><span class="lc-num">21</span><h4>Linux fundamentals: from basics to daily-use commands</h4><p>Filed last, but read it right after Stage 01 if the terminal is new to you — the filesystem, permissions, pipes, processes, and networking commands every other stage assumes you already know.</p></a>
   </div>
 </section>
 
@@ -407,7 +418,7 @@ pre:hover .copy-btn{ opacity:1; }
 
 <div class="divider"></div>
 <footer>
-  Vamsi <span style="color:var(--accent)">·</span> <span style="color:var(--accent)">Application Builder</span> · Last updated 22 Jul 2026
+  Vamsi <span style="color:var(--accent)">·</span> <span style="color:var(--accent)">Application Builder</span> · Last updated 23 Jul 2026
 </footer>
 
 </main>
@@ -516,7 +527,7 @@ pre:hover .copy-btn{ opacity:1; }
 
 
   /* site-wide search */
-  var SEARCH_INDEX = [{"n": "01", "t": "Plan & threat-model first", "f": "01-plan-and-threat-model.html"}, {"n": "02", "t": "Frontend", "f": "02-frontend.html"}, {"n": "03", "t": "Backend & API", "f": "03-backend-api.html"}, {"n": "04", "t": "Database — structure, scaling, and how it actually gets hacked", "f": "04-database.html"}, {"n": "05", "t": "Auth, OTP & the password wallet", "f": "05-auth-otp-secrets.html"}, {"n": "06", "t": "Email / OTP delivery", "f": "06-email-otp-delivery.html"}, {"n": "07", "t": "File storage & the CDN", "f": "07-storage-cdn.html"}, {"n": "08", "t": "Servers & the VM", "f": "08-servers-vm.html"}, {"n": "09", "t": "Load balancers & autoscaling", "f": "09-load-balancing-autoscaling.html"}, {"n": "10", "t": "Domain names & DNS", "f": "10-domains-dns.html"}, {"n": "11", "t": "CI/CD pipelines", "f": "11-cicd.html"}, {"n": "12", "t": "Monitoring & incident response", "f": "12-monitoring-incident-response.html"}, {"n": "13", "t": "Security hardening checklist — the consolidated view", "f": "13-security-checklist.html"}, {"n": "14", "t": "Compliance & governance, including India", "f": "14-compliance.html"}, {"n": "15", "t": "Skill roadmap: junior → staff", "f": "15-skill-roadmap.html"}, {"n": "16", "t": "Glossary", "f": "16-glossary.html"}, {"n": "17", "t": "Full resource catalog, explained", "f": "17-full-resource-catalog.html"}, {"n": "18", "t": "A backend, file by file — then an AI security audit", "f": "18-worked-backend-example.html"}, {"n": "19", "t": "Reliability & resilience — redundancy, backups, DDoS, and disaster recovery", "f": "19-reliability-and-disaster-recovery.html"}, {"n": "20", "t": "Your first build: checklist & capstone project", "f": "20-your-first-build.html"}, {"n": "00", "t": "How to use this manual", "f": "how-to-build-an-application.html"}];
+  var SEARCH_INDEX = [{"n": "01", "t": "Plan & threat-model first", "f": "01-plan-and-threat-model.html"}, {"n": "02", "t": "Frontend", "f": "02-frontend.html"}, {"n": "03", "t": "Backend & API", "f": "03-backend-api.html"}, {"n": "04", "t": "Database — structure, scaling, and how it actually gets hacked", "f": "04-database.html"}, {"n": "05", "t": "Auth, OTP & the password wallet", "f": "05-auth-otp-secrets.html"}, {"n": "06", "t": "Email / OTP delivery", "f": "06-email-otp-delivery.html"}, {"n": "07", "t": "File storage & the CDN", "f": "07-storage-cdn.html"}, {"n": "08", "t": "Servers & the VM", "f": "08-servers-vm.html"}, {"n": "09", "t": "Load balancers & autoscaling", "f": "09-load-balancing-autoscaling.html"}, {"n": "10", "t": "Domain names & DNS", "f": "10-domains-dns.html"}, {"n": "11", "t": "CI/CD pipelines", "f": "11-cicd.html"}, {"n": "12", "t": "Monitoring & incident response", "f": "12-monitoring-incident-response.html"}, {"n": "13", "t": "Security hardening checklist — the consolidated view", "f": "13-security-checklist.html"}, {"n": "14", "t": "Compliance & governance, including India", "f": "14-compliance.html"}, {"n": "15", "t": "Skill roadmap: junior → staff", "f": "15-skill-roadmap.html"}, {"n": "16", "t": "Glossary", "f": "16-glossary.html"}, {"n": "17", "t": "Full resource catalog, explained", "f": "17-full-resource-catalog.html"}, {"n": "18", "t": "A backend, file by file — then an AI security audit", "f": "18-worked-backend-example.html"}, {"n": "19", "t": "Reliability & resilience — redundancy, backups, DDoS, and disaster recovery", "f": "19-reliability-and-disaster-recovery.html"}, {"n": "20", "t": "Your first build: checklist & capstone project", "f": "20-your-first-build.html"}, {"n": "21", "t": "Linux fundamentals: from basics to daily-use commands", "f": "21-linux-fundamentals.html"}, {"n": "00", "t": "How to use this manual", "f": "how-to-build-an-application.html"}];
   var searchBtn=document.getElementById('search-btn'), searchOverlay=document.getElementById('search-overlay'),
       searchInput=document.getElementById('search-input'), searchResults=document.getElementById('search-results');
   function renderResults(q){

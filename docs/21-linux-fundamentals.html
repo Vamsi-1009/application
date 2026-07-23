@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%A7%AD%3C/text%3E%3C/svg%3E">
-<title>Your first build: checklist &amp; capstone project — Field Manual</title>
-<meta property="og:title" content="Your first build: checklist &amp; capstone project">
-<meta property="og:description" content="A day-by-day checklist through all 19 stages, and a capstone project spec that touches every one of them - so finishing this manual ends in shipping something real, not just reading.">
+<title>Linux fundamentals: from basics to daily-use commands — Field Manual</title>
+<meta property="og:title" content="Linux fundamentals: from basics to daily-use commands">
+<meta property="og:description" content="Everything from Stage 02 onward assumes you can find your way around a terminal. This stage builds that up from zero - the filesystem, permissions, pipes, processes, networking, and the commands you will actually type every day building and running the rest of this manual.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://webstocking.com/application/20-your-first-build.html">
+<meta property="og:url" content="https://webstocking.com/application/21-linux-fundamentals.html">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Your first build: checklist &amp; capstone project">
-<meta name="twitter:description" content="A day-by-day checklist through all 19 stages, and a capstone project spec that touches every one of them - so finishing this manual ends in shipping something real, not just reading.">
+<meta name="twitter:title" content="Linux fundamentals: from basics to daily-use commands">
+<meta name="twitter:description" content="Everything from Stage 02 onward assumes you can find your way around a terminal. This stage builds that up from zero - the filesystem, permissions, pipes, processes, networking, and the commands you will actually type every day building and running the rest of this manual.">
 <style>
 :root{
   --bg:#060910; --bg2:#0a0f1a;
@@ -95,7 +95,7 @@ main{ padding:70px 7vw 110px; max-width:960px; margin:0 auto; }
 @media (max-width:980px){ main{ padding:40px 6vw 90px; } }
 
 section.stage{ padding-top:16px; margin-bottom:78px; scroll-margin-top:24px; }
-.stage-head{ display:flex; align-items:baseline; gap:16px; margin-bottom:8px; }
+.stage-head{ display:flex; align-items:baseline; gap:16px; margin-bottom:8px; flex-wrap:wrap; }
 .stage-num{ font-size:13px; color:var(--accent); letter-spacing:.05em; }
 .stage h2{ font-size:clamp(26px,3.4vw,34px); margin:0; }
 .stage .dek{ color:var(--muted); font-size:16.5px; margin:12px 0 30px; max-width:62ch; }
@@ -108,7 +108,7 @@ section.stage{ padding-top:16px; margin-bottom:78px; scroll-margin-top:24px; }
 .stage li::marker{ color:var(--accent); font-family:var(--f-mono); font-size:.88em; }
 .stage-badge{ font-family:var(--f-mono); font-size:11px; color:var(--muted); border:1px solid var(--line); border-radius:6px; padding:2px 9px; white-space:nowrap; }
 
-pre{ background:var(--code-bg); border:1px solid var(--line); border-radius:12px; padding:17px 19px; overflow-x:auto; font-size:13.2px; line-height:1.62; backdrop-filter:blur(6px); box-shadow:inset 0 1px 0 rgba(255,255,255,.03); }
+pre{ background:var(--code-bg); border:1px solid var(--line); border-radius:12px; padding:17px 19px; overflow-x:auto; font-size:13.2px; line-height:1.62; backdrop-filter:blur(6px); box-shadow:inset 0 1px 0 rgba(255,255,255,.03); position:relative; }
 code{ font-family:var(--f-mono); }
 p code,li code{ background:var(--code-bg); border:1px solid var(--line-soft); border-radius:5px; padding:1px 6px; font-size:.85em; color:var(--accent); }
 
@@ -177,7 +177,6 @@ footer{ border-top:1px solid var(--line); padding:28px 0 40px; color:var(--muted
 .stage h3:hover .h-anchor{ opacity:1; }
 .h-anchor:hover{ color:var(--accent); }
 .copy-btn{ position:absolute; top:10px; right:10px; background:var(--glass-strong); border:1px solid var(--line); color:var(--muted); font-family:var(--f-mono); font-size:11px; padding:5px 10px; border-radius:7px; cursor:pointer; opacity:0; transition:opacity .15s var(--ease), border-color .15s var(--ease), color .15s var(--ease); }
-pre{ position:relative; }
 pre:hover .copy-btn{ opacity:1; }
 .copy-btn:hover{ border-color:var(--accent); color:var(--accent); }
 .copy-btn.copied{ opacity:1; color:var(--ok); border-color:var(--ok); }
@@ -186,15 +185,23 @@ pre:hover .copy-btn{ opacity:1; }
 .complete-toggle.done{ border-color:var(--ok); color:var(--ok); }
 .btn{ display:inline-flex; align-items:center; gap:9px; padding:13px 22px; border-radius:11px; border:1px solid var(--line); color:var(--text); font-size:13.5px; text-decoration:none; background:var(--glass-strong); backdrop-filter:blur(8px); transition:transform var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease); }
 .btn:hover{ transform:translateY(-3px); border-color:var(--accent); box-shadow:0 14px 34px -14px var(--accent-glow); color:var(--text); }
-
-.checklist{ list-style:none; padding-left:0 !important; margin:10px 0 22px; }
-.checklist li{ display:flex; align-items:flex-start; gap:11px; padding:8px 0; border-bottom:1px solid var(--line-soft); }
-.checklist li::marker{ content:none; }
-.checklist input[type="checkbox"]{ appearance:none; -webkit-appearance:none; width:18px; height:18px; flex:none; margin-top:2px; border:1.5px solid var(--line); border-radius:5px; background:var(--glass); cursor:pointer; position:relative; transition:border-color .15s var(--ease), background .15s var(--ease); }
-.checklist input[type="checkbox"]:checked{ background:var(--accent); border-color:var(--accent); }
-.checklist input[type="checkbox"]:checked::after{ content:""; position:absolute; left:5px; top:1px; width:5px; height:9px; border:solid var(--bg); border-width:0 2px 2px 0; transform:rotate(45deg); }
-.checklist label{ font-size:14.8px; cursor:pointer; }
-.checklist .stage-tag{ font-family:var(--f-mono); font-size:10.5px; color:var(--accent); margin-right:6px; }
+.anim-fig{ margin:30px 0; border:1px solid var(--line); border-radius:16px; background:var(--glass); backdrop-filter:blur(10px); padding:22px 22px 15px; box-shadow:var(--shadow); }
+.anim-fig svg{ width:100%; height:auto; display:block; }
+.anim-fig figcaption{ margin-top:13px; font-size:12.5px; color:var(--muted); font-family:var(--f-mono); text-align:center; }
+.anim-fig .fig-tag{ display:inline-block; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); margin-bottom:14px; }
+.af-box{ fill:var(--glass-strong); stroke:var(--line); stroke-width:1.5; }
+.af-title{ fill:var(--text); font:600 12.5px var(--f-mono); }
+.af-sub{ fill:var(--muted); font:11px var(--f-mono); }
+.af-lbl{ fill:var(--muted-2); font:10.5px var(--f-mono); }
+.af-flow{ stroke:var(--accent); stroke-width:2; stroke-dasharray:5 7; animation:af-dash 1s linear infinite; opacity:.75; }
+@keyframes af-dash{ to{ stroke-dashoffset:-12; } }
+.af-pkt{ fill:var(--warn); } .af-pkt2{ fill:var(--accent); }
+.order-list{ counter-reset:step; list-style:none; padding-left:0 !important; }
+.order-list li{ counter-increment:step; position:relative; padding-left:44px; margin-bottom:14px; }
+.order-list li::before{ content:counter(step); position:absolute; left:0; top:-1px; width:28px; height:28px; border-radius:50%; background:var(--glass-strong); border:1px solid var(--line); color:var(--accent); font-family:var(--f-mono); font-size:12px; display:flex; align-items:center; justify-content:center; }
+.order-list li::marker{ content:none; }
+.order-list li.start::before{ content:"\2192"; color:var(--ok); border-color:var(--ok); }
+.order-list li.stop::before{ content:"\25A0"; color:var(--danger); border-color:var(--danger); font-size:11px; }
 </style>
 </head>
 <body>
@@ -203,64 +210,239 @@ pre:hover .copy-btn{ opacity:1; }
 <div class="shell">
 <main>
 
-<section class="stage" id="s20">
-  <div class="stage-head reveal"><span class="stage-num">20</span><h2>Your first build: a checklist, and a capstone project</h2><span class="stage-badge">~2-4 weeks &middot; All levels</span></div>
-  <p class="dek reveal">Everything before this stage is organized as a reference — pick it up at any point, read the stage you need. This one is different: it's a linear, checkable path through the whole manual, plus a concrete project spec that touches all 19 stages, so finishing this ends in something you actually shipped.</p>
+<section class="stage" id="s21">
+  <div class="stage-head reveal"><span class="stage-num">21</span><h2>Linux fundamentals: from basics to daily-use commands</h2><span class="stage-badge">~2-3 hrs &middot; Beginner</span></div>
+  <p class="dek reveal">Everything from Stage 02 onward quietly assumes you can find your way around a terminal. This stage builds that up from zero. If you've never used a Linux shell before, read this <b>right after Stage 01, before Stage 02</b> — despite the file number, it belongs near the start (see the recommended order on the landing page).</p>
 
-  <button class="btn complete-toggle reveal" id="complete-toggle" data-page="20-your-first-build.html" type="button">
+  <button class="btn complete-toggle reveal" id="complete-toggle" data-page="21-linux-fundamentals.html" type="button">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <span class="ct-label">Mark this stage complete</span>
   </button>
 
-  <h3 class="reveal" id="the-build-order-checklist">The build-order checklist<a class="h-anchor" href="#the-build-order-checklist" aria-label="Link to this section">#</a></h3>
-  <p class="reveal">Each item is a real, testable outcome — not "read Stage X." Checking a box here saves to your browser only (same mechanism as the "mark stage complete" buttons); it's a personal build log, not a synced account.</p>
+  <div class="callout reveal" id="in-page-toc">
+    <div class="ctitle">On this page</div>
+    <ul style="columns:2; column-gap:28px; margin:0; padding-left:1.1em;">
+      <li><a href="#shell-and-filesystem">The shell and the filesystem tree</a></li>
+      <li><a href="#moving-around">Moving around and looking at things</a></li>
+      <li><a href="#create-copy-move-delete">Creating, copying, moving, deleting</a></li>
+      <li><a href="#permissions-and-ownership">Permissions and ownership</a></li>
+      <li><a href="#pipes-and-redirection">Pipes, redirection, and combining commands</a></li>
+      <li><a href="#searching-and-processing-text">Searching and processing text</a></li>
+      <li><a href="#processes-and-services">Processes and services</a></li>
+      <li><a href="#networking-from-the-terminal">Networking from the terminal</a></li>
+      <li><a href="#installing-software">Installing software</a></li>
+      <li><a href="#disk-space-and-archives">Disk space and archives</a></li>
+      <li><a href="#environment-and-shell-config">Environment variables and shell config</a></li>
+      <li><a href="#scheduling-with-cron">Scheduling recurring tasks</a></li>
+      <li><a href="#reading-logs">Reading logs</a></li>
+      <li><a href="#the-cheat-sheet">The cheat sheet</a></li>
+    </ul>
+  </div>
 
-  <ul class="checklist reveal" id="build-checklist">
-    <li><input type="checkbox" id="c1"><label for="c1"><span class="stage-tag">01</span>Wrote a one-paragraph spec: who the user is, the one core action, what "done" looks like for v1</label></li>
-    <li><input type="checkbox" id="c2"><label for="c2"><span class="stage-tag">01</span>Sketched the architecture and did a 5-question threat-model pass before writing code</label></li>
-    <li><input type="checkbox" id="c3"><label for="c3"><span class="stage-tag">02</span>Every screen in the frontend handles loading / empty / error / success states</label></li>
-    <li><input type="checkbox" id="c4"><label for="c4"><span class="stage-tag">02</span>Confirmed the access token is never in localStorage (checked devtools yourself)</label></li>
-    <li><input type="checkbox" id="c5"><label for="c5"><span class="stage-tag">03</span>Every mutating route checks resource ownership, not just authentication</label></li>
-    <li><input type="checkbox" id="c6"><label for="c6"><span class="stage-tag">03</span>Rate limiting actually returns 429 after N attempts — tested it yourself, didn't just add the middleware</label></li>
-    <li><input type="checkbox" id="c7"><label for="c7"><span class="stage-tag">04</span>Schema changes are migration files checked into git, not hand edits</label></li>
-    <li><input type="checkbox" id="c8"><label for="c8"><span class="stage-tag">04</span>Uniqueness is enforced at the database level, not only in application code</label></li>
-    <li><input type="checkbox" id="c9"><label for="c9"><span class="stage-tag">05</span>Passwords are hashed with Argon2id — verified in the database, not just in code</label></li>
-    <li><input type="checkbox" id="c10"><label for="c10"><span class="stage-tag">05</span>OTP codes expire and lock out after a capped number of wrong attempts</label></li>
-    <li><input type="checkbox" id="c11"><label for="c11"><span class="stage-tag">06</span>SPF/DKIM/DMARC configured for the sending domain — OTP email lands in the inbox, not spam</label></li>
-    <li><input type="checkbox" id="c12"><label for="c12"><span class="stage-tag">07</span>File upload goes through a presigned URL — the API server never touches raw bytes</label></li>
-    <li><input type="checkbox" id="c13"><label for="c13"><span class="stage-tag">07</span>Confirmed the storage bucket is private; only the CDN can read it</label></li>
-    <li><input type="checkbox" id="c14"><label for="c14"><span class="stage-tag">08</span>SSH is key-only, root login disabled, firewall denies by default</label></li>
-    <li><input type="checkbox" id="c15"><label for="c15"><span class="stage-tag">08</span>Killed the app process manually and watched it auto-restart</label></li>
-    <li><input type="checkbox" id="c16"><label for="c16"><span class="stage-tag">09</span>At least two app instances run behind the load balancer</label></li>
-    <li><input type="checkbox" id="c17"><label for="c17"><span class="stage-tag">09</span>Took one instance down and confirmed zero dropped requests</label></li>
-    <li><input type="checkbox" id="c18"><label for="c18"><span class="stage-tag">10</span>Domain resolves correctly (checked with <code>nslookup</code>) and HTTPS auto-renews</label></li>
-    <li><input type="checkbox" id="c19"><label for="c19"><span class="stage-tag">11</span>A push to main deploys automatically — verified end-to-end with a visible change, not just a green checkmark</label></li>
-    <li><input type="checkbox" id="c20"><label for="c20"><span class="stage-tag">12</span>Logs are spot-checked to confirm passwords/tokens are actually redacted</label></li>
-    <li><input type="checkbox" id="c21"><label for="c21"><span class="stage-tag">13/14</span>Ran the consolidated security checklist and the compliance section against your own app</label></li>
-    <li><input type="checkbox" id="c22"><label for="c22"><span class="stage-tag">17</span>Picked the 5-10 catalog entries most relevant to what you actually built</label></li>
-    <li><input type="checkbox" id="c23"><label for="c23"><span class="stage-tag">18</span>Ran the AI-audit prompt against your own codebase and fixed at least one real finding</label></li>
-    <li><input type="checkbox" id="c24"><label for="c24"><span class="stage-tag">19</span>Took a real backup and restored it in a scratch environment — and timed how long it took</label></li>
+  <h3 class="reveal" id="shell-and-filesystem">The shell and the filesystem tree<a class="h-anchor" href="#shell-and-filesystem" aria-label="Link to this section">#</a></h3>
+  <p class="reveal">A <b>shell</b> (usually <code>bash</code>) is a program that reads the commands you type and runs them. Everything on a Linux system — files, folders, even devices — lives under one single tree starting at <code>/</code> (the root). There's no "C: drive" concept; an external disk just gets <i>mounted</i> somewhere inside that same tree.</p>
+  <ul class="reveal">
+    <li><code>/</code> — the root of everything</li>
+    <li><code>/home/yourname</code> (shorthand: <code>~</code>) — your personal files</li>
+    <li><code>/etc</code> — system-wide configuration files (this is where Nginx's config lives in Stage 08)</li>
+    <li><code>/var/log</code> — log files</li>
+    <li><code>/usr/bin</code>, <code>/bin</code> — where installed programs actually live</li>
   </ul>
+  <p class="reveal">A path starting with <code>/</code> is <b>absolute</b> (always means the same place, no matter where you are). A path that doesn't is <b>relative</b> (means different things depending on your current folder). <code>.</code> means "here," <code>..</code> means "one folder up."</p>
 
-  <h3 class="reveal" id="capstone-project-tinylink">Capstone project: TinyLink<a class="h-anchor" href="#capstone-project-tinylink" aria-label="Link to this section">#</a></h3>
-  <p class="reveal">A deliberately small project that still touches every stage above — an authenticated link shortener. Small enough to actually finish, real enough that every decision in this manual matters.</p>
+  <h3 class="reveal" id="moving-around">Moving around and looking at things<a class="h-anchor" href="#moving-around" aria-label="Link to this section">#</a></h3>
+  <pre class="mono reveal">pwd                 # print working directory - "where am I?"
+ls                  # list files in the current folder
+ls -la              # -l = long format (permissions, size, date), -a = show hidden files (dotfiles)
+cd /var/log         # change directory (absolute path)
+cd ..               # go up one level
+cd ~                # go home
+cat file.txt        # print a whole file to the screen
+less file.txt       # page through a file (q to quit) - use this for anything long
+head -20 file.txt   # first 20 lines
+tail -20 file.txt   # last 20 lines
+tail -f app.log     # follow a file live as new lines are appended - the single most-used
+                    # command while debugging a running service (see Stage 12)
+man ls              # the full manual page for a command
+ls --help           # a shorter built-in summary</pre>
 
-  <div class="grid2 reveal">
-    <div class="card"><h4>Auth &amp; accounts</h4><p>Sign up with email OTP verification. Argon2id password hashing. Short-lived JWT + rotating refresh token.</p></div>
-    <div class="card"><h4>Core feature</h4><p>Create a short link tied to your account. Redirect endpoint is rate-limited and logs a click count.</p></div>
-    <div class="card"><h4>Data layer</h4><p>Postgres schema with a unique, indexed short-code column, migrations tracked in git.</p></div>
-    <div class="card"><h4>Storage &amp; CDN</h4><p>Optional per-link custom preview image, uploaded via a presigned URL, served through a CDN.</p></div>
-    <div class="card"><h4>Deployment</h4><p>Two app instances behind a load balancer on a hardened VM, a real domain with HTTPS.</p></div>
-    <div class="card"><h4>Operations</h4><p>GitHub Actions auto-deploy, redacted structured logs, one alert wired up, one tested backup restore.</p></div>
+  <h3 class="reveal" id="create-copy-move-delete">Creating, copying, moving, deleting<a class="h-anchor" href="#create-copy-move-delete" aria-label="Link to this section">#</a></h3>
+  <pre class="mono reveal">mkdir myproject           # create a folder
+mkdir -p a/b/c            # create nested folders in one shot
+touch notes.txt           # create an empty file (or update its timestamp)
+cp source.txt backup.txt  # copy a file
+cp -r sourcedir/ backup/  # copy a folder recursively
+mv old-name.txt new-name.txt   # rename (mv is also how you rename)
+mv file.txt ~/Documents/       # move into another folder
+rm file.txt               # delete a file - no trash bin, this is permanent
+rm -r somedir/             # delete a folder and everything in it</pre>
+  <div class="mistake reveal">
+    <div class="ctitle">The command every beginner needs to fear a little</div>
+    <p><code>rm -rf /</code> (or any careless <code>rm -rf</code> with a wrong path) deletes everything, permanently, with no confirmation and no undo. Before running <code>rm -r</code> on anything, run <code>ls</code> on the exact same path first and actually read the output. Never run <code>rm -rf</code> copy-pasted from the internet without understanding every character of the path.</p>
   </div>
 
-  <div class="callout reveal">
-    <div class="ctitle">Definition of done</div>
-    <p>Ship it publicly reachable over HTTPS, then run the Stage 18-style AI security audit against your own code before calling it finished. If it finds something real, fix it — that last step is the difference between "it works" and "it's actually ready."</p>
+  <h3 class="reveal" id="permissions-and-ownership">Permissions and ownership<a class="h-anchor" href="#permissions-and-ownership" aria-label="Link to this section">#</a></h3>
+  <p class="reveal">Every file has an owner, a group, and three permission sets (owner / group / everyone else), each with read (r), write (w), and execute (x). <code>ls -la</code> shows this as a 10-character string like <code>-rwxr-xr--</code>.</p>
+  <pre class="mono reveal">chmod 600 .env           # owner: read+write only, nobody else - correct for secrets (Stage 05)
+chmod 755 deploy.sh        # owner: read+write+execute, everyone else: read+execute - typical for a script
+chmod +x script.sh         # add execute permission, keep everything else as-is
+chown vamsi:vamsi file.txt # change the owner (and group) of a file
+sudo some-command          # run one command as root ("superuser do") - only when you actually need to</pre>
+  <div class="security reveal">
+    <div class="ctitle">Security checklist — permissions</div>
+    <ul>
+      <li>Never <code>chmod 777</code> anything to "make an error go away" — that grants read/write/execute to literally everyone on the system <span class="std">CIS Benchmarks</span></li>
+      <li>Secrets/config files (like <code>.env</code>) should be <code>600</code> — only the owner can even read them <span class="std">CWE-732</span></li>
+      <li>Run your application as a dedicated non-root user, using <code>sudo</code> only for the specific commands that need it — this is exactly Stage 08's "never run the app as root" rule <span class="std">DISA STIGs</span></li>
+    </ul>
   </div>
+
+  <h3 class="reveal" id="pipes-and-redirection">Pipes, redirection, and combining commands<a class="h-anchor" href="#pipes-and-redirection" aria-label="Link to this section">#</a></h3>
+  <p class="reveal">The real power of a shell is chaining small, single-purpose commands together. A <b>pipe</b> (<code>|</code>) sends one command's output straight into the next command's input.</p>
+  <pre class="mono reveal">cat access.log | grep ERROR | sort | uniq -c
+# read the file, keep only lines containing "ERROR", sort them,
+# then collapse duplicates and count how many times each appears
+
+command > file.txt    # redirect output to a file, overwriting it
+command >> file.txt   # redirect output to a file, appending
+command 2> errors.txt # redirect only error output
+command &> all.txt    # redirect both normal and error output
+find . -name "*.log" | xargs rm   # feed a list of results as arguments to another command</pre>
+
+  <figure class="anim-fig reveal">
+    <span class="fig-tag">Animated · a pipeline in motion</span>
+    <svg viewBox="0 0 820 170" role="img" aria-label="Animation: a log file's contents flow through grep, sort, and uniq -c in sequence, each stage narrowing the data further">
+      <style>
+        .pl-n{ animation:pl-blink 5.2s linear infinite; }
+        .pl-n2{ animation-delay:1.1s; } .pl-n3{ animation-delay:2.2s; } .pl-n4{ animation-delay:3.3s; }
+        @keyframes pl-blink{ 0%,6%{ stroke:var(--accent); stroke-width:2.6; } 16%,100%{ stroke:var(--line); stroke-width:1.5; } }
+        .pl-g{ animation:pl-move 5.2s ease-in-out infinite; }
+        @keyframes pl-move{ 0%{ transform:translateX(95px);} 88%{ transform:translateX(725px);} 100%{ transform:translateX(725px);} }
+      </style>
+      <line class="af-flow" x1="95" y1="80" x2="725" y2="80"/>
+      <g><rect class="af-box pl-n"  x="30"  y="56" width="130" height="48" rx="11"/><text class="af-title" x="95"  y="79" text-anchor="middle">access.log</text><text class="af-sub" x="95" y="95" text-anchor="middle">10,000 lines</text></g>
+      <g><rect class="af-box pl-n pl-n2" x="187" y="56" width="130" height="48" rx="11"/><text class="af-title" x="252" y="79" text-anchor="middle">grep ERROR</text><text class="af-sub" x="252" y="95" text-anchor="middle">42 lines</text></g>
+      <g><rect class="af-box pl-n pl-n3" x="344" y="56" width="130" height="48" rx="11"/><text class="af-title" x="409" y="79" text-anchor="middle">sort</text><text class="af-sub" x="409" y="95" text-anchor="middle">same 42, ordered</text></g>
+      <g><rect class="af-box pl-n pl-n4" x="501" y="56" width="130" height="48" rx="11"/><text class="af-title" x="566" y="72" text-anchor="middle">uniq -c</text><text class="af-sub" x="566" y="88" text-anchor="middle">grouped +</text><text class="af-sub" x="566" y="102" text-anchor="middle">counted</text></g>
+      <g><rect class="af-box" x="658" y="56" width="130" height="48" rx="11"/><text class="af-title" x="723" y="79" text-anchor="middle">6 rows</text><text class="af-sub" x="723" y="95" text-anchor="middle">final result</text></g>
+      <g class="pl-g"><circle class="af-pkt2" cx="0" cy="80" r="6"/></g>
+    </svg>
+    <figcaption>Each command only does one thing well — the pipe is what turns them into a real tool.</figcaption>
+  </figure>
+
+  <h3 class="reveal" id="searching-and-processing-text">Searching and processing text<a class="h-anchor" href="#searching-and-processing-text" aria-label="Link to this section">#</a></h3>
+  <pre class="mono reveal">grep "ERROR" app.log        # print lines containing "ERROR"
+grep -i "error" app.log      # case-insensitive
+grep -r "TODO" src/          # search recursively through a folder
+grep -c "ERROR" app.log      # just count matching lines
+sed 's/foo/bar/' file.txt    # replace the first "foo" with "bar" on each line
+awk '{print $1}' access.log  # print just the first whitespace-separated field of each line
+cut -d',' -f2 data.csv       # print the 2nd column of a comma-separated file
+sort names.txt | uniq        # sort, then remove duplicate lines
+wc -l file.txt                # count lines in a file</pre>
+
+  <h3 class="reveal" id="processes-and-services">Processes and services<a class="h-anchor" href="#processes-and-services" aria-label="Link to this section">#</a></h3>
+  <pre class="mono reveal">ps aux              # list every running process
+ps aux | grep node   # find a specific process
+top                  # live, updating view of CPU/memory usage (q to quit)
+kill 1234            # ask process 1234 to stop (graceful)
+kill -9 1234         # force-kill it (last resort - no cleanup happens)
+command &            # run a command in the background
+jobs                  # list background jobs in this shell session
+nohup command &       # keep a command running even after you disconnect
+systemctl status pixelgram-backend    # check a service (Stage 08)
+systemctl restart pixelgram-backend   # restart it
+systemctl enable pixelgram-backend    # make it start automatically on boot</pre>
+
+  <h3 class="reveal" id="networking-from-the-terminal">Networking from the terminal<a class="h-anchor" href="#networking-from-the-terminal" aria-label="Link to this section">#</a></h3>
+  <pre class="mono reveal">curl https://api.example.com/health       # make an HTTP request, print the response
+curl -I https://example.com                # headers only
+curl -sI https://example.com | grep -i server   # combine with grep, as used throughout this manual
+ping example.com                            # check basic connectivity
+ss -tulpn                                   # list listening ports (modern replacement for netstat)
+ssh vamsi@203.0.113.5 -p 22022               # connect to a remote server (Stage 08)
+scp file.txt vamsi@203.0.113.5:/home/vamsi/  # copy a file to a remote server over SSH</pre>
+
+  <h3 class="reveal" id="installing-software">Installing software<a class="h-anchor" href="#installing-software" aria-label="Link to this section">#</a></h3>
+  <p class="reveal">On Ubuntu/Debian (what this manual's VM stages assume), packages are installed via <code>apt</code>:</p>
+  <pre class="mono reveal">sudo apt update              # refresh the list of available package versions
+sudo apt upgrade              # install available updates
+sudo apt install nginx git    # install specific packages
+apt list --upgradable         # see what's outdated without installing anything
+sudo apt autoremove            # clean up packages nothing depends on anymore</pre>
+
+  <h3 class="reveal" id="disk-space-and-archives">Disk space and archives<a class="h-anchor" href="#disk-space-and-archives" aria-label="Link to this section">#</a></h3>
+  <pre class="mono reveal">df -h                        # disk space free/used per mounted filesystem, human-readable
+du -sh some-folder/           # total size of one folder
+tar -czvf backup.tar.gz dir/  # compress a folder into a single .tar.gz archive
+tar -xzvf backup.tar.gz       # extract one
+rsync -avz src/ user@host:/dest/   # efficiently sync files/folders, including over SSH</pre>
+
+  <h3 class="reveal" id="environment-and-shell-config">Environment variables and shell config<a class="h-anchor" href="#environment-and-shell-config" aria-label="Link to this section">#</a></h3>
+  <pre class="mono reveal">echo $HOME                  # print one environment variable
+env                          # list all of them
+export API_KEY=abc123        # set one for this shell session only
+# For anything that should persist, add an export line to ~/.bashrc
+# (interactive shells) - never hardcode real secrets there; use the
+# secrets-manager pattern from Stage 05 instead.
+echo 'alias ll="ls -la"' >> ~/.bashrc   # a shortcut you'll actually use daily</pre>
+
+  <h3 class="reveal" id="scheduling-with-cron">Scheduling recurring tasks<a class="h-anchor" href="#scheduling-with-cron" aria-label="Link to this section">#</a></h3>
+  <pre class="mono reveal">crontab -e     # edit your personal scheduled jobs
+crontab -l     # list them
+
+# minute hour day-of-month month day-of-week   command
+0 3 * * *   /home/vamsi/scripts/backup.sh   # every day at 3:00 AM - see Stage 19's backup discipline</pre>
+
+  <h3 class="reveal" id="reading-logs">Reading logs<a class="h-anchor" href="#reading-logs" aria-label="Link to this section">#</a></h3>
+  <pre class="mono reveal">journalctl -u pixelgram-backend      # logs for one systemd service
+journalctl -u pixelgram-backend -f   # follow them live
+journalctl --since "1 hour ago"      # narrow by time
+tail -f /var/log/nginx/access.log    # Nginx logs directly, as used in Stage 12</pre>
+
+  <h3 class="reveal" id="the-cheat-sheet">The cheat sheet<a class="h-anchor" href="#the-cheat-sheet" aria-label="Link to this section">#</a></h3>
+  <div class="tablewrap reveal">
+  <table>
+    <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><code>pwd</code></td><td>Print the current directory</td></tr>
+      <tr><td><code>ls -la</code></td><td>List files, including hidden ones, in detail</td></tr>
+      <tr><td><code>cd</code></td><td>Change directory</td></tr>
+      <tr><td><code>cat</code> / <code>less</code></td><td>Print / page through a file</td></tr>
+      <tr><td><code>tail -f</code></td><td>Follow a file live as it grows</td></tr>
+      <tr><td><code>mkdir -p</code></td><td>Create nested folders</td></tr>
+      <tr><td><code>cp -r</code> / <code>mv</code> / <code>rm -r</code></td><td>Copy / move-rename / delete</td></tr>
+      <tr><td><code>chmod</code> / <code>chown</code></td><td>Change permissions / ownership</td></tr>
+      <tr><td><code>sudo</code></td><td>Run one command with root privileges</td></tr>
+      <tr><td><code>grep</code> / <code>sed</code> / <code>awk</code></td><td>Search / substitute / extract fields from text</td></tr>
+      <tr><td><code>sort</code> / <code>uniq</code> / <code>wc -l</code></td><td>Sort, dedupe, count lines</td></tr>
+      <tr><td><code>ps aux</code> / <code>top</code></td><td>List / monitor running processes</td></tr>
+      <tr><td><code>kill</code> / <code>kill -9</code></td><td>Stop a process gracefully / forcefully</td></tr>
+      <tr><td><code>systemctl status/restart/enable</code></td><td>Manage a background service</td></tr>
+      <tr><td><code>curl</code> / <code>ssh</code> / <code>scp</code></td><td>HTTP requests / remote shell / remote file copy</td></tr>
+      <tr><td><code>ss -tulpn</code></td><td>List listening network ports</td></tr>
+      <tr><td><code>apt update/install</code></td><td>Refresh package lists / install software</td></tr>
+      <tr><td><code>df -h</code> / <code>du -sh</code></td><td>Disk space free / folder size</td></tr>
+      <tr><td><code>tar -czvf</code> / <code>-xzvf</code></td><td>Compress / extract an archive</td></tr>
+      <tr><td><code>crontab -e</code></td><td>Edit scheduled recurring tasks</td></tr>
+      <tr><td><code>journalctl -u name -f</code></td><td>Follow a systemd service's logs live</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="security reveal">
+    <div class="ctitle">Security checklist — the terminal itself</div>
+    <ul>
+      <li>Never pipe a downloaded script straight into a shell (<code>curl ... | bash</code>) without reading it first — you're handing a stranger's code full account access <span class="std">OWASP ASVS</span></li>
+      <li>Prefer <code>sudo &lt;single-command&gt;</code> over opening a permanent root shell — smaller window, clearer audit trail <span class="std">CIS Benchmarks</span></li>
+      <li>Double-check the exact path before any destructive command (<code>rm -r</code>, <code>chmod -R</code>) — there's no undo <span class="std">CWE-732</span></li>
+    </ul>
+  </div>
+
+  <p class="reveal appendix-note">This is deliberately a reference, not an exhaustive shell course — come back to it whenever a command in an earlier or later stage looks unfamiliar.</p>
 </section>
 
-<div class="page-nav reveal"><a class="page-nav-link prev" href="19-reliability-and-disaster-recovery.html"><span class="page-nav-label">&larr; Previous</span><span class="page-nav-title">Reliability &amp; resilience</span></a><a class="page-nav-link next" href="21-linux-fundamentals.html"><span class="page-nav-label">Next &rarr;</span><span class="page-nav-title">Linux fundamentals</span></a></div>
+<div class="page-nav reveal"><a class="page-nav-link prev" href="20-your-first-build.html"><span class="page-nav-label">&larr; Previous</span><span class="page-nav-title">Your first build: checklist &amp; capstone</span></a><span></span></div>
 
 <div class="divider"></div>
 <footer>
@@ -272,7 +454,7 @@ pre:hover .copy-btn{ opacity:1; }
 <button id="search-btn" aria-label="Search" title="Search (Ctrl+K)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
 <div id="search-overlay">
   <div id="search-modal">
-    <input id="search-input" type="text" placeholder="Search all 21 stages…" autocomplete="off">
+    <input id="search-input" type="text" placeholder="Search all 22 stages…" autocomplete="off">
     <div id="search-results"></div>
   </div>
 </div>
@@ -310,7 +492,6 @@ pre:hover .copy-btn{ opacity:1; }
     p.appendChild(btn);
   });
 
-  /* progress tracking (this stage) */
   (function(){
     var KEY='manual-progress';
     function getProgress(){ try{ return JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){ return {}; } }
@@ -333,20 +514,6 @@ pre:hover .copy-btn{ opacity:1; }
     }
   })();
 
-  /* checklist persistence (separate key, per checkbox) */
-  (function(){
-    var KEY='manual-checklist';
-    var state; try{ state = JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){ state={}; }
-    document.querySelectorAll('#build-checklist input[type="checkbox"]').forEach(function(cb){
-      if(state[cb.id]) cb.checked = true;
-      cb.addEventListener('change', function(){
-        state[cb.id] = cb.checked;
-        try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
-      });
-    });
-  })();
-
-  /* site-wide search */
   var SEARCH_INDEX = [{"n": "01", "t": "Plan & threat-model first", "f": "01-plan-and-threat-model.html"}, {"n": "02", "t": "Frontend", "f": "02-frontend.html"}, {"n": "03", "t": "Backend & API", "f": "03-backend-api.html"}, {"n": "04", "t": "Database — structure, scaling, and how it actually gets hacked", "f": "04-database.html"}, {"n": "05", "t": "Auth, OTP & the password wallet", "f": "05-auth-otp-secrets.html"}, {"n": "06", "t": "Email / OTP delivery", "f": "06-email-otp-delivery.html"}, {"n": "07", "t": "File storage & the CDN", "f": "07-storage-cdn.html"}, {"n": "08", "t": "Servers & the VM", "f": "08-servers-vm.html"}, {"n": "09", "t": "Load balancers & autoscaling", "f": "09-load-balancing-autoscaling.html"}, {"n": "10", "t": "Domain names & DNS", "f": "10-domains-dns.html"}, {"n": "11", "t": "CI/CD pipelines", "f": "11-cicd.html"}, {"n": "12", "t": "Monitoring & incident response", "f": "12-monitoring-incident-response.html"}, {"n": "13", "t": "Security hardening checklist — the consolidated view", "f": "13-security-checklist.html"}, {"n": "14", "t": "Compliance & governance, including India", "f": "14-compliance.html"}, {"n": "15", "t": "Skill roadmap: junior → staff", "f": "15-skill-roadmap.html"}, {"n": "16", "t": "Glossary", "f": "16-glossary.html"}, {"n": "17", "t": "Full resource catalog, explained", "f": "17-full-resource-catalog.html"}, {"n": "18", "t": "A backend, file by file — then an AI security audit", "f": "18-worked-backend-example.html"}, {"n": "19", "t": "Reliability & resilience — redundancy, backups, DDoS, and disaster recovery", "f": "19-reliability-and-disaster-recovery.html"}, {"n": "20", "t": "Your first build: checklist & capstone project", "f": "20-your-first-build.html"}, {"n": "21", "t": "Linux fundamentals: from basics to daily-use commands", "f": "21-linux-fundamentals.html"}, {"n": "00", "t": "How to use this manual", "f": "how-to-build-an-application.html"}];
   var searchBtn=document.getElementById('search-btn'), searchOverlay=document.getElementById('search-overlay'),
       searchInput=document.getElementById('search-input'), searchResults=document.getElementById('search-results');
@@ -374,7 +541,6 @@ pre:hover .copy-btn{ opacity:1; }
     });
   }
 
-  /* ===== living network canvas ===== */
   var cv=document.getElementById('bg-net'); if(!cv) return; var ctx=cv.getContext('2d');
   var W,H,DPR,nodes,packets,raf;
   function accent(){ return getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||'#5eead4'; }
