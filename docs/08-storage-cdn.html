@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%A7%AD%3C/text%3E%3C/svg%3E">
-<title>Auth, OTP & the password wallet — Field Manual</title>
-<meta property="og:title" content="Auth, OTP & the password wallet">
-<meta property="og:description" content="Two different &quot;password wallets&quot; get confused constantly — get the distinction straight before building either.">
+<title>File storage & the CDN — Field Manual</title>
+<meta property="og:title" content="File storage & the CDN">
+<meta property="og:description" content="User-uploaded images/videos and your static frontend assets don't belong on the same server that runs your API.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://webstocking.com/application/05-auth-otp-secrets.html">
+<meta property="og:url" content="https://webstocking.com/application/08-storage-cdn.html">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Auth, OTP & the password wallet">
-<meta name="twitter:description" content="Two different &quot;password wallets&quot; get confused constantly — get the distinction straight before building either.">
+<meta name="twitter:title" content="File storage & the CDN">
+<meta name="twitter:description" content="User-uploaded images/videos and your static frontend assets don't belong on the same server that runs your API.">
 <style>
 :root{
   --bg:#060910; --bg2:#0a0f1a;
@@ -305,94 +305,75 @@ pre:hover .copy-btn{ opacity:1; }
 <div class="shell">
 <main>
 
-<section class="stage" id="s5">
-  <div class="stage-head reveal"><span class="stage-num">05</span><h2>Auth, OTP &amp; the password wallet</h2><span class="stage-badge">~2 hrs &middot; Intermediate</span></div>
-  <button class="btn complete-toggle reveal" id="complete-toggle" data-page="05-auth-otp-secrets.html" type="button">
+<section class="stage" id="s7">
+  <div class="stage-head reveal"><span class="stage-num">08</span><h2>File storage &amp; the CDN</h2><span class="stage-badge">~1 hr &middot; Intermediate</span></div>
+  <button class="btn complete-toggle reveal" id="complete-toggle" data-page="08-storage-cdn.html" type="button">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <span class="ct-label">Mark this stage complete</span>
   </button>
 
-  <p class="dek reveal">Two different "password wallets" get confused constantly — get the distinction straight before building either.</p>
+  <p class="dek reveal">User-uploaded images/videos and your static frontend assets don't belong on the same server that runs your API.</p>
 
 <figure class="anim-fig reveal">
-  <span class="fig-tag">Animated · OTP lifecycle</span>
-  <svg viewBox="0 0 820 210" role="img" aria-label="Animation: a one-time code is generated, hashed and stored, emailed, entered by the user, verified, and expires on a timer">
+  <span class="fig-tag">Animated · CDN edge caching</span>
+  <svg viewBox="0 0 820 240" role="img" aria-label="Animation: users are served cached copies from nearby edge locations, which only occasionally fetch from the origin">
     <style>
-      .otp-n{ animation:otp-blink 6s linear infinite; }
-      .otp-n2{ animation-delay:1.1s; } .otp-n3{ animation-delay:2.2s; } .otp-n4{ animation-delay:3.3s; } .otp-n5{ animation-delay:4.4s; }
-      @keyframes otp-blink{ 0%,5%{ stroke:var(--accent-2); stroke-width:2.6; } 14%,100%{ stroke:var(--line); stroke-width:1.5; } }
-      .otp-g{ animation:otp-move 6s ease-in-out infinite; }
-      @keyframes otp-move{ 0%{ transform:translateX(95px);} 88%{ transform:translateX(725px);} 100%{ transform:translateX(725px);} }
-      .otp-ring{ stroke:var(--accent); stroke-width:5; fill:none; stroke-linecap:round; stroke-dasharray:138; animation:otp-count 6s linear infinite; transform:rotate(-90deg); transform-origin:60px 175px; }
-      @keyframes otp-count{ 0%{ stroke-dashoffset:0; } 100%{ stroke-dashoffset:138; } }
+      .cdn-fill{ stroke:var(--accent); stroke-width:2; fill:none; stroke-dasharray:6 8; opacity:.5; animation:cdn-fill 5s linear infinite; }
+      @keyframes cdn-fill{ to{ stroke-dashoffset:-14; } }
+      .cdn-u1{ animation:cdn-u 2.4s ease-in-out infinite; }
+      .cdn-u2{ animation:cdn-u 2.4s ease-in-out infinite; animation-delay:.8s; }
+      .cdn-u3{ animation:cdn-u 2.4s ease-in-out infinite; animation-delay:1.6s; }
+      @keyframes cdn-u{ 0%{ opacity:0; } 15%{ opacity:1; } 50%{ opacity:1; } 60%,100%{ opacity:0; } }
+      .cdn-e{ animation:cdn-epulse 2.4s ease-in-out infinite; }
+      .cdn-e2{ animation-delay:.8s; } .cdn-e3{ animation-delay:1.6s; }
+      @keyframes cdn-epulse{ 0%,45%{ stroke:var(--line); stroke-width:1.5; } 52%,70%{ stroke:var(--accent-2); stroke-width:2.6; } 80%,100%{ stroke:var(--line); stroke-width:1.5; } }
     </style>
-    <line class="af-flow" x1="95" y1="80" x2="725" y2="80"/>
-    <g><rect class="af-box otp-n"  x="30"  y="56" width="130" height="48" rx="11"/><text class="af-title" x="95"  y="85" text-anchor="middle">generate</text></g>
-    <g><rect class="af-box otp-n otp-n2" x="187" y="56" width="130" height="48" rx="11"/><text class="af-title" x="252" y="79" text-anchor="middle">hash +</text><text class="af-title" x="252" y="95" text-anchor="middle">store</text></g>
-    <g><rect class="af-box otp-n otp-n3" x="344" y="56" width="130" height="48" rx="11"/><text class="af-title" x="409" y="85" text-anchor="middle">email</text></g>
-    <g><rect class="af-box otp-n otp-n4" x="501" y="56" width="130" height="48" rx="11"/><text class="af-title" x="566" y="85" text-anchor="middle">user enters</text></g>
-    <g><rect class="af-box otp-n otp-n5" x="658" y="56" width="130" height="48" rx="11"/><text class="af-title" x="723" y="85" text-anchor="middle">verify</text></g>
-    <g class="otp-g"><circle class="af-pkt" cx="0" cy="80" r="6"/></g>
-    <circle cx="60" cy="175" r="22" fill="none" stroke="var(--line)" stroke-width="5"/>
-    <circle class="otp-ring" cx="60" cy="175" r="22"/>
-    <text class="af-lbl" x="110" y="172" font="11px 'SFMono-Regular',monospace">10-minute expiry</text>
-    <text class="af-lbl" x="110" y="188" font="11px 'SFMono-Regular',monospace">capped attempts &amp; resends</text>
+    <line class="cdn-fill" x1="230" y1="120" x2="470" y2="60"/>
+    <line class="cdn-fill" x1="230" y1="120" x2="470" y2="120"/>
+    <line class="cdn-fill" x1="230" y1="120" x2="470" y2="180"/>
+    <g><rect class="af-box" x="60" y="88" width="170" height="64" rx="11"/><text class="af-title" x="145" y="114" text-anchor="middle">Origin</text><text class="af-sub" x="145" y="133" text-anchor="middle">S3 bucket (private)</text></g>
+    <g><rect class="af-box cdn-e"    x="470" y="36" width="150" height="48" rx="11"/><text class="af-title" x="545" y="65" text-anchor="middle">Edge · Mumbai</text></g>
+    <g><rect class="af-box cdn-e cdn-e2" x="470" y="96" width="150" height="48" rx="11"/><text class="af-title" x="545" y="125" text-anchor="middle">Edge · Delhi</text></g>
+    <g><rect class="af-box cdn-e cdn-e3" x="470" y="156" width="150" height="48" rx="11"/><text class="af-title" x="545" y="185" text-anchor="middle">Edge · Chennai</text></g>
+    <line class="af-line" x1="620" y1="60"  x2="720" y2="60"/>
+    <line class="af-line" x1="620" y1="120" x2="720" y2="120"/>
+    <line class="af-line" x1="620" y1="180" x2="720" y2="180"/>
+    <g class="cdn-u1"><circle class="af-pkt2" cx="700" cy="60" r="6"/><text class="af-lbl" x="748" y="64" text-anchor="middle">user</text></g>
+    <g class="cdn-u2"><circle class="af-pkt2" cx="700" cy="120" r="6"/><text class="af-lbl" x="748" y="124" text-anchor="middle">user</text></g>
+    <g class="cdn-u3"><circle class="af-pkt2" cx="700" cy="180" r="6"/><text class="af-lbl" x="748" y="184" text-anchor="middle">user</text></g>
   </svg>
-  <figcaption>The code is random, stored only as a hash, single-use, and expires on a timer — every step limits an attacker's window.</figcaption>
+  <figcaption>Each user is served a cached copy from the nearest edge; the private origin is touched only on a cache miss.</figcaption>
 </figure>
 
-  <div class="callout reveal">
-    <div class="ctitle">Two meanings of "password wallet" — pick the right one</div>
-    <p><b>1. End-user password management</b> — your app hashing and verifying each user's own password, optionally with a personal vault feature (like a browser password manager) if your product actually needs one.</p>
-    <p><b>2. Application secrets management</b> — <i>your infrastructure's</i> own credentials (DB password, JWT signing key, third-party API keys) held in a secrets manager (AWS Secrets Manager, HashiCorp Vault, GCP Secret Manager) instead of a <code>.env</code> file committed to git. Almost everyone building "an app with a password wallet" actually means this second one — most apps don't need a personal-vault feature at all.</p>
-  </div>
+  <h3 class="reveal" id="object-storage-presigned-uploads">Object storage + presigned uploads<a class="h-anchor" href="#object-storage-presigned-uploads" aria-label="Link to this section">#</a></h3>
+  <p class="reveal">Use S3 (or an S3-compatible store). The API never touches the image bytes — it hands the client a short-lived, scoped "presigned URL," the client uploads directly to storage, and the API just records the resulting object key.</p>
+  <pre class="mono reveal">// Backend: issue a scoped, time-limited upload URL — the object key is
+// namespaced under the requesting user's own prefix so they can't
+// overwrite or reference someone else's objects.
+const key = `posts/${userId}/${crypto.randomUUID()}.jpg`;
+const uploadUrl = await s3.getSignedUrl("putObject", { Bucket, Key: key, Expires: 300 });
+res.json({ uploadUrl, objectKey: key });
 
-  <h3 class="reveal" id="hashing-a-users-password-correctly">Hashing a user's password correctly<a class="h-anchor" href="#hashing-a-users-password-correctly" aria-label="Link to this section">#</a></h3>
-  <pre class="mono reveal">import argon2 from "argon2";
-// Argon2id: memory-hard, resistant to GPU-cracking — OWASP's current
-// recommendation over bcrypt/scrypt for new systems.
-const hash = await argon2.hash(plainPassword, { type: argon2.argon2id });
-const valid = await argon2.verify(hash, attempt);</pre>
+// Client: PUT the file straight to storage — the API server never
+// sees or holds the binary, which is both faster and removes an
+// entire class of upload-based attacks from the API surface.
+await fetch(uploadUrl, { method: "PUT", body: file });</pre>
 
-  <h3 class="reveal" id="otp-one-time-password-for-emailphone-verification">OTP (one-time password) for email/phone verification<a class="h-anchor" href="#otp-one-time-password-for-emailphone-verification" aria-label="Link to this section">#</a></h3>
-  <pre class="mono reveal">import crypto from "crypto";
-const code = crypto.randomInt(100000, 999999).toString(); // not Math.random()
-const codeHash = await argon2.hash(code);   // store the hash, never the plaintext
-// expire in 10 minutes, cap verify attempts at 5, cap resends at 3/hour/account
-await db.otpCode.create({ data: { userId, codeHash, expiresAt: in10Min() } });</pre>
-
-  <h3 class="reveal" id="sessions-short-lived-access-token-rotating-refresh-token">Sessions: short-lived access token + rotating refresh token<a class="h-anchor" href="#sessions-short-lived-access-token-rotating-refresh-token" aria-label="Link to this section">#</a></h3>
-  <ul class="reveal">
-    <li>Access token (JWT): 15-minute expiry, used on every API call, never stored anywhere persistent.</li>
-    <li>Refresh token: long-lived, opaque random value, stored <i>hashed</i> in the DB, delivered via httpOnly cookie, <b>rotated on every use</b> — reusing an old refresh token should revoke the whole session chain (a strong signal of theft).</li>
-  </ul>
-
-  <h3 class="reveal" id="the-application-secrets-manager-done-right">The application secrets manager, done right<a class="h-anchor" href="#the-application-secrets-manager-done-right" aria-label="Link to this section">#</a></h3>
-  <pre class="mono reveal">// Boot-time: fail fast if a required secret is missing — never silently
-// fall back to a default or an empty string in production.
-const Secrets = z.object({
-  DATABASE_URL: z.string().url(),
-  JWT_SIGNING_KEY: z.string().min(32),
-  SMTP_PASSWORD: z.string().min(1),
-}).parse(process.env);
-// In production these env vars are injected by the platform from
-// AWS Secrets Manager / Vault at deploy time — never committed to git,
-// never logged, rotated on a schedule.</pre>
+  <h3 class="reveal" id="front-the-bucket-with-a-cdn">Front the bucket with a CDN<a class="h-anchor" href="#front-the-bucket-with-a-cdn" aria-label="Link to this section">#</a></h3>
+  <p class="reveal">CloudFront (AWS), Cloudflare, or Fastly sit between users and your storage bucket: they cache images at edge locations close to the user (faster loads), absorb traffic spikes without hitting your origin, and are the only thing with public read access — the bucket itself stays private.</p>
 
   <div class="security reveal">
-    <div class="ctitle">Security checklist — auth &amp; secrets</div>
+    <div class="ctitle">Security checklist — storage &amp; CDN</div>
     <ul>
-      <li>Argon2id (or bcrypt/scrypt as a fallback) for password hashing — never MD5/SHA-1/plain SHA-256 <span class="std">NIST Cryptographic Standards</span></li>
-      <li>OTP codes: cryptographically random, hashed at rest, short expiry, capped attempts and resends <span class="std">CWE-330 · CWE-307</span></li>
-      <li>Multi-factor / passkey support where the product warrants it — phishing-resistant beats SMS OTP long-term <span class="std">FIDO Alliance</span></li>
-      <li>No secret ever committed to git — use a secrets manager and a <code>.gitignore</code>'d <code>.env</code> locally with a `.env.example` for onboarding <span class="std">CWE-798</span></li>
-      <li>Least-privilege IAM: the app's runtime role can read only the specific secrets it needs, nothing account-wide <span class="std">CSA Cloud Controls Matrix</span></li>
-      <li>Rotate signing keys and long-lived credentials on a schedule, and immediately on suspected compromise <span class="std">NIST SSDF</span></li>
+      <li>Bucket is private by default; only the CDN (via Origin Access Control) can read from it <span class="std">CIS Benchmarks</span></li>
+      <li>Validate file type and size server-side before issuing the presigned URL, and re-check content-type on the object once uploaded — never trust a client-declared MIME type alone <span class="std">OWASP · Unrestricted File Upload</span></li>
+      <li>Object keys scoped to the uploading user's own namespace, checked server-side, to prevent one user overwriting or referencing another's files (an IDOR variant) <span class="std">OWASP API Security · BOLA</span></li>
+      <li>HTTPS-only at the CDN edge; redirect any HTTP request <span class="std">Mozilla Web Security</span></li>
     </ul>
   </div>
 </section>
 
-<div class="page-nav reveal"><a class="page-nav-link prev" href="04-database.html"><span class="page-nav-label">&larr; Previous</span><span class="page-nav-title">Database — structure, scaling, and how it actually gets hacked</span></a><a class="page-nav-link next" href="06-email-otp-delivery.html"><span class="page-nav-label">Next &rarr;</span><span class="page-nav-title">Email / OTP delivery</span></a></div>
+<div class="page-nav reveal"><a class="page-nav-link prev" href="07-email-otp-delivery.html"><span class="page-nav-label">&larr; Previous</span><span class="page-nav-title">Email / OTP delivery</span></a><a class="page-nav-link next" href="09-servers-vm.html"><span class="page-nav-label">Next &rarr;</span><span class="page-nav-title">Servers & the VM</span></a></div>
 
 <div class="divider"></div>
 <footer>
@@ -506,7 +487,7 @@ const Secrets = z.object({
 
 
   /* site-wide search */
-  var SEARCH_INDEX = [{"n": "01", "t": "Plan & threat-model first", "f": "01-plan-and-threat-model.html"}, {"n": "02", "t": "Frontend", "f": "02-frontend.html"}, {"n": "03", "t": "Backend & API", "f": "03-backend-api.html"}, {"n": "04", "t": "Database — structure, scaling, and how it actually gets hacked", "f": "04-database.html"}, {"n": "05", "t": "Auth, OTP & the password wallet", "f": "05-auth-otp-secrets.html"}, {"n": "06", "t": "Email / OTP delivery", "f": "06-email-otp-delivery.html"}, {"n": "07", "t": "File storage & the CDN", "f": "07-storage-cdn.html"}, {"n": "08", "t": "Servers & the VM", "f": "08-servers-vm.html"}, {"n": "09", "t": "Load balancers & autoscaling", "f": "09-load-balancing-autoscaling.html"}, {"n": "10", "t": "Domain names & DNS", "f": "10-domains-dns.html"}, {"n": "11", "t": "CI/CD pipelines", "f": "11-cicd.html"}, {"n": "12", "t": "Monitoring & incident response", "f": "12-monitoring-incident-response.html"}, {"n": "13", "t": "Security hardening checklist — the consolidated view", "f": "13-security-checklist.html"}, {"n": "14", "t": "Compliance & governance, including India", "f": "14-compliance.html"}, {"n": "15", "t": "Skill roadmap: junior → staff", "f": "15-skill-roadmap.html"}, {"n": "16", "t": "Glossary", "f": "16-glossary.html"}, {"n": "17", "t": "Full resource catalog, explained", "f": "17-full-resource-catalog.html"}, {"n": "18", "t": "A backend, file by file — then an AI security audit", "f": "18-worked-backend-example.html"}, {"n": "19", "t": "Reliability & resilience — redundancy, backups, DDoS, and disaster recovery", "f": "19-reliability-and-disaster-recovery.html"}, {"n": "20", "t": "Your first build: checklist & capstone project", "f": "20-your-first-build.html"}, {"n": "21", "t": "Linux fundamentals: from basics to daily-use commands", "f": "21-linux-fundamentals.html"}, {"n": "00", "t": "How to use this manual", "f": "how-to-build-an-application.html"}];
+  var SEARCH_INDEX = [{"n": "01", "t": "Plan & threat-model first", "f": "01-plan-and-threat-model.html"}, {"n": "02", "t": "Linux fundamentals: from basics to daily-use commands", "f": "02-linux-fundamentals.html"}, {"n": "03", "t": "Frontend", "f": "03-frontend.html"}, {"n": "04", "t": "Backend & API", "f": "04-backend-api.html"}, {"n": "05", "t": "Database — structure, scaling, and how it actually gets hacked", "f": "05-database.html"}, {"n": "06", "t": "Auth, OTP & the password wallet", "f": "06-auth-otp-secrets.html"}, {"n": "07", "t": "Email / OTP delivery", "f": "07-email-otp-delivery.html"}, {"n": "08", "t": "File storage & the CDN", "f": "08-storage-cdn.html"}, {"n": "09", "t": "Servers & the VM", "f": "09-servers-vm.html"}, {"n": "10", "t": "Load balancers & autoscaling", "f": "10-load-balancing-autoscaling.html"}, {"n": "11", "t": "Domain names & DNS", "f": "11-domains-dns.html"}, {"n": "12", "t": "CI/CD pipelines", "f": "12-cicd.html"}, {"n": "13", "t": "Monitoring & incident response", "f": "13-monitoring-incident-response.html"}, {"n": "14", "t": "Reliability & resilience — redundancy, backups, DDoS, and disaster recovery", "f": "14-reliability-and-disaster-recovery.html"}, {"n": "15", "t": "Security hardening checklist — the consolidated view", "f": "15-security-checklist.html"}, {"n": "16", "t": "Compliance & governance, including India", "f": "16-compliance.html"}, {"n": "17", "t": "A backend, file by file — then an AI security audit", "f": "17-worked-backend-example.html"}, {"n": "18", "t": "Your first build: checklist & capstone project", "f": "18-your-first-build.html"}, {"n": "19", "t": "Skill roadmap: junior → staff", "f": "19-skill-roadmap.html"}, {"n": "20", "t": "Glossary", "f": "20-glossary.html"}, {"n": "21", "t": "Full resource catalog, explained", "f": "21-full-resource-catalog.html"}, {"n": "00", "t": "How to use this manual", "f": "how-to-build-an-application.html"}];
   var searchBtn=document.getElementById('search-btn'), searchOverlay=document.getElementById('search-overlay'),
       searchInput=document.getElementById('search-input'), searchResults=document.getElementById('search-results');
   function renderResults(q){

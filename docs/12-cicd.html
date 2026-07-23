@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%A7%AD%3C/text%3E%3C/svg%3E">
-<title>Monitoring & incident response — Field Manual</title>
-<meta property="og:title" content="Monitoring & incident response">
-<meta property="og:description" content="You find out about most real problems from a dashboard or an alert, not a user's angry email — if you've set it up.">
+<title>CI/CD pipelines — Field Manual</title>
+<meta property="og:title" content="CI/CD pipelines">
+<meta property="og:description" content="The automated path from &quot;I pushed a commit&quot; to &quot;it's safely running in production.&quot;">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://webstocking.com/application/12-monitoring-incident-response.html">
+<meta property="og:url" content="https://webstocking.com/application/12-cicd.html">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Monitoring & incident response">
-<meta name="twitter:description" content="You find out about most real problems from a dashboard or an alert, not a user's angry email — if you've set it up.">
+<meta name="twitter:title" content="CI/CD pipelines">
+<meta name="twitter:description" content="The automated path from &quot;I pushed a commit&quot; to &quot;it's safely running in production.&quot;">
 <style>
 :root{
   --bg:#060910; --bg2:#0a0f1a;
@@ -305,33 +305,46 @@ pre:hover .copy-btn{ opacity:1; }
 <div class="shell">
 <main>
 
-<section class="stage" id="s12">
-  <div class="stage-head reveal"><span class="stage-num">12</span><h2>Monitoring &amp; incident response</h2><span class="stage-badge">~45 min &middot; Intermediate</span></div>
-  <button class="btn complete-toggle reveal" id="complete-toggle" data-page="12-monitoring-incident-response.html" type="button">
+<section class="stage" id="s11">
+  <div class="stage-head reveal"><span class="stage-num">12</span><h2>CI/CD pipelines</h2><span class="stage-badge">~1 hr &middot; Intermediate</span></div>
+  <button class="btn complete-toggle reveal" id="complete-toggle" data-page="12-cicd.html" type="button">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <span class="ct-label">Mark this stage complete</span>
   </button>
 
-  <p class="dek reveal">You find out about most real problems from a dashboard or an alert, not a user's angry email — if you've set it up.</p>
-  <p class="reveal" style="color:var(--muted-2); font-size:13.5px; margin-top:-18px;">New to the terminal commands used here? See <a href="21-linux-fundamentals.html">Stage 21 — Linux fundamentals</a>.</p>
+  <p class="dek reveal">The automated path from "I pushed a commit" to "it's safely running in production."</p>
+  <p class="reveal" style="color:var(--muted-2); font-size:13.5px; margin-top:-18px;">New to the terminal commands used here? See <a href="02-linux-fundamentals.html">Stage 02 — Linux fundamentals</a>.</p>
   <ul class="reveal">
-    <li><b>Metrics:</b> CPU/memory/request-rate/error-rate per instance, and business metrics (signups, OTP failures, upload failures).</li>
-    <li><b>Structured logs:</b> JSON logs with a request ID that ties a user's request across every service it touched — and redact secrets/tokens/passwords from every log line.</li>
-    <li><b>Alerts:</b> error-rate spikes, elevated latency, failed health checks, unusual auth-failure rates (a brute-force signal).</li>
-    <li><b>A written incident runbook:</b> who gets paged, what the first three diagnostic steps are, and where the postmortem gets written afterward.</li>
+    <li><b>CI (continuous integration):</b> on every push — install deps, typecheck, lint, run the test suite, run a dependency-vulnerability scan.</li>
+    <li><b>CD (continuous deployment):</b> on merge to main — build, run database migrations, deploy to a staging environment, run a smoke test, then roll out to production instances one at a time behind the load balancer.</li>
   </ul>
+  <pre class="mono reveal"># conceptual pipeline (GitHub Actions / GitLab CI, either works)
+on: push
+jobs:
+  test:    npm ci && npm run typecheck && npm test
+  audit:   npm audit --audit-level=high
+  deploy:  # only on main, only if test+audit passed
+           npm run build
+           npx prisma migrate deploy
+           ssh app-server "sudo systemctl restart app-backend"
+           curl --fail https://api.example.com/health</pre>
+
+  <div class="mistake reveal">
+    <div class="ctitle">Real mistake, hit deploying this exact site</div>
+    <p>A deploy workflow reported green on every single run for days — while the live site never actually updated. The cause: the VM this deployed to also hosted a second, unrelated project, and a separate deploy pipeline on that same box generated its own SSH key using the same generic filename and the same <code>authorized_keys</code> comment ours used. It silently overwrote our key's forced command with its own project's deploy script — so our workflow was authenticating successfully and running <i>the other project's</i> deploy, exiting 0, and showing a convincing green checkmark the entire time. <b>A green CI checkmark only proves a command ran — not that it did what you think.</b> The fix: give every deploy key a name unique to its own project, never a generic one like <code>deploy_key</code>, especially on any server that might host more than one thing.</p>
+  </div>
 
   <div class="security reveal">
-    <div class="ctitle">Security checklist — monitoring/IR</div>
+    <div class="ctitle">Security checklist — CI/CD</div>
     <ul>
-      <li>Redact Authorization headers, passwords, and OTP codes from all logs before they're ever written <span class="std">OWASP ASVS · Logging</span></li>
-      <li>Alert on abnormal authentication-failure rates — it's usually the earliest signal of credential stuffing <span class="std">MITRE ATT&amp;CK · Credential Access</span></li>
-      <li>Keep an incident-response plan and a named contact path before you need either <span class="std">NIST CSF · Respond/Recover</span></li>
+      <li>Dependency vulnerability scanning wired into CI, failing the build on high-severity findings <span class="std">OSV / GitHub Advisory Database</span></li>
+      <li>Deploy credentials scoped narrowly and stored as CI secrets, never in the repo <span class="std">CWE-798</span></li>
+      <li>Build provenance — know that what's deployed is exactly what was reviewed and tested, not a hand-edited artifact <span class="std">SLSA</span></li>
     </ul>
   </div>
 </section>
 
-<div class="page-nav reveal"><a class="page-nav-link prev" href="11-cicd.html"><span class="page-nav-label">&larr; Previous</span><span class="page-nav-title">CI/CD pipelines</span></a><a class="page-nav-link next" href="13-security-checklist.html"><span class="page-nav-label">Next &rarr;</span><span class="page-nav-title">Security hardening checklist — the consolidated view</span></a></div>
+<div class="page-nav reveal"><a class="page-nav-link prev" href="11-domains-dns.html"><span class="page-nav-label">&larr; Previous</span><span class="page-nav-title">Domain names & DNS</span></a><a class="page-nav-link next" href="13-monitoring-incident-response.html"><span class="page-nav-label">Next &rarr;</span><span class="page-nav-title">Monitoring & incident response</span></a></div>
 
 <div class="divider"></div>
 <footer>
@@ -445,7 +458,7 @@ pre:hover .copy-btn{ opacity:1; }
 
 
   /* site-wide search */
-  var SEARCH_INDEX = [{"n": "01", "t": "Plan & threat-model first", "f": "01-plan-and-threat-model.html"}, {"n": "02", "t": "Frontend", "f": "02-frontend.html"}, {"n": "03", "t": "Backend & API", "f": "03-backend-api.html"}, {"n": "04", "t": "Database — structure, scaling, and how it actually gets hacked", "f": "04-database.html"}, {"n": "05", "t": "Auth, OTP & the password wallet", "f": "05-auth-otp-secrets.html"}, {"n": "06", "t": "Email / OTP delivery", "f": "06-email-otp-delivery.html"}, {"n": "07", "t": "File storage & the CDN", "f": "07-storage-cdn.html"}, {"n": "08", "t": "Servers & the VM", "f": "08-servers-vm.html"}, {"n": "09", "t": "Load balancers & autoscaling", "f": "09-load-balancing-autoscaling.html"}, {"n": "10", "t": "Domain names & DNS", "f": "10-domains-dns.html"}, {"n": "11", "t": "CI/CD pipelines", "f": "11-cicd.html"}, {"n": "12", "t": "Monitoring & incident response", "f": "12-monitoring-incident-response.html"}, {"n": "13", "t": "Security hardening checklist — the consolidated view", "f": "13-security-checklist.html"}, {"n": "14", "t": "Compliance & governance, including India", "f": "14-compliance.html"}, {"n": "15", "t": "Skill roadmap: junior → staff", "f": "15-skill-roadmap.html"}, {"n": "16", "t": "Glossary", "f": "16-glossary.html"}, {"n": "17", "t": "Full resource catalog, explained", "f": "17-full-resource-catalog.html"}, {"n": "18", "t": "A backend, file by file — then an AI security audit", "f": "18-worked-backend-example.html"}, {"n": "19", "t": "Reliability & resilience — redundancy, backups, DDoS, and disaster recovery", "f": "19-reliability-and-disaster-recovery.html"}, {"n": "20", "t": "Your first build: checklist & capstone project", "f": "20-your-first-build.html"}, {"n": "21", "t": "Linux fundamentals: from basics to daily-use commands", "f": "21-linux-fundamentals.html"}, {"n": "00", "t": "How to use this manual", "f": "how-to-build-an-application.html"}];
+  var SEARCH_INDEX = [{"n": "01", "t": "Plan & threat-model first", "f": "01-plan-and-threat-model.html"}, {"n": "02", "t": "Linux fundamentals: from basics to daily-use commands", "f": "02-linux-fundamentals.html"}, {"n": "03", "t": "Frontend", "f": "03-frontend.html"}, {"n": "04", "t": "Backend & API", "f": "04-backend-api.html"}, {"n": "05", "t": "Database — structure, scaling, and how it actually gets hacked", "f": "05-database.html"}, {"n": "06", "t": "Auth, OTP & the password wallet", "f": "06-auth-otp-secrets.html"}, {"n": "07", "t": "Email / OTP delivery", "f": "07-email-otp-delivery.html"}, {"n": "08", "t": "File storage & the CDN", "f": "08-storage-cdn.html"}, {"n": "09", "t": "Servers & the VM", "f": "09-servers-vm.html"}, {"n": "10", "t": "Load balancers & autoscaling", "f": "10-load-balancing-autoscaling.html"}, {"n": "11", "t": "Domain names & DNS", "f": "11-domains-dns.html"}, {"n": "12", "t": "CI/CD pipelines", "f": "12-cicd.html"}, {"n": "13", "t": "Monitoring & incident response", "f": "13-monitoring-incident-response.html"}, {"n": "14", "t": "Reliability & resilience — redundancy, backups, DDoS, and disaster recovery", "f": "14-reliability-and-disaster-recovery.html"}, {"n": "15", "t": "Security hardening checklist — the consolidated view", "f": "15-security-checklist.html"}, {"n": "16", "t": "Compliance & governance, including India", "f": "16-compliance.html"}, {"n": "17", "t": "A backend, file by file — then an AI security audit", "f": "17-worked-backend-example.html"}, {"n": "18", "t": "Your first build: checklist & capstone project", "f": "18-your-first-build.html"}, {"n": "19", "t": "Skill roadmap: junior → staff", "f": "19-skill-roadmap.html"}, {"n": "20", "t": "Glossary", "f": "20-glossary.html"}, {"n": "21", "t": "Full resource catalog, explained", "f": "21-full-resource-catalog.html"}, {"n": "00", "t": "How to use this manual", "f": "how-to-build-an-application.html"}];
   var searchBtn=document.getElementById('search-btn'), searchOverlay=document.getElementById('search-overlay'),
       searchInput=document.getElementById('search-input'), searchResults=document.getElementById('search-results');
   function renderResults(q){

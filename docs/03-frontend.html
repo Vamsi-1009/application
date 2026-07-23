@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%A7%AD%3C/text%3E%3C/svg%3E">
-<title>Skill roadmap: junior → staff — Field Manual</title>
-<meta property="og:title" content="Skill roadmap: junior → staff">
-<meta property="og:description" content="What &quot;more senior&quot; actually means in this stack, stage by stage.">
+<title>Frontend — Field Manual</title>
+<meta property="og:title" content="Frontend">
+<meta property="og:description" content="The part users touch. Optimize for clarity of state (loading / error / empty / success) before you optimize for visual polish.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://webstocking.com/application/15-skill-roadmap.html">
+<meta property="og:url" content="https://webstocking.com/application/03-frontend.html">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Skill roadmap: junior → staff">
-<meta name="twitter:description" content="What &quot;more senior&quot; actually means in this stack, stage by stage.">
+<meta name="twitter:title" content="Frontend">
+<meta name="twitter:description" content="The part users touch. Optimize for clarity of state (loading / error / empty / success) before you optimize for visual polish.">
 <style>
 :root{
   --bg:#060910; --bg2:#0a0f1a;
@@ -305,30 +305,81 @@ pre:hover .copy-btn{ opacity:1; }
 <div class="shell">
 <main>
 
-<section class="stage" id="s15">
-  <div class="stage-head reveal"><span class="stage-num">15</span><h2>Skill roadmap: junior → staff</h2><span class="stage-badge">~15 min &middot; Reference</span></div>
-  <button class="btn complete-toggle reveal" id="complete-toggle" data-page="15-skill-roadmap.html" type="button">
+<section class="stage" id="s2">
+  <div class="stage-head reveal"><span class="stage-num">03</span><h2>Frontend</h2><span class="stage-badge">~1.5 hrs &middot; Beginner</span></div>
+  <button class="btn complete-toggle reveal" id="complete-toggle" data-page="03-frontend.html" type="button">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <span class="ct-label">Mark this stage complete</span>
   </button>
 
-  <p class="dek reveal">What "more senior" actually means in this stack, stage by stage.</p>
-  <div class="tablewrap reveal">
-  <table>
-    <thead><tr><th>Level</th><th>What you own</th><th>Signal you've reached it</th></tr></thead>
-    <tbody>
-      <tr><td>Junior</td><td>A single feature, in one part of the stack, with guidance</td><td>You can implement a well-specified endpoint or screen correctly and test it</td></tr>
-      <tr><td>Mid</td><td>A full feature across frontend + backend + DB, unsupervised</td><td>You catch your own authorization/edge-case bugs before review, not after</td></tr>
-      <tr><td>Senior</td><td>A subsystem (auth, feed, uploads) end-to-end, including its failure modes</td><td>You design for the case where a dependency is slow/down/compromised, not just the happy path</td></tr>
-      <tr><td>Staff/Lead</td><td>The whole architecture: how services, data, and infra fit together and scale</td><td>You can explain a tradeoff (consistency vs. availability, cost vs. latency) and defend the choice you made</td></tr>
-      <tr><td>Principal/Architect</td><td>Cross-team technical direction and risk — security, compliance, cost, and scaling posture as one picture</td><td>Other senior engineers come to you before a decision, not after it's already made</td></tr>
-    </tbody>
-  </table>
+  <p class="dek reveal">The part users touch. Optimize for clarity of state (loading / error / empty / success) before you optimize for visual polish.</p>
+
+<figure class="anim-fig reveal">
+  <span class="fig-tag">Animated · token refresh cycle</span>
+  <svg viewBox="0 0 820 200" role="img" aria-label="Animation: an API call with an expired token returns 401, triggers a silent refresh, then the original request is retried and succeeds">
+    <style>
+      .tok-n{ animation:tok-blink 5.2s linear infinite; }
+      .tok-n2{ animation-delay:1.3s; } .tok-n3{ animation-delay:2.6s; } .tok-n4{ animation-delay:3.9s; }
+      @keyframes tok-blink{ 0%,6%{ stroke:var(--accent-2); stroke-width:2.6; } 16%,100%{ stroke:var(--line); stroke-width:1.5; } }
+      .tok-ret{ stroke:var(--accent); stroke-width:2; fill:none; stroke-dasharray:6 7; animation:tok-dash 1s linear infinite; opacity:.8; }
+      @keyframes tok-dash{ to{ stroke-dashoffset:-13; } }
+      .tok-g{ animation:tok-move 5.2s ease-in-out infinite; }
+      @keyframes tok-move{ 0%{ transform:translateX(115px);} 78%{ transform:translateX(705px);} 100%{ transform:translateX(705px);} }
+    </style>
+    <line class="af-flow" x1="115" y1="95" x2="705" y2="95"/>
+    <g><rect class="af-box tok-n"  x="35"  y="70" width="160" height="52" rx="11"/><text class="af-title" x="115" y="92" text-anchor="middle">API call</text><text class="af-sub" x="115" y="110" text-anchor="middle">+ access token</text></g>
+    <g><rect class="af-box tok-n tok-n2" x="245" y="70" width="150" height="52" rx="11"/><text class="af-title" x="320" y="92" text-anchor="middle">401</text><text class="af-sub" x="320" y="110" text-anchor="middle">token expired</text></g>
+    <g><rect class="af-box tok-n tok-n3" x="445" y="70" width="150" height="52" rx="11"/><text class="af-title" x="520" y="92" text-anchor="middle">/refresh</text><text class="af-sub" x="520" y="110" text-anchor="middle">httpOnly cookie</text></g>
+    <g><rect class="af-box tok-n tok-n4" x="645" y="70" width="150" height="52" rx="11"/><text class="af-title" x="720" y="92" text-anchor="middle">retry OK</text><text class="af-sub" x="720" y="110" text-anchor="middle">new token</text></g>
+    <path class="tok-ret" d="M720 66 C 720 30, 115 30, 115 66"/>
+    <g class="tok-g"><circle class="af-pkt2" cx="0" cy="95" r="6"/></g>
+  </svg>
+  <figcaption>Access token lives in memory only; on a 401 the app silently refreshes and retries — the user never notices.</figcaption>
+</figure>
+
+  <h3 class="reveal" id="pick-a-stack-and-stop-debating-it">Pick a stack and stop debating it<a class="h-anchor" href="#pick-a-stack-and-stop-debating-it" aria-label="Link to this section">#</a></h3>
+  <p class="reveal">For 2026, a defensible default: <b>React + TypeScript + Vite</b> for a single-page app, or <b>Next.js</b> if you want server rendering and API routes in one codebase. TypeScript is not optional at this point — it catches an entire category of bugs (wrong shapes crossing the frontend/backend boundary) before a user ever sees them.</p>
+
+  <h3 class="reveal" id="the-four-states-every-screen-needs">The four states every screen needs<a class="h-anchor" href="#the-four-states-every-screen-needs" aria-label="Link to this section">#</a></h3>
+  <ul class="reveal">
+    <li><b>Loading</b> — a skeleton or spinner, never a blank white screen.</li>
+    <li><b>Empty</b> — what a brand-new user sees with zero data; this is most people's first impression.</li>
+    <li><b>Error</b> — a message that says what happened and what to do next, not a raw stack trace.</li>
+    <li><b>Success</b> — the actual content, plus confirmation for anything destructive (delete, unfollow, cancel).</li>
+  </ul>
+
+  <h3 class="reveal" id="where-tokens-live-this-decision-matters-more-than-it-looks">Where tokens live (this decision matters more than it looks)<a class="h-anchor" href="#where-tokens-live-this-decision-matters-more-than-it-looks" aria-label="Link to this section">#</a></h3>
+  <pre class="mono reveal">// Access token: kept ONLY in memory (a module-level variable or React context).
+// Never in localStorage/sessionStorage — any XSS on the page can read those.
+let accessToken: string | null = null;
+
+// Refresh token: never touched by JS at all. The backend sets it as an
+// httpOnly + Secure + SameSite=Strict cookie, so a script on the page
+// cannot read or exfiltrate it even if XSS occurs.
+async function apiFetch(path: string, opts: RequestInit = {}) {
+  const res = await fetch(path, { ...opts, credentials: "include",
+    headers: { ...opts.headers, Authorization: `Bearer ${accessToken}` } });
+  if (res.status === 401) {
+    const r = await fetch("/api/auth/refresh", { method: "POST", credentials: "include" });
+    if (r.ok) { accessToken = (await r.json()).accessToken; return apiFetch(path, opts); }
+    window.location.href = "/login";
+  }
+  return res;
+}</pre>
+
+  <div class="security reveal">
+    <div class="ctitle">Security checklist — frontend</div>
+    <ul>
+      <li>Never use <code>dangerouslySetInnerHTML</code> (or raw <code>innerHTML</code>) on user-generated text — rely on the framework's default escaping <span class="std">OWASP · XSS</span></li>
+      <li>Set a Content-Security-Policy header restricting script sources; it's your backstop when an escaping mistake still happens <span class="std">Mozilla Web Security</span></li>
+      <li>Treat every client-side validation rule as UX only — the backend must re-validate everything, because the client is attacker-controlled <span class="std">OWASP ASVS</span></li>
+      <li>Don't put secrets (API keys, anything sensitive) in frontend code — anything shipped to the browser is public <span class="std">CWE-798</span></li>
+      <li>Pin dependency versions and run <code>npm audit</code> / Dependabot in CI — the frontend has the deepest dependency tree in most apps <span class="std">OpenSSF</span></li>
+    </ul>
   </div>
-  <p class="reveal" style="margin-top:16px">The fastest way through this ladder isn't more frameworks — it's building one real system through every stage in this manual, then doing it again with the mistakes from the first one fixed.</p>
 </section>
 
-<div class="page-nav reveal"><a class="page-nav-link prev" href="14-compliance.html"><span class="page-nav-label">&larr; Previous</span><span class="page-nav-title">Compliance & governance, including India</span></a><a class="page-nav-link next" href="16-glossary.html"><span class="page-nav-label">Next &rarr;</span><span class="page-nav-title">Glossary</span></a></div>
+<div class="page-nav reveal"><a class="page-nav-link prev" href="02-linux-fundamentals.html"><span class="page-nav-label">&larr; Previous</span><span class="page-nav-title">Linux fundamentals</span></a><a class="page-nav-link next" href="04-backend-api.html"><span class="page-nav-label">Next &rarr;</span><span class="page-nav-title">Backend & API</span></a></div>
 
 <div class="divider"></div>
 <footer>
@@ -442,7 +493,7 @@ pre:hover .copy-btn{ opacity:1; }
 
 
   /* site-wide search */
-  var SEARCH_INDEX = [{"n": "01", "t": "Plan & threat-model first", "f": "01-plan-and-threat-model.html"}, {"n": "02", "t": "Frontend", "f": "02-frontend.html"}, {"n": "03", "t": "Backend & API", "f": "03-backend-api.html"}, {"n": "04", "t": "Database — structure, scaling, and how it actually gets hacked", "f": "04-database.html"}, {"n": "05", "t": "Auth, OTP & the password wallet", "f": "05-auth-otp-secrets.html"}, {"n": "06", "t": "Email / OTP delivery", "f": "06-email-otp-delivery.html"}, {"n": "07", "t": "File storage & the CDN", "f": "07-storage-cdn.html"}, {"n": "08", "t": "Servers & the VM", "f": "08-servers-vm.html"}, {"n": "09", "t": "Load balancers & autoscaling", "f": "09-load-balancing-autoscaling.html"}, {"n": "10", "t": "Domain names & DNS", "f": "10-domains-dns.html"}, {"n": "11", "t": "CI/CD pipelines", "f": "11-cicd.html"}, {"n": "12", "t": "Monitoring & incident response", "f": "12-monitoring-incident-response.html"}, {"n": "13", "t": "Security hardening checklist — the consolidated view", "f": "13-security-checklist.html"}, {"n": "14", "t": "Compliance & governance, including India", "f": "14-compliance.html"}, {"n": "15", "t": "Skill roadmap: junior → staff", "f": "15-skill-roadmap.html"}, {"n": "16", "t": "Glossary", "f": "16-glossary.html"}, {"n": "17", "t": "Full resource catalog, explained", "f": "17-full-resource-catalog.html"}, {"n": "18", "t": "A backend, file by file — then an AI security audit", "f": "18-worked-backend-example.html"}, {"n": "19", "t": "Reliability & resilience — redundancy, backups, DDoS, and disaster recovery", "f": "19-reliability-and-disaster-recovery.html"}, {"n": "20", "t": "Your first build: checklist & capstone project", "f": "20-your-first-build.html"}, {"n": "21", "t": "Linux fundamentals: from basics to daily-use commands", "f": "21-linux-fundamentals.html"}, {"n": "00", "t": "How to use this manual", "f": "how-to-build-an-application.html"}];
+  var SEARCH_INDEX = [{"n": "01", "t": "Plan & threat-model first", "f": "01-plan-and-threat-model.html"}, {"n": "02", "t": "Linux fundamentals: from basics to daily-use commands", "f": "02-linux-fundamentals.html"}, {"n": "03", "t": "Frontend", "f": "03-frontend.html"}, {"n": "04", "t": "Backend & API", "f": "04-backend-api.html"}, {"n": "05", "t": "Database — structure, scaling, and how it actually gets hacked", "f": "05-database.html"}, {"n": "06", "t": "Auth, OTP & the password wallet", "f": "06-auth-otp-secrets.html"}, {"n": "07", "t": "Email / OTP delivery", "f": "07-email-otp-delivery.html"}, {"n": "08", "t": "File storage & the CDN", "f": "08-storage-cdn.html"}, {"n": "09", "t": "Servers & the VM", "f": "09-servers-vm.html"}, {"n": "10", "t": "Load balancers & autoscaling", "f": "10-load-balancing-autoscaling.html"}, {"n": "11", "t": "Domain names & DNS", "f": "11-domains-dns.html"}, {"n": "12", "t": "CI/CD pipelines", "f": "12-cicd.html"}, {"n": "13", "t": "Monitoring & incident response", "f": "13-monitoring-incident-response.html"}, {"n": "14", "t": "Reliability & resilience — redundancy, backups, DDoS, and disaster recovery", "f": "14-reliability-and-disaster-recovery.html"}, {"n": "15", "t": "Security hardening checklist — the consolidated view", "f": "15-security-checklist.html"}, {"n": "16", "t": "Compliance & governance, including India", "f": "16-compliance.html"}, {"n": "17", "t": "A backend, file by file — then an AI security audit", "f": "17-worked-backend-example.html"}, {"n": "18", "t": "Your first build: checklist & capstone project", "f": "18-your-first-build.html"}, {"n": "19", "t": "Skill roadmap: junior → staff", "f": "19-skill-roadmap.html"}, {"n": "20", "t": "Glossary", "f": "20-glossary.html"}, {"n": "21", "t": "Full resource catalog, explained", "f": "21-full-resource-catalog.html"}, {"n": "00", "t": "How to use this manual", "f": "how-to-build-an-application.html"}];
   var searchBtn=document.getElementById('search-btn'), searchOverlay=document.getElementById('search-overlay'),
       searchInput=document.getElementById('search-input'), searchResults=document.getElementById('search-results');
   function renderResults(q){

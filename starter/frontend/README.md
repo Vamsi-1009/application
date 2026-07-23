@@ -1,6 +1,6 @@
 # TinyLink frontend
 
-React + TypeScript + Vite, implementing the frontend patterns taught in Stage 02 of the [Field Manual](../../docs/20-your-first-build.html) — in-memory access tokens, silent refresh-on-401, and no `dangerouslySetInnerHTML` anywhere.
+React + TypeScript + Vite, implementing the frontend patterns taught in Stage 03 of the [Field Manual](../../docs/18-your-first-build.html) — in-memory access tokens, silent refresh-on-401, and no `dangerouslySetInnerHTML` anywhere.
 
 ## Running it locally
 
@@ -29,7 +29,7 @@ React + TypeScript + Vite, implementing the frontend patterns taught in Stage 02
 
 ## Security decisions, and why
 
-- **Access token in memory only** (`src/lib/apiClient.ts`), never `localStorage` — an XSS bug can't steal it if it's never written to a place JavaScript-readable storage APIs can reach. See Stage 02.
+- **Access token in memory only** (`src/lib/apiClient.ts`), never `localStorage` — an XSS bug can't steal it if it's never written to a place JavaScript-readable storage APIs can reach. See Stage 03.
 - **Refresh token never touched by the frontend at all** — it's an httpOnly cookie the backend sets; `credentials: "include"` sends it automatically.
 - **Client-side validation is UX only.** The password-length check on signup, for example, doesn't replace the backend's own validation — it just gives faster feedback.
 - **No `dangerouslySetInnerHTML` anywhere.** User-entered content (URLs, emails) is rendered through normal JSX, which escapes it by default.

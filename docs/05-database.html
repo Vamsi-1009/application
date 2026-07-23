@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%A7%AD%3C/text%3E%3C/svg%3E">
-<title>Domain names & DNS — Field Manual</title>
-<meta property="og:title" content="Domain names & DNS">
-<meta property="og:description" content="The address people type, and the records that tell the internet where to send them.">
+<title>Database — structure, scaling, and how it actually gets hacked — Field Manual</title>
+<meta property="og:title" content="Database — structure, scaling, and how it actually gets hacked">
+<meta property="og:description" content="Get the schema and indexes right early — migrating a live table under load is the least fun afternoon in software. This stage also covers what happens once one database isn't enough, and how a database is actually attacked, step by step.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://webstocking.com/application/10-domains-dns.html">
+<meta property="og:url" content="https://webstocking.com/application/05-database.html">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Domain names & DNS">
-<meta name="twitter:description" content="The address people type, and the records that tell the internet where to send them.">
+<meta name="twitter:title" content="Database — structure, scaling, and how it actually gets hacked">
+<meta name="twitter:description" content="Get the schema and indexes right early — migrating a live table under load is the least fun afternoon in software. This stage also covers what happens once one database isn't enough, and how a database is actually attacked, step by step.">
 <style>
 :root{
   --bg:#060910; --bg2:#0a0f1a;
@@ -305,34 +305,165 @@ pre:hover .copy-btn{ opacity:1; }
 <div class="shell">
 <main>
 
-<section class="stage" id="s10">
-  <div class="stage-head reveal"><span class="stage-num">10</span><h2>Domain names &amp; DNS</h2><span class="stage-badge">~30 min &middot; Beginner</span></div>
-  <button class="btn complete-toggle reveal" id="complete-toggle" data-page="10-domains-dns.html" type="button">
+<section class="stage" id="s4">
+  <div class="stage-head reveal"><span class="stage-num">05</span><h2>Database — structure, scaling, and how it actually gets hacked</h2><span class="stage-badge">~1.5 hrs &middot; Intermediate</span></div>
+  <button class="btn complete-toggle reveal" id="complete-toggle" data-page="05-database.html" type="button">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <span class="ct-label">Mark this stage complete</span>
   </button>
 
-  <p class="dek reveal">The address people type, and the records that tell the internet where to send them.</p>
-
-  <h3 class="reveal" id="buying-and-pointing-a-domain">Buying and pointing a domain<a class="h-anchor" href="#buying-and-pointing-a-domain" aria-label="Link to this section">#</a></h3>
-  <ol class="reveal">
-    <li>Register a domain through a registrar — <b>GoDaddy India, BigRock, Namecheap, or Hostinger</b> are all common choices for developers in India; a <code>.in</code> domain works fine for an India-first product, a generic <code>.com</code>/<code>.dev</code> for a global one.</li>
-    <li>Delegate the domain's nameservers to your DNS provider (Route53, Cloudflare DNS) — this is the step that lets Terraform/your infra actually manage records.</li>
-    <li>Point an <code>A</code>/<code>ALIAS</code> record at your load balancer for the API, and a separate record at your CDN distribution for the frontend/static assets.</li>
-    <li>Issue an HTTPS certificate (AWS ACM, or Let's Encrypt via Certbot if self-managing Nginx) for every hostname you serve.</li>
-  </ol>
-
-  <div class="security reveal">
-    <div class="ctitle">Security checklist — domain/DNS</div>
-    <ul>
-      <li>Enable registrar-level domain lock/2FA — a stolen domain login is a full takeover of your product <span class="std">CIS Controls</span></li>
-      <li>DNSSEC where your registrar/DNS provider supports it, to prevent DNS spoofing <span class="std">IETF RFCs</span></li>
-      <li>Certificates on an auto-renewal path (ACM or Certbot cron) — an expired cert is a self-inflicted outage <span class="std">Mozilla Web Security</span></li>
+  <p class="dek reveal">Get the schema and indexes right early — migrating a live table under load is the least fun afternoon in software. This stage also covers what happens once one database isn't enough, and how a database is actually attacked, step by step.</p>
+  <p class="reveal" style="color:var(--muted-2); font-size:13.5px; margin-top:-18px;">New to the terminal commands used here? See <a href="02-linux-fundamentals.html">Stage 02 — Linux fundamentals</a>.</p>
+  <div class="callout reveal" id="in-page-toc">
+    <div class="ctitle">On this page</div>
+    <ul style="columns:2; column-gap:28px; margin:0; padding-left:1.1em;">
+      <li><a href="#relational-by-default">Relational by default</a></li>
+      <li><a href="#structure-index-what-you-query-by-constrain-what-must-be-unique">Structure: index what you query by, constrain what must be unique</a></li>
+      <li><a href="#scaling-what-happens-after-one-database-isnt-enough">Scaling: what happens after one database isn't enough</a></li>
+      <li><a href="#beyond-a-single-relational-database-how-distributed-stores-stay-correct">Beyond a single relational database: how distributed stores stay correct</a></li>
+      <li><a href="#the-hacking-side-how-a-database-actually-gets-breached">The hacking side: how a database actually gets breached</a></li>
     </ul>
   </div>
+
+
+<figure class="anim-fig reveal">
+  <span class="fig-tag">Animated · cache-aside (hit vs. miss)</span>
+  <svg viewBox="0 0 820 250" role="img" aria-label="Animation: a cache hit is served straight from memory, while a cache miss falls through to the database and then populates the cache">
+    <style>
+      .ca-hit{ animation:ca-hit 8s ease-in-out infinite; }
+      @keyframes ca-hit{
+        0%{ transform:translate(185px,120px); opacity:1; }
+        10%{ transform:translate(545px,70px); opacity:1; }
+        22%{ transform:translate(185px,120px); opacity:1; }
+        26%,100%{ transform:translate(185px,120px); opacity:0; }
+      }
+      .ca-miss{ opacity:0; animation:ca-miss 8s ease-in-out infinite; }
+      @keyframes ca-miss{
+        0%,45%{ transform:translate(185px,120px); opacity:0; }
+        48%{ transform:translate(185px,120px); opacity:1; }
+        58%{ transform:translate(545px,70px); opacity:1; }
+        68%{ transform:translate(545px,185px); opacity:1; }
+        82%{ transform:translate(185px,120px); opacity:1; }
+        92%,100%{ transform:translate(185px,120px); opacity:0; }
+      }
+      .ca-cap-hit{ opacity:0; animation:ca-caphit 8s ease-in-out infinite; }
+      @keyframes ca-caphit{ 0%,3%{opacity:0;} 8%,38%{opacity:1;} 44%,100%{opacity:0;} }
+      .ca-cap-miss{ opacity:0; animation:ca-capmiss 8s ease-in-out infinite; }
+      @keyframes ca-capmiss{ 0%,47%{opacity:0;} 52%,90%{opacity:1;} 96%,100%{opacity:0;} }
+    </style>
+    <line class="af-line" x1="185" y1="120" x2="545" y2="70"/>
+    <line class="af-line" x1="545" y1="95" x2="545" y2="160"/>
+    <g><rect class="af-box" x="65" y="95" width="120" height="52" rx="11"/><text class="af-title" x="125" y="126" text-anchor="middle">App</text></g>
+    <g><rect class="af-box" x="545" y="44" width="200" height="52" rx="11"/><text class="af-title" x="645" y="68" text-anchor="middle">Cache</text><text class="af-sub" x="645" y="86" text-anchor="middle">in-memory · fast</text></g>
+    <g><rect class="af-box" x="545" y="160" width="200" height="56" rx="11"/><text class="af-title" x="645" y="184" text-anchor="middle">Database</text><text class="af-sub" x="645" y="202" text-anchor="middle">durable · slower</text></g>
+    <circle class="af-pkt2 ca-hit" cx="0" cy="0" r="6"/>
+    <circle class="af-pkt ca-miss" cx="0" cy="0" r="6"/>
+    <text class="ca-cap-hit af-ok" x="300" y="235" font="600 12px 'SFMono-Regular',monospace" fill="var(--ok,#63d99a)">HIT &middot; served from memory, no DB touch</text>
+    <text class="ca-cap-miss" x="300" y="235" font="600 12px 'SFMono-Regular',monospace" fill="var(--accent)">MISS &middot; falls through to the database</text>
+  </svg>
+  <figcaption>Check the cache first; on a miss, read the database and populate the cache so the next read is a hit.</figcaption>
+</figure>
+
+  <h3 class="reveal" id="relational-by-default">Relational by default<a class="h-anchor" href="#relational-by-default" aria-label="Link to this section">#</a></h3>
+  <p class="reveal"><b>PostgreSQL</b> is the right default for almost everything with users, relationships, and money-adjacent data. Reach for a document store (MongoDB) or a cache (Redis) only when you have a specific access pattern that relational modeling actively fights — not because it feels more modern.</p>
+
+  <h3 class="reveal" id="structure-index-what-you-query-by-constrain-what-must-be-unique">Structure: index what you query by, constrain what must be unique<a class="h-anchor" href="#structure-index-what-you-query-by-constrain-what-must-be-unique" aria-label="Link to this section">#</a></h3>
+  <pre class="mono reveal">model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  username  String   @unique
+  passwordHash String
+  createdAt DateTime @default(now())
+}
+
+model Follow {
+  followerId  String
+  followingId String
+  @@id([followerId, followingId])   // prevents duplicate follows at the DB level
+  @@index([followingId])            // fast "who follows me" lookups
+}</pre>
+  <p class="reveal">Three structural decisions matter more than the rest: normalize until duplication would cause a real bug (a user's email lives in one place, not copied onto every post), index every column you filter or sort by in a hot query path, and put a uniqueness constraint at the database level for anything that must never collide — application-code checks alone have a race-condition window between "check" and "insert" that a real database constraint closes for free.</p>
+
+  <div class="callout reveal">
+    <div class="ctitle">Migrations discipline</div>
+    <p>Every schema change is a migration file, checked into git, applied the same way in every environment (local → staging → production). Never hand-edit a production schema through a GUI — you lose the ability to reproduce it.</p>
+  </div>
+
+  <h3 class="reveal" id="scaling-what-happens-after-one-database-isnt-enough">Scaling: what happens after one database isn't enough<a class="h-anchor" href="#scaling-what-happens-after-one-database-isnt-enough" aria-label="Link to this section">#</a></h3>
+  <p class="reveal">Alex Xu's <i>System Design Interview</i> lays out the standard progression clearly (Chapter 1, "Scale From Zero To Millions Of Users") — the order below is that same progression, applied to the database tier specifically:</p>
+  <ol class="reveal">
+    <li><b>Vertical scaling first</b> — a bigger machine (more CPU/RAM/IOPS). Simplest option, and the right first move; it has a ceiling and a single point of failure, but it buys time without adding architectural complexity.</li>
+    <li><b>Read replicas</b> — one writable "leader" database and one or more read-only "follower" copies kept in sync via replication. Reads (which usually outnumber writes many times over on a social app's feed) get spread across followers; only writes hit the leader. If the leader goes down, a follower can be promoted — this is also your first real answer to "what if the database dies."</li>
+    <li><b>Caching in front of the database</b> — a cache-aside pattern (check Redis/Memcached first, fall through to Postgres on a miss, populate the cache after) removes repeat reads from the database entirely. An expiration policy (TTL) plus an eviction policy (commonly LRU) keeps the cache bounded and roughly fresh.</li>
+    <li><b>Sharding (horizontal scaling)</b> — once a single leader can't hold or serve the whole dataset, split the table's rows across multiple independent databases ("shards") using a <b>sharding key</b> (e.g. <code>userId</code>) that decides which shard a given row lives on. Every shard has the same schema; the data on each is different.</li>
+  </ol>
+
+  <div class="callout reveal">
+    <div class="ctitle">What sharding costs you (also straight from Chapter 1)</div>
+    <p>Sharding is a real technique, not a free upgrade. It introduces three concrete problems: <b>resharding</b> — what happens when one shard outgrows its capacity or a bad sharding key produces an uneven split, forcing you to move data and update the routing logic while live; the <b>hotspot/celebrity problem</b> — a poorly chosen key can dump disproportionate traffic on one shard (one extremely active user's data hammering a single shard while others sit idle); and <b>cross-shard queries</b> — a join or aggregate that used to be one query across one table now has to fan out across many shards and merge results in application code.</p>
+  </div>
+
+  <p class="reveal"><b>Consistent hashing</b> (Chapter 5 of the same book) is the standard fix for the resharding problem specifically: instead of a naive <code>hash(key) % N</code> (where adding or removing one server reshuffles almost everything), servers and keys are placed on a conceptual ring by hash value, and each key belongs to the next server clockwise from it. Adding or removing a server then only affects its immediate neighbors on the ring, not the entire dataset — this is the same idea behind how a load balancer distributes requests and how a distributed cache decides which node holds which key.</p>
+
+  <h3 class="reveal" id="beyond-a-single-relational-database-how-distributed-stores-stay-correct">Beyond a single relational database: how distributed stores stay correct<a class="h-anchor" href="#beyond-a-single-relational-database-how-distributed-stores-stay-correct" aria-label="Link to this section">#</a></h3>
+  <p class="reveal">If you ever move part of your data into a distributed key-value store (Cassandra, DynamoDB, Riak — the subject of Chapter 6, "Design A Key-Value Store"), a few ideas from that world explain <i>why</i> those systems behave the way they do, and they're worth recognizing even if Postgres is all you use:</p>
+  <div class="grid2 reveal">
+    <div class="card"><h4>CAP theorem</h4><p>During a network partition, a distributed system must choose between Consistency (every read sees the latest write) and Availability (every request gets a response). You can't fully have both at once — most key-value stores are tuned toward one side (CP or AP) and let you tune per-operation.</p></div>
+    <div class="card"><h4>Quorum consensus (N/W/R)</h4><p>Data is replicated to N nodes; a write must be acknowledged by W of them, a read must query R of them. Picking W+R > N guarantees every read sees at least one copy of the latest write — a tunable knob between consistency and latency.</p></div>
+    <div class="card"><h4>Vector clocks</h4><p>When two replicas accept conflicting writes during a partition, a vector clock records which version "happened before" another, so the system (or the app) can detect and resolve the conflict instead of silently picking one write and losing the other.</p></div>
+    <div class="card"><h4>Gossip protocol &amp; hinted handoff</h4><p>Nodes tell each other which peers are up or down (gossip), so the system detects a failed node without a central coordinator. If a node is briefly unreachable, another node temporarily holds ("hints at") the writes meant for it and hands them off once it's back — a temporary failure doesn't become a permanent data loss.</p></div>
+  </div>
+
+  <h3 class="reveal" id="the-hacking-side-how-a-database-actually-gets-breached">The hacking side: how a database actually gets breached<a class="h-anchor" href="#the-hacking-side-how-a-database-actually-gets-breached" aria-label="Link to this section">#</a></h3>
+  <p class="reveal">Every step below is a real, common attack chain — not a hypothetical. Each one maps to a specific, fixable cause.</p>
+
+  <h4 style="margin:22px 0 8px; font-size:15px; color:var(--accent-2);" class="reveal mono">1. SQL injection — the classic</h4>
+  <pre class="mono reveal">// Vulnerable: user input concatenated straight into the query string
+const query = `SELECT * FROM users WHERE username = '${input}'`;
+// An attacker submits:  ' OR '1'='1
+// The query the database actually runs becomes:
+//   SELECT * FROM users WHERE username = '' OR '1'='1'
+// which matches every row in the table, not zero.</pre>
+  <p class="reveal">This is how it proceeds in a real attack: the attacker first tries a single quote in every input field and watches for a database error in the response — that error is confirmation the input reaches a raw query. From there they use <code>UNION SELECT</code> to pull columns from <i>other</i> tables (like a <code>password_hash</code> column no one meant to expose), then time-based or boolean-based blind techniques to extract data one bit at a time even when the app shows no visible error. The fix is not "sanitize the input" — it's structural: <b>parameterized queries / an ORM</b> that always sends user input as data, never as part of the SQL text, so there is no string for an attacker to break out of. Stage 04 and the worked example in Stage 17 both build on this.</p>
+
+  <h4 style="margin:22px 0 8px; font-size:15px; color:var(--accent-2);" class="reveal mono">2. Excessive privilege turns a small bug into a total breach</h4>
+  <p class="reveal">The injection above is only catastrophic if the database user the app connects as <i>can</i> read every table, drop tables, or read other databases on the same instance. A properly scoped, least-privilege app user — one that can only touch the specific tables/rows the app needs, with no <code>DROP</code>/<code>ALTER</code> permission — turns "attacker can run arbitrary SQL" into "attacker can still only see what the app itself could see," which is a much smaller blast radius. This is the single highest-leverage database security control that isn't about the query at all.</p>
+
+  <h4 style="margin:22px 0 8px; font-size:15px; color:var(--accent-2);" class="reveal mono">3. A database left reachable from the public internet</h4>
+  <p class="reveal">If a database has a public IP and its firewall allows inbound connections from anywhere, an attacker doesn't need an application bug at all — they scan for open database ports directly, then try default/leaked credentials. This is exactly why Stage 09/09 puts the database in a <b>private subnet</b> reachable only from the app tier's security group: there is no network path to attack from the outside, regardless of how the credentials leak.</p>
+
+  <h4 style="margin:22px 0 8px; font-size:15px; color:var(--accent-2);" class="reveal mono">4. Leaked credentials or a leaked backup</h4>
+  <p class="reveal">A database password committed to git, pasted into a support ticket, or sitting in an unencrypted backup file in a misconfigured public storage bucket is functionally the same breach as a successful injection attack — the attacker just connects directly with valid credentials. This is why Stage 06/13 insists secrets live in a secrets manager (never in source), and why backups need both encryption at rest and access controls at least as strict as the live database's.</p>
+
+  <h4 style="margin:22px 0 8px; font-size:15px; color:var(--accent-2);" class="reveal mono">5. NoSQL injection (the document-database version)</h4>
+  <pre class="mono reveal">// Vulnerable: a MongoDB query built from raw, unvalidated request input
+db.users.find({ username: req.body.username, password: req.body.password });
+// An attacker sends password as an OBJECT instead of a string:
+//   { "username": "alice", "password": { "$ne": null } }
+// "$ne": null means "not equal to null" — true for any real password hash,
+// so the query matches alice's account with no valid password at all.</pre>
+  <p class="reveal">The fix is the same principle as SQL injection: never let raw client input become part of a query's structure. A strict schema validator (Stage 04's zod example) that rejects a password field unless it's a plain string closes this before it ever reaches the database driver.</p>
+
+  <h4 style="margin:22px 0 8px; font-size:15px; color:var(--accent-2);" class="reveal mono">6. Lateral movement from a compromised app server</h4>
+  <p class="reveal">If an attacker compromises the app server itself (through an unrelated bug — a vulnerable dependency, an exposed debug endpoint), the database credentials sitting in that process's environment variables let them pivot straight to the database with full app-level access. Least-privilege DB users, short-lived/rotated credentials, and network segmentation (Stage 09/09) all limit what that pivot actually gains an attacker, which is why no single control on this list is sufficient alone — they're layered on purpose.</p>
+
+  <div class="security reveal">
+    <div class="ctitle">Security checklist — database</div>
+    <ul>
+      <li>Parameterized queries / an ORM everywhere — never build a query by concatenating a string <span class="std">CWE-89</span></li>
+      <li>Strict schema validation on any field that reaches a query, including document-store queries — rejects operator-injection payloads like <code>$ne</code>/<code>$where</code> <span class="std">CWE-943</span></li>
+      <li>Least-privilege DB user for the app — cannot drop tables or read other databases on the instance <span class="std">CIS Benchmarks</span></li>
+      <li>Encrypt at rest, including backups/snapshots (most managed databases do this by default — verify it's actually on) <span class="std">NIST Cryptographic Standards</span></li>
+      <li>Automated backups with a <i>tested</i> restore procedure — an untested backup is a hope, not a plan <span class="std">NIST CSF · Recover</span></li>
+      <li>Database in a private subnet with no public IP; only the app tier's security group can reach it <span class="std">CSA Cloud Controls Matrix</span></li>
+      <li>Credentials in a secrets manager, rotated on a schedule — never in source, never in an unencrypted backup <span class="std">CWE-798</span></li>
+    </ul>
+  </div>
+
+  <p class="reveal appendix-note">Scaling and distributed-systems concepts in this stage (replication, sharding, consistent hashing, quorum/vector clocks/gossip) are referenced from Alex Xu's <i>System Design Interview: An Insider's Guide</i>, Chapters 1, 5, and 6 — read those chapters directly for the full depth (diagrams, numeric examples, and interview framing) this summary necessarily leaves out.</p>
 </section>
 
-<div class="page-nav reveal"><a class="page-nav-link prev" href="09-load-balancing-autoscaling.html"><span class="page-nav-label">&larr; Previous</span><span class="page-nav-title">Load balancers & autoscaling</span></a><a class="page-nav-link next" href="11-cicd.html"><span class="page-nav-label">Next &rarr;</span><span class="page-nav-title">CI/CD pipelines</span></a></div>
+<div class="page-nav reveal"><a class="page-nav-link prev" href="04-backend-api.html"><span class="page-nav-label">&larr; Previous</span><span class="page-nav-title">Backend & API</span></a><a class="page-nav-link next" href="06-auth-otp-secrets.html"><span class="page-nav-label">Next &rarr;</span><span class="page-nav-title">Auth, OTP & the password wallet</span></a></div>
 
 <div class="divider"></div>
 <footer>
@@ -446,7 +577,7 @@ pre:hover .copy-btn{ opacity:1; }
 
 
   /* site-wide search */
-  var SEARCH_INDEX = [{"n": "01", "t": "Plan & threat-model first", "f": "01-plan-and-threat-model.html"}, {"n": "02", "t": "Frontend", "f": "02-frontend.html"}, {"n": "03", "t": "Backend & API", "f": "03-backend-api.html"}, {"n": "04", "t": "Database — structure, scaling, and how it actually gets hacked", "f": "04-database.html"}, {"n": "05", "t": "Auth, OTP & the password wallet", "f": "05-auth-otp-secrets.html"}, {"n": "06", "t": "Email / OTP delivery", "f": "06-email-otp-delivery.html"}, {"n": "07", "t": "File storage & the CDN", "f": "07-storage-cdn.html"}, {"n": "08", "t": "Servers & the VM", "f": "08-servers-vm.html"}, {"n": "09", "t": "Load balancers & autoscaling", "f": "09-load-balancing-autoscaling.html"}, {"n": "10", "t": "Domain names & DNS", "f": "10-domains-dns.html"}, {"n": "11", "t": "CI/CD pipelines", "f": "11-cicd.html"}, {"n": "12", "t": "Monitoring & incident response", "f": "12-monitoring-incident-response.html"}, {"n": "13", "t": "Security hardening checklist — the consolidated view", "f": "13-security-checklist.html"}, {"n": "14", "t": "Compliance & governance, including India", "f": "14-compliance.html"}, {"n": "15", "t": "Skill roadmap: junior → staff", "f": "15-skill-roadmap.html"}, {"n": "16", "t": "Glossary", "f": "16-glossary.html"}, {"n": "17", "t": "Full resource catalog, explained", "f": "17-full-resource-catalog.html"}, {"n": "18", "t": "A backend, file by file — then an AI security audit", "f": "18-worked-backend-example.html"}, {"n": "19", "t": "Reliability & resilience — redundancy, backups, DDoS, and disaster recovery", "f": "19-reliability-and-disaster-recovery.html"}, {"n": "20", "t": "Your first build: checklist & capstone project", "f": "20-your-first-build.html"}, {"n": "21", "t": "Linux fundamentals: from basics to daily-use commands", "f": "21-linux-fundamentals.html"}, {"n": "00", "t": "How to use this manual", "f": "how-to-build-an-application.html"}];
+  var SEARCH_INDEX = [{"n": "01", "t": "Plan & threat-model first", "f": "01-plan-and-threat-model.html"}, {"n": "02", "t": "Linux fundamentals: from basics to daily-use commands", "f": "02-linux-fundamentals.html"}, {"n": "03", "t": "Frontend", "f": "03-frontend.html"}, {"n": "04", "t": "Backend & API", "f": "04-backend-api.html"}, {"n": "05", "t": "Database — structure, scaling, and how it actually gets hacked", "f": "05-database.html"}, {"n": "06", "t": "Auth, OTP & the password wallet", "f": "06-auth-otp-secrets.html"}, {"n": "07", "t": "Email / OTP delivery", "f": "07-email-otp-delivery.html"}, {"n": "08", "t": "File storage & the CDN", "f": "08-storage-cdn.html"}, {"n": "09", "t": "Servers & the VM", "f": "09-servers-vm.html"}, {"n": "10", "t": "Load balancers & autoscaling", "f": "10-load-balancing-autoscaling.html"}, {"n": "11", "t": "Domain names & DNS", "f": "11-domains-dns.html"}, {"n": "12", "t": "CI/CD pipelines", "f": "12-cicd.html"}, {"n": "13", "t": "Monitoring & incident response", "f": "13-monitoring-incident-response.html"}, {"n": "14", "t": "Reliability & resilience — redundancy, backups, DDoS, and disaster recovery", "f": "14-reliability-and-disaster-recovery.html"}, {"n": "15", "t": "Security hardening checklist — the consolidated view", "f": "15-security-checklist.html"}, {"n": "16", "t": "Compliance & governance, including India", "f": "16-compliance.html"}, {"n": "17", "t": "A backend, file by file — then an AI security audit", "f": "17-worked-backend-example.html"}, {"n": "18", "t": "Your first build: checklist & capstone project", "f": "18-your-first-build.html"}, {"n": "19", "t": "Skill roadmap: junior → staff", "f": "19-skill-roadmap.html"}, {"n": "20", "t": "Glossary", "f": "20-glossary.html"}, {"n": "21", "t": "Full resource catalog, explained", "f": "21-full-resource-catalog.html"}, {"n": "00", "t": "How to use this manual", "f": "how-to-build-an-application.html"}];
   var searchBtn=document.getElementById('search-btn'), searchOverlay=document.getElementById('search-overlay'),
       searchInput=document.getElementById('search-input'), searchResults=document.getElementById('search-results');
   function renderResults(q){

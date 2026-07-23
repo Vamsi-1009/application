@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%A7%AD%3C/text%3E%3C/svg%3E">
-<title>Security hardening checklist — the consolidated view — Field Manual</title>
-<meta property="og:title" content="Security hardening checklist — the consolidated view">
-<meta property="og:description" content="Every amber box above, gathered in one pass, organized by domain instead of by build stage — use this as your pre-launch pass.">
+<title>A backend, file by file — then an AI security audit — Field Manual</title>
+<meta property="og:title" content="A backend, file by file — then an AI security audit">
+<meta property="og:description" content="Everything above has been explained concept-first. This stage does it code-first: one concrete backend file tree, what each file actually does and why it earns its place, then the exact process for having an AI (or a human) audit the finished code against the catalog above.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://webstocking.com/application/13-security-checklist.html">
+<meta property="og:url" content="https://webstocking.com/application/17-worked-backend-example.html">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Security hardening checklist — the consolidated view">
-<meta name="twitter:description" content="Every amber box above, gathered in one pass, organized by domain instead of by build stage — use this as your pre-launch pass.">
+<meta name="twitter:title" content="A backend, file by file — then an AI security audit">
+<meta name="twitter:description" content="Everything above has been explained concept-first. This stage does it code-first: one concrete backend file tree, what each file actually does and why it earns its place, then the exact process for having an AI (or a human) audit the finished code against the catalog above.">
 <style>
 :root{
   --bg:#060910; --bg2:#0a0f1a;
@@ -305,29 +305,249 @@ pre:hover .copy-btn{ opacity:1; }
 <div class="shell">
 <main>
 
-<section class="stage" id="s13">
-  <div class="stage-head reveal"><span class="stage-num">13</span><h2>Security hardening checklist — the consolidated view</h2><span class="stage-badge">~30 min &middot; Reference</span></div>
-  <button class="btn complete-toggle reveal" id="complete-toggle" data-page="13-security-checklist.html" type="button">
+<section class="stage" id="s18">
+  <div class="stage-head reveal"><span class="stage-num">17</span><h2>A backend, file by file — then an AI security audit</h2><span class="stage-badge">~2 hrs &middot; Advanced</span></div>
+  <button class="btn complete-toggle reveal" id="complete-toggle" data-page="17-worked-backend-example.html" type="button">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <span class="ct-label">Mark this stage complete</span>
   </button>
 
-  <p class="dek reveal">Every amber box above, gathered in one pass, organized by domain instead of by build stage — use this as your pre-launch pass.</p>
-
-  <div class="grid2 reveal">
-    <div class="card"><h4>Identity &amp; access</h4><p>Argon2id hashing · short JWTs + rotating refresh · rate-limited auth/OTP · MFA/passkeys where warranted · least-privilege IAM everywhere</p></div>
-    <div class="card"><h4>Injection &amp; input</h4><p>Parameterized queries only · strict schema validation rejecting unknown fields · output escaping, no raw HTML injection</p></div>
-    <div class="card"><h4>Access control</h4><p>Ownership checks on every mutating route · object keys scoped per user · no security decision made client-side alone</p></div>
-    <div class="card"><h4>Transport &amp; storage</h4><p>TLS 1.2+ everywhere · encryption at rest for DB/storage · private subnets for DB and app tier · public-read only through the CDN</p></div>
-    <div class="card"><h4>Secrets</h4><p>Nothing in git · a real secrets manager · least-privilege read access · scheduled rotation</p></div>
-    <div class="card"><h4>Supply chain</h4><p>Dependency scanning in CI · pinned versions · build provenance · minimal third-party JS on the frontend</p></div>
-    <div class="card"><h4>Operations</h4><p>Redacted structured logs · alerting on anomalies · tested backups · a written incident runbook</p></div>
-    <div class="card"><h4>Email/OTP integrity</h4><p>SPF/DKIM/DMARC on the sending domain · hashed, expiring, attempt-capped OTPs · no user-enumeration in error messages</p></div>
+  <p class="dek reveal">Everything above has been explained concept-first. This stage does it code-first: one concrete backend file tree, what each file actually does and why it earns its place, then the exact process for having an AI (or a human) audit the finished code against the catalog above.</p>
+  <div class="callout reveal" id="in-page-toc">
+    <div class="ctitle">On this page</div>
+    <ul style="columns:2; column-gap:28px; margin:0; padding-left:1.1em;">
+      <li><a href="#the-file-tree">The file tree</a></li>
+      <li><a href="#what-each-file-does-and-the-benefit-of-splitting-it-out-this-way">What each file does, and the benefit of splitting it out this way</a></li>
+      <li><a href="#cors-exactly-where-it-lives-and-what-it-actually-decides">CORS, exactly where it lives and what it actually decides</a></li>
+      <li><a href="#middleware-order-is-itself-a-security-decision">Middleware order is itself a security decision</a></li>
+      <li><a href="#routes-guards-stacked-in-front-of-the-handler">Routes: guards stacked in front of the handler</a></li>
+      <li><a href="#env-where-the-apps-own-passwords-actually-live">.env — where the app's own passwords actually live</a></li>
+      <li><a href="#the-code-is-done-now-audit-it">The code is "done." Now audit it.</a></li>
+      <li><a href="#turning-that-into-a-prompt-you-actually-hand-an-ai">Turning that into a prompt you actually hand an AI</a></li>
+      <li><a href="#two-findings-this-exact-prompt-would-catch">Two findings this exact prompt would catch</a></li>
+      <li><a href="#back-to-the-infrastructure-everything-an-app-like-this-actually-runs-on">Back to the infrastructure: everything an app like this actually runs on</a></li>
+    </ul>
   </div>
-  <p class="reveal" style="margin-top:18px" class="appendix-note">For a much deeper pass — mobile, AI/LLM features, IoT, industrial, automotive, and formal compliance frameworks — work through the <a href="security/master_cybersecurity_checks_resources.html">full 103-item resource catalog</a> (also mirrored in the appendix below), filtering to what's actually relevant to your product.</p>
+
+
+  <div class="callout reveal">
+    <div class="ctitle">Who wrote this example, and why that's disclosed</div>
+    <p>The file tree and snippets below are illustrative teaching code, drafted with an AI pair-programmer (in this case, Claude) rather than hand-typed line by line. That's disclosed here on purpose: whether code comes from a human, an AI assistant, or both, the rule doesn't change — <b>every line that reaches production must be read, understood, and reviewed by someone accountable for it.</b> AI-assisted code is not exempt from review; if anything it needs the same scrutiny you'd give a contractor's first pull request.</p>
+  </div>
+
+  <h3 class="reveal" id="the-file-tree">The file tree<a class="h-anchor" href="#the-file-tree" aria-label="Link to this section">#</a></h3>
+  <p class="reveal">A realistic shape for the Node.js + TypeScript + Express + PostgreSQL/Prisma backend described in Stages 04–08, applied to a photo-sharing app like the one in this manual's examples:</p>
+  <pre class="mono reveal">backend/
+  src/
+    app.ts                  # builds the Express app: middleware chain + routes
+    server.ts               # boots the HTTP server; loads/validates secrets first
+    config/
+      secrets.ts            # reads & validates env vars, fails fast if any are missing
+      logger.ts             # structured logging, redacts secrets/tokens automatically
+    middleware/
+      auth.ts               # verifies the JWT, attaches req.user
+      validate.ts           # runs a zod schema against body/params/query
+      rateLimit.ts           # throttles auth/OTP endpoints
+      errorHandler.ts        # catches errors, hides internals in production
+    routes/
+      auth.routes.ts         # /api/auth/*  — signup, login, OTP, refresh
+      posts.routes.ts        # /api/posts/* — create, delete, like, comment
+      feed.routes.ts         # /api/feed     — paginated timeline
+    modules/
+      auth/                  # controller + service: the actual signup/login logic
+      posts/                 # controller + service: the actual post logic
+    lib/
+      prisma.ts              # the one shared database client
+      jwt.ts                 # sign/verify tokens, explicit algorithm allow-list
+      password.ts            # Argon2id hash/verify wrapper
+      mailer.ts              # sends OTP/reset emails via SMTP
+      s3.ts                  # issues presigned upload URLs
+  prisma/
+    schema.prisma            # the database schema, version-controlled
+  .env.example                # every required secret NAME, no real values
+  package.json                # pinned dependency versions</pre>
+
+  <h3 class="reveal" id="what-each-file-does-and-the-benefit-of-splitting-it-out-this-way">What each file does, and the benefit of splitting it out this way<a class="h-anchor" href="#what-each-file-does-and-the-benefit-of-splitting-it-out-this-way" aria-label="Link to this section">#</a></h3>
+  <div class="tablewrap reveal">
+  <table>
+    <thead><tr><th>File</th><th>What it does</th><th>Why it's worth the separate file</th></tr></thead>
+    <tbody>
+      <tr><td><code>app.ts</code></td><td>Creates the Express app and wires every piece of middleware and every route into one place, in a fixed order.</td><td>One file is the single source of truth for "what runs on every request." A security review only has to read this one file to know the whole request pipeline.</td></tr>
+      <tr><td><code>server.ts</code></td><td>Imports <code>app.ts</code>, loads and validates secrets, then starts listening on a port.</td><td>Separated from <code>app.ts</code> so the app itself can be imported into tests without actually opening a network port.</td></tr>
+      <tr><td><code>config/secrets.ts</code></td><td>Parses <code>process.env</code> through a strict schema; throws immediately if anything required is missing or malformed.</td><td>Turns "the app is silently misconfigured in production" into "the app refuses to start" — a much cheaper failure to catch.</td></tr>
+      <tr><td><code>config/logger.ts</code></td><td>A shared logger that automatically strips <code>Authorization</code> headers, passwords, and OTP codes before writing a log line.</td><td>Without a shared logger, it's easy for one route to accidentally <code>console.log(req.body)</code> and leak a password into a log file.</td></tr>
+      <tr><td><code>middleware/auth.ts</code></td><td>Reads the JWT from the <code>Authorization</code> header, verifies its signature and algorithm, and attaches the decoded user to <code>req.user</code>.</td><td>Every protected route reuses this instead of re-implementing token verification — one bug fixed here fixes it everywhere.</td></tr>
+      <tr><td><code>middleware/validate.ts</code></td><td>Takes a zod schema and rejects the request with <code>400</code> if the body/params/query don't match it exactly.</td><td>Centralizes input validation so a route handler can trust its input has the right shape before it touches the database.</td></tr>
+      <tr><td><code>middleware/rateLimit.ts</code></td><td>Counts requests per account/IP and returns <code>429</code> past a threshold, tuned per endpoint (tighter on OTP than on the feed).</td><td>One tunable place to slow down brute-force and abuse instead of scattering counters through business logic.</td></tr>
+      <tr><td><code>middleware/errorHandler.ts</code></td><td>The last middleware in the chain — catches anything thrown upstream and returns a generic message in production, full detail only in server-side logs.</td><td>Guarantees no route can accidentally leak a stack trace, SQL error, or file path to a client, even one nobody remembered to wrap in a try/catch.</td></tr>
+      <tr><td><code>routes/*.ts</code></td><td>Maps a URL + HTTP verb to a handler, and lists which middleware guard that specific route (e.g. <code>requireAuth</code>, then <code>validate(schema)</code>, then the handler).</td><td>Reading one route file tells you exactly what protects that endpoint — nothing hidden in the handler itself.</td></tr>
+      <tr><td><code>modules/*/service.ts</code></td><td>The actual business logic: "create this post," "follow this user" — including the ownership/authorization check (is this <i>my</i> post to delete?).</td><td>Keeps the authorization decision physically next to the operation it guards, instead of trusting a route comment to remind someone.</td></tr>
+      <tr><td><code>lib/jwt.ts</code></td><td>One function to sign a token, one to verify it, with the signing algorithm hardcoded to a single allowed value.</td><td>Stops a developer three months from now from accidentally accepting a token signed with a weaker or attacker-chosen algorithm.</td></tr>
+      <tr><td><code>lib/password.ts</code></td><td>Wraps Argon2id so the rest of the codebase never touches a hashing function directly.</td><td>If the hashing algorithm ever needs to change, it changes in one file, not in every place a password is checked.</td></tr>
+      <tr><td><code>lib/s3.ts</code></td><td>Issues a short-lived, scoped presigned upload URL for a given user's own object-key prefix.</td><td>Guarantees the API server itself never receives or stores raw image bytes — removes a whole class of upload-based attacks from its surface.</td></tr>
+      <tr><td><code>prisma/schema.prisma</code></td><td>Declares every table, column, index, and uniqueness constraint as version-controlled text.</td><td>Every schema change is a reviewable diff and a migration file, not an unrecorded click in a database GUI.</td></tr>
+      <tr><td><code>.env.example</code></td><td>Lists every secret <i>name</i> the app needs, with placeholder (fake) values.</td><td>A new developer knows exactly what to configure without ever being handed a real credential over Slack or email.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3 class="reveal" id="cors-exactly-where-it-lives-and-what-it-actually-decides">CORS, exactly where it lives and what it actually decides<a class="h-anchor" href="#cors-exactly-where-it-lives-and-what-it-actually-decides" aria-label="Link to this section">#</a></h3>
+  <pre class="mono reveal">// inside app.ts — this runs before any route sees the request
+app.use(cors({
+  origin(origin, callback) {
+    // "origin" is the website that sent this request (from the browser's
+    // Origin header). Undefined means it's not a browser request at all
+    // (curl, a mobile app, server-to-server) — allow those through.
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Origin not allowed by CORS policy"));
+    }
+  },
+  credentials: true, // allows the browser to send the httpOnly refresh cookie
+}));</pre>
+  <p class="reveal">CORS is a <i>browser-enforced</i> rule about which websites are allowed to read the response of a cross-origin request. Get it wrong in either direction and something breaks: set <code>origin: "*"</code> with <code>credentials: true</code> and browsers will refuse it outright (and if it did work, it would let any website on the internet make authenticated requests using a logged-in user's cookie); lock it down too tightly and your own frontend can't call your own API. The fix is always the same: an explicit allow-list of exactly the origins that should be able to call you — your production frontend domain, your local dev server, nothing else.</p>
+
+  <h3 class="reveal" id="middleware-order-is-itself-a-security-decision">Middleware order is itself a security decision<a class="h-anchor" href="#middleware-order-is-itself-a-security-decision" aria-label="Link to this section">#</a></h3>
+  <pre class="mono reveal">// app.ts, in this exact order — the order is not arbitrary:
+app.use(helmet());               // 1. security headers on every response, first
+app.use(cors(corsOptions));      // 2. reject disallowed origins before anything else runs
+app.use(express.json({ limit: "100kb" })); // 3. parse body, but cap its size
+app.use(cookieParser());         // 4. read the refresh-token cookie
+app.use(requestLogger);          // 5. log the request (after body parsing, so size is known)
+
+app.use("/api/auth", authRoutes);   // 6. routes — each internally adds requireAuth/
+app.use("/api/posts", postsRoutes); //    validate/rateLimit where that route needs it
+app.use("/api/feed", feedRoutes);
+
+app.use(notFoundHandler);        // 7. anything unmatched becomes a clean 404
+app.use(errorHandler);           // 8. MUST be last — Express only treats a 4-arg
+                                  //    function as an error handler, and only errors
+                                  //    thrown by earlier middleware reach it</pre>
+  <p class="reveal">If <code>errorHandler</code> moved earlier, thrown errors from routes registered after it would never be caught. If <code>cors</code> moved after the routes, a disallowed origin's request would already have executed your business logic before being rejected. The order in the file <i>is</i> the security model — which is exactly why Stage 04's authorization check inside a route handler is a second, independent layer, not a replacement for getting this order right.</p>
+
+  <h3 class="reveal" id="routes-guards-stacked-in-front-of-the-handler">Routes: guards stacked in front of the handler<a class="h-anchor" href="#routes-guards-stacked-in-front-of-the-handler" aria-label="Link to this section">#</a></h3>
+  <pre class="mono reveal">// routes/posts.routes.ts
+router.delete(
+  "/:id",
+  requireAuth,                 // 1. must be logged in at all
+  validate(idParamSchema, "params"), // 2. :id must actually look like a valid id
+  asyncHandler(deletePostHandler)   // 3. only now does business logic run,
+);                                   //    which itself checks post.authorId === req.user.id</pre>
+  <p class="reveal">Read a route top to bottom as a checklist of what must be true before the handler runs. Delete any one guard and ask what breaks: no <code>requireAuth</code> — anyone, logged in or not, can call this; no <code>validate</code> — a malformed <code>:id</code> reaches the database layer instead of failing cleanly; and even with both, the handler <i>itself</i> still has to check ownership, because "logged in" and "owns this specific post" are two different questions (this is the BOLA/IDOR check from Stage 04).</p>
+
+  <h3 class="reveal" id="env-where-the-apps-own-passwords-actually-live">.env — where the app's own passwords actually live<a class="h-anchor" href="#env-where-the-apps-own-passwords-actually-live" aria-label="Link to this section">#</a></h3>
+  <pre class="mono reveal"># .env.example — committed to git, values are placeholders only
+DATABASE_URL=postgres://user:CHANGE_ME@localhost:5432/pixelgram
+JWT_SIGNING_KEY=replace_with_a_random_32+_character_value
+SMTP_HOST=email-smtp.ap-south-1.amazonaws.com
+SMTP_USER=replace_with_ses_smtp_username
+SMTP_PASSWORD=replace_with_ses_smtp_password
+AWS_ACCESS_KEY_ID=replace_me
+AWS_SECRET_ACCESS_KEY=replace_me
+S3_BUCKET=pixelgram-media
+
+# .env — NEVER committed (this exact filename is in .gitignore), holds
+# the REAL values above, used only for local development.</pre>
+  <div class="security reveal">
+    <div class="ctitle">Why this file gets called a "password wallet"</div>
+    <ul>
+      <li><code>.env.example</code> is safe to commit — it documents which secrets exist without exposing any of them <span class="std">CWE-798</span></li>
+      <li>The real <code>.env</code> lives only on a developer's machine, listed in <code>.gitignore</code>, never pushed <span class="std">CWE-798</span></li>
+      <li>In production, none of this comes from a file at all — <code>config/secrets.ts</code> reads environment variables that the platform injects at deploy time from a real secrets manager (Stage 06/13: AWS Secrets Manager, Vault) <span class="std">CSA Cloud Controls Matrix</span></li>
+      <li>If a real <code>.env</code> is ever committed by accident, treat every value in it as compromised — rotate all of them, don't just delete the file from a later commit (git history still has it) <span class="std">NIST SSDF</span></li>
+    </ul>
+  </div>
+
+  <h3 class="reveal" id="the-code-is-done-now-audit-it">The code is "done." Now audit it.<a class="h-anchor" href="#the-code-is-done-now-audit-it" aria-label="Link to this section">#</a></h3>
+  <p class="reveal">Passing your own manual testing is not the same as being secure — it only proves the features work when used as intended. The next step is deliberately trying to break your own rules, checking the finished code against named standards instead of vibes. Here's what that looks like against the file tree above, tied directly to entries from Stage 21's catalog:</p>
+
+  <div class="tablewrap reveal">
+  <table>
+    <thead><tr><th>Check</th><th>Where to look</th><th>Standard</th></tr></thead>
+    <tbody>
+      <tr><td>Does every route that reads/writes a specific resource verify the caller owns it, not just that they're logged in?</td><td><code>modules/*/service.ts</code> — every function taking an id</td><td><span class="std" style="margin-left:0">OWASP API Security · BOLA</span></td></tr>
+      <tr><td>Is any SQL built by string concatenation instead of going through Prisma's parameterized queries?</td><td>grep the whole <code>src/</code> tree for raw <code>$queryRaw</code> usage</td><td><span class="std" style="margin-left:0">CWE-89</span></td></tr>
+      <tr><td>Is there a hardcoded credential, API key, or secret anywhere in source instead of read from <code>config/secrets.ts</code>?</td><td>grep for suspicious literals: <code>key=</code>, <code>password=</code>, AWS key patterns</td><td><span class="std" style="margin-left:0">CWE-798</span></td></tr>
+      <tr><td>Does the error handler ever return a stack trace, SQL error text, or internal file path to the client?</td><td><code>middleware/errorHandler.ts</code></td><td><span class="std" style="margin-left:0">OWASP ASVS</span></td></tr>
+      <tr><td>Are auth, OTP-send, OTP-verify, and password-reset all rate-limited, per account <i>and</i> per IP?</td><td><code>routes/auth.routes.ts</code>, <code>middleware/rateLimit.ts</code></td><td><span class="std" style="margin-left:0">CWE-307</span></td></tr>
+      <tr><td>Does the JWT verification step pin an explicit algorithm, rejecting "none" or an attacker-chosen alg?</td><td><code>lib/jwt.ts</code></td><td><span class="std" style="margin-left:0">OWASP · Broken Authentication</span></td></tr>
+      <tr><td>Is CORS an explicit origin allow-list rather than <code>*</code> or a reflected <code>Origin</code> header?</td><td><code>app.ts</code></td><td><span class="std" style="margin-left:0">CWE-942</span></td></tr>
+      <tr><td>Do any dependencies in <code>package.json</code> have a known high-severity advisory?</td><td><code>npm audit</code>, or paste <code>package.json</code> into OSV.dev</td><td><span class="std" style="margin-left:0">OSV / GitHub Advisory Database</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3 class="reveal" id="turning-that-into-a-prompt-you-actually-hand-an-ai">Turning that into a prompt you actually hand an AI<a class="h-anchor" href="#turning-that-into-a-prompt-you-actually-hand-an-ai" aria-label="Link to this section">#</a></h3>
+  <p class="reveal">This is the literal mechanism the question is asking about: you give an AI coding assistant (Claude, or any other) the standards to check against and the codebase to check them in, and ask it to report concrete findings instead of general advice. A prompt that actually works, adapted from the table above:</p>
+  <pre class="mono reveal">Perform a security review of the backend in src/. For each finding,
+report the exact file and line, the vulnerable pattern, which standard
+it violates, and the minimal fix — no generic advice, no rewording the
+standard back at me.
+
+Check specifically for:
+1. Missing ownership/authorization checks on any route or service
+   function that reads or mutates a specific resource by id
+   (OWASP API Security — Broken Object Level Authorization).
+2. Any raw/string-built SQL instead of parameterized queries (CWE-89).
+3. Hardcoded secrets, API keys, or credentials in source instead of
+   read from the environment (CWE-798).
+4. Error responses that leak stack traces, SQL text, or file paths in
+   production (OWASP ASVS).
+5. Auth, OTP, and password-reset endpoints missing rate limiting (CWE-307).
+6. JWT verification that doesn't pin an explicit signing algorithm.
+7. A CORS policy that isn't an explicit origin allow-list.
+
+Reference material for the above:
+- OWASP API Security Top 10 — https://owasp.org/www-project-api-security/
+- MITRE CWE — https://cwe.mitre.org/
+- OWASP ASVS — https://owasp.org/
+
+List every finding, ranked most severe first. If a check passes, say so
+explicitly rather than omitting it — I need to know what was verified,
+not just what failed.</pre>
+  <p class="reveal">Two things make this work better than "review my code for security issues": naming the exact standards (so the AI checks against a real bar, not a vague sense of "best practice"), and demanding file:line findings with a stated pass/fail per check (so silence doesn't get mistaken for "nothing was found"). This is precisely what a <code>/security-review</code>-style workflow automates — feed it your diff or codebase, point it at the catalog from Stage 21, and read the findings before you ship.</p>
+
+  <div class="callout reveal">
+    <div class="ctitle">What an AI review is, and isn't</div>
+    <p>An AI pass like this is fast, cheap, and good at catching the exact patterns above — because they're well-documented, named vulnerability classes it has seen thousands of times. It's not a substitute for <code>npm audit</code>/OSV (which know about specific CVEs in your exact dependency versions), and it's not a substitute for a real penetration test before handling sensitive data at scale (Stage 16's PTES/OSSTMM/CREST entries). Use it as a fast first pass on every change, not the only pass before launch.</p>
+  </div>
+
+  <h3 class="reveal" id="two-findings-this-exact-prompt-would-catch">Two findings this exact prompt would catch<a class="h-anchor" href="#two-findings-this-exact-prompt-would-catch" aria-label="Link to this section">#</a></h3>
+  <div class="grid2 reveal">
+    <div class="card">
+      <h4>Before — vulnerable</h4>
+      <p><code>async function deletePost(req, res) {<br>&nbsp;&nbsp;await db.post.delete({ where: { id: req.params.id } });<br>&nbsp;&nbsp;res.status(204).end();<br>}</code><br><br>Any logged-in user can delete <i>any</i> post by guessing its id — no ownership check. <span class="std" style="margin-left:0">OWASP API Security · BOLA</span></p>
+    </div>
+    <div class="card">
+      <h4>After — fixed</h4>
+      <p><code>const post = await db.post.findUnique({ where: { id } });<br>if (post.authorId !== req.user.id) return res.status(403).end();<br>await db.post.delete({ where: { id } });</code><br><br>One extra check, one extra line — the entire class of bug, closed.</p>
+    </div>
+  </div>
+
+  <h3 class="reveal" id="back-to-the-infrastructure-everything-an-app-like-this-actually-runs-on">Back to the infrastructure: everything an app like this actually runs on<a class="h-anchor" href="#back-to-the-infrastructure-everything-an-app-like-this-actually-runs-on" aria-label="Link to this section">#</a></h3>
+  <p class="reveal">The code above needs somewhere to run. Every piece below was covered in its own stage — this is the one-page inventory version, in the order you'd provision them.</p>
+  <div class="tablewrap reveal">
+  <table>
+    <thead><tr><th>Service</th><th>Job</th><th>Covered in</th></tr></thead>
+    <tbody>
+      <tr><td>Virtual machine(s)</td><td>Runs the backend process (via systemd), behind Nginx as a reverse proxy</td><td>Stage 09</td></tr>
+      <tr><td>Load balancer</td><td>Terminates HTTPS, health-checks instances, routes only to healthy ones, enables zero-downtime deploys</td><td>Stage 10</td></tr>
+      <tr><td>Auto Scaling Group</td><td>Adds/removes VMs automatically based on CPU/request load — the "volume increaser"</td><td>Stage 10</td></tr>
+      <tr><td>Managed database (RDS Postgres)</td><td>Stores users, posts, follows, likes, comments — private subnet, encrypted, backed up</td><td>Stage 05</td></tr>
+      <tr><td>Object storage (S3)</td><td>Stores uploaded images/videos, private, written to only via presigned URLs</td><td>Stage 08</td></tr>
+      <tr><td>CDN (CloudFront/Cloudflare)</td><td>Caches images at edge locations near users, the only thing with public read access to the bucket</td><td>Stage 08</td></tr>
+      <tr><td>Transactional email (SES)</td><td>Delivers OTP codes and password-reset emails, with SPF/DKIM/DMARC configured</td><td>Stage 07</td></tr>
+      <tr><td>DNS + domain (Route53)</td><td>Points your domain at the load balancer (API) and CDN (frontend/media)</td><td>Stage 11</td></tr>
+      <tr><td>Secrets manager</td><td>Holds the DB password, JWT key, SMTP credentials — the app's own "password wallet"</td><td>Stage 06 / 13</td></tr>
+      <tr><td>CI/CD pipeline</td><td>Tests, scans dependencies, and deploys automatically on every merge</td><td>Stage 12</td></tr>
+      <tr><td>Monitoring/logging</td><td>Metrics, structured logs, alerts, and an incident runbook</td><td>Stage 13</td></tr>
+    </tbody>
+  </table>
+  </div>
 </section>
 
-<div class="page-nav reveal"><a class="page-nav-link prev" href="12-monitoring-incident-response.html"><span class="page-nav-label">&larr; Previous</span><span class="page-nav-title">Monitoring & incident response</span></a><a class="page-nav-link next" href="14-compliance.html"><span class="page-nav-label">Next &rarr;</span><span class="page-nav-title">Compliance & governance, including India</span></a></div>
+<div class="page-nav reveal"><a class="page-nav-link prev" href="16-compliance.html"><span class="page-nav-label">&larr; Previous</span><span class="page-nav-title">Compliance & governance, including India</span></a><a class="page-nav-link next" href="18-your-first-build.html"><span class="page-nav-label">Next &rarr;</span><span class="page-nav-title">Your first build: checklist &amp; capstone</span></a></div>
 
 <div class="divider"></div>
 <footer>
@@ -441,7 +661,7 @@ pre:hover .copy-btn{ opacity:1; }
 
 
   /* site-wide search */
-  var SEARCH_INDEX = [{"n": "01", "t": "Plan & threat-model first", "f": "01-plan-and-threat-model.html"}, {"n": "02", "t": "Frontend", "f": "02-frontend.html"}, {"n": "03", "t": "Backend & API", "f": "03-backend-api.html"}, {"n": "04", "t": "Database — structure, scaling, and how it actually gets hacked", "f": "04-database.html"}, {"n": "05", "t": "Auth, OTP & the password wallet", "f": "05-auth-otp-secrets.html"}, {"n": "06", "t": "Email / OTP delivery", "f": "06-email-otp-delivery.html"}, {"n": "07", "t": "File storage & the CDN", "f": "07-storage-cdn.html"}, {"n": "08", "t": "Servers & the VM", "f": "08-servers-vm.html"}, {"n": "09", "t": "Load balancers & autoscaling", "f": "09-load-balancing-autoscaling.html"}, {"n": "10", "t": "Domain names & DNS", "f": "10-domains-dns.html"}, {"n": "11", "t": "CI/CD pipelines", "f": "11-cicd.html"}, {"n": "12", "t": "Monitoring & incident response", "f": "12-monitoring-incident-response.html"}, {"n": "13", "t": "Security hardening checklist — the consolidated view", "f": "13-security-checklist.html"}, {"n": "14", "t": "Compliance & governance, including India", "f": "14-compliance.html"}, {"n": "15", "t": "Skill roadmap: junior → staff", "f": "15-skill-roadmap.html"}, {"n": "16", "t": "Glossary", "f": "16-glossary.html"}, {"n": "17", "t": "Full resource catalog, explained", "f": "17-full-resource-catalog.html"}, {"n": "18", "t": "A backend, file by file — then an AI security audit", "f": "18-worked-backend-example.html"}, {"n": "19", "t": "Reliability & resilience — redundancy, backups, DDoS, and disaster recovery", "f": "19-reliability-and-disaster-recovery.html"}, {"n": "20", "t": "Your first build: checklist & capstone project", "f": "20-your-first-build.html"}, {"n": "21", "t": "Linux fundamentals: from basics to daily-use commands", "f": "21-linux-fundamentals.html"}, {"n": "00", "t": "How to use this manual", "f": "how-to-build-an-application.html"}];
+  var SEARCH_INDEX = [{"n": "01", "t": "Plan & threat-model first", "f": "01-plan-and-threat-model.html"}, {"n": "02", "t": "Linux fundamentals: from basics to daily-use commands", "f": "02-linux-fundamentals.html"}, {"n": "03", "t": "Frontend", "f": "03-frontend.html"}, {"n": "04", "t": "Backend & API", "f": "04-backend-api.html"}, {"n": "05", "t": "Database — structure, scaling, and how it actually gets hacked", "f": "05-database.html"}, {"n": "06", "t": "Auth, OTP & the password wallet", "f": "06-auth-otp-secrets.html"}, {"n": "07", "t": "Email / OTP delivery", "f": "07-email-otp-delivery.html"}, {"n": "08", "t": "File storage & the CDN", "f": "08-storage-cdn.html"}, {"n": "09", "t": "Servers & the VM", "f": "09-servers-vm.html"}, {"n": "10", "t": "Load balancers & autoscaling", "f": "10-load-balancing-autoscaling.html"}, {"n": "11", "t": "Domain names & DNS", "f": "11-domains-dns.html"}, {"n": "12", "t": "CI/CD pipelines", "f": "12-cicd.html"}, {"n": "13", "t": "Monitoring & incident response", "f": "13-monitoring-incident-response.html"}, {"n": "14", "t": "Reliability & resilience — redundancy, backups, DDoS, and disaster recovery", "f": "14-reliability-and-disaster-recovery.html"}, {"n": "15", "t": "Security hardening checklist — the consolidated view", "f": "15-security-checklist.html"}, {"n": "16", "t": "Compliance & governance, including India", "f": "16-compliance.html"}, {"n": "17", "t": "A backend, file by file — then an AI security audit", "f": "17-worked-backend-example.html"}, {"n": "18", "t": "Your first build: checklist & capstone project", "f": "18-your-first-build.html"}, {"n": "19", "t": "Skill roadmap: junior → staff", "f": "19-skill-roadmap.html"}, {"n": "20", "t": "Glossary", "f": "20-glossary.html"}, {"n": "21", "t": "Full resource catalog, explained", "f": "21-full-resource-catalog.html"}, {"n": "00", "t": "How to use this manual", "f": "how-to-build-an-application.html"}];
   var searchBtn=document.getElementById('search-btn'), searchOverlay=document.getElementById('search-overlay'),
       searchInput=document.getElementById('search-input'), searchResults=document.getElementById('search-results');
   function renderResults(q){

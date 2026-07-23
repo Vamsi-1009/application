@@ -8,7 +8,7 @@
 <meta property="og:title" content="Full resource catalog, explained">
 <meta property="og:description" content="All 103 entries from the source catalog, grouped by what they're actually for, each with a plain-language explanation and a direct link — not just a reprint of the raw table. This is the reference every STD tag earlier in this manual points back to.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://webstocking.com/application/17-full-resource-catalog.html">
+<meta property="og:url" content="https://webstocking.com/application/21-full-resource-catalog.html">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Full resource catalog, explained">
 <meta name="twitter:description" content="All 103 entries from the source catalog, grouped by what they're actually for, each with a plain-language explanation and a direct link — not just a reprint of the raw table. This is the reference every STD tag earlier in this manual points back to.">
@@ -306,8 +306,8 @@ pre:hover .copy-btn{ opacity:1; }
 <main>
 
 <section class="stage" id="s17">
-  <div class="stage-head reveal"><span class="stage-num">17</span><h2>Full resource catalog, explained</h2><span class="stage-badge">~20 min &middot; Reference</span></div>
-  <button class="btn complete-toggle reveal" id="complete-toggle" data-page="17-full-resource-catalog.html" type="button">
+  <div class="stage-head reveal"><span class="stage-num">21</span><h2>Full resource catalog, explained</h2><span class="stage-badge">~20 min &middot; Reference</span></div>
+  <button class="btn complete-toggle reveal" id="complete-toggle" data-page="21-full-resource-catalog.html" type="button">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <span class="ct-label">Mark this stage complete</span>
   </button>
@@ -329,31 +329,31 @@ pre:hover .copy-btn{ opacity:1; }
   </div>
 
 
-  <p class="reveal">Read this as a map, not a to-do list: most single apps only need a handful of these seriously (Stage 13's consolidated checklist already pulled those out). The rest exist so that when you eventually touch mobile, AI features, IoT, or a regulated industry, you know exactly where to look instead of starting from zero.</p>
+  <p class="reveal">Read this as a map, not a to-do list: most single apps only need a handful of these seriously (Stage 15's consolidated checklist already pulled those out). The rest exist so that when you eventually touch mobile, AI features, IoT, or a regulated industry, you know exactly where to look instead of starting from zero.</p>
 
   <div class="search-wrap reveal" style="padding:0 0 16px;"><input id="cat-search" type="text" placeholder="Filter the catalog… e.g. API, cloud, IoT, AI, identity"></div>
 
   <h3 class="reveal" id="1-application-api-and-mobile-security-testing">1 · Application, API &amp; mobile security testing<a class="h-anchor" href="#1-application-api-and-mobile-security-testing" aria-label="Link to this section">#</a></h3>
-  <p class="reveal">Where you go to learn <i>how</i> to find and fix bugs in the app you're building right now — the most directly useful group for Stages 02–07 above.</p>
+  <p class="reveal">Where you go to learn <i>how</i> to find and fix bugs in the app you're building right now — the most directly useful group for Stages 03–08 above.</p>
   <div class="tablewrap reveal">
   <table id="catalog-table">
     <thead><tr><th style="width:38px">#</th><th>Resource</th><th>What it's for</th></tr></thead>
     <tbody>
       <tr><td>1</td><td><a href="https://owasp.org/" target="_blank" rel="noopener">OWASP</a></td><td>The umbrella project behind the Top 10, ASVS (a checklist of security requirements), WSTG (a testing guide), and dozens of cheat sheets. Start here for almost any web security question.</td></tr>
       <tr><td>2</td><td><a href="https://portswigger.net/web-security" target="_blank" rel="noopener">PortSwigger Web Security Academy</a></td><td>Free, hands-on labs that let you actually exploit SQLi, XSS, CSRF, SSRF, JWT flaws, and access-control bugs in a safe sandbox — the fastest way to build real intuition.</td></tr>
-      <tr><td>3</td><td><a href="https://owasp.org/www-project-api-security/" target="_blank" rel="noopener">OWASP API Security Top 10</a></td><td>The API-specific version of the Top 10 — BOLA/IDOR (Stage 03's authorization checks), broken auth, and unrestricted resource consumption all come from this list.</td></tr>
+      <tr><td>3</td><td><a href="https://owasp.org/www-project-api-security/" target="_blank" rel="noopener">OWASP API Security Top 10</a></td><td>The API-specific version of the Top 10 — BOLA/IDOR (Stage 04's authorization checks), broken auth, and unrestricted resource consumption all come from this list.</td></tr>
       <tr><td>4</td><td><a href="https://mas.owasp.org/" target="_blank" rel="noopener">OWASP MAS (Mobile)</a></td><td>The mobile equivalent — relevant the moment PixelGram-style app grows a native iOS/Android client instead of just a web frontend.</td></tr>
       <tr><td>5</td><td><a href="https://genai.owasp.org/" target="_blank" rel="noopener">OWASP GenAI Security Project</a></td><td>Risks specific to features built on LLMs — prompt injection, insecure output handling, excessive agency. Relevant only if you add an AI feature.</td></tr>
       <tr><td>6</td><td><a href="https://owaspai.org/" target="_blank" rel="noopener">OWASP AI Exchange</a></td><td>A broader knowledge base of AI threats and controls, one level up from the GenAI-specific project above.</td></tr>
       <tr><td>7</td><td><a href="https://owasp.org/www-project-firmware-security-testing-methodology/" target="_blank" rel="noopener">OWASP Firmware Security Testing Methodology</a></td><td>Only relevant if your product includes an embedded device — extraction, binary analysis, and credential-hunting on firmware images.</td></tr>
-      <tr><td>8</td><td><a href="https://owasp.org/www-project-software-component-verification-standard/" target="_blank" rel="noopener">OWASP Software Component Verification Standard</a></td><td>A checklist for vetting third-party/open-source packages before you depend on them — pairs with Stage 11's dependency scanning.</td></tr>
+      <tr><td>8</td><td><a href="https://owasp.org/www-project-software-component-verification-standard/" target="_blank" rel="noopener">OWASP Software Component Verification Standard</a></td><td>A checklist for vetting third-party/open-source packages before you depend on them — pairs with Stage 12's dependency scanning.</td></tr>
       <tr><td>9</td><td><a href="https://owaspsamm.org/" target="_blank" rel="noopener">OWASP SAMM</a></td><td>A maturity model for your whole engineering org's security practice — useful once you're past a single app and building a security program.</td></tr>
     </tbody>
   </table>
   </div>
 
   <h3 class="reveal" id="2-vulnerability-and-threat-intelligence">2 · Vulnerability &amp; threat intelligence<a class="h-anchor" href="#2-vulnerability-and-threat-intelligence" aria-label="Link to this section">#</a></h3>
-  <p class="reveal">Where known bugs, exploited-in-the-wild flaws, and severity scores live — what you'd check before shipping a dependency, and what an incident-response process (Stage 12) draws on.</p>
+  <p class="reveal">Where known bugs, exploited-in-the-wild flaws, and severity scores live — what you'd check before shipping a dependency, and what an incident-response process (Stage 13) draws on.</p>
   <div class="tablewrap reveal">
   <table>
     <thead><tr><th style="width:38px">#</th><th>Resource</th><th>What it's for</th></tr></thead>
@@ -371,29 +371,29 @@ pre:hover .copy-btn{ opacity:1; }
       <tr><td>20</td><td><a href="https://www.exploit-db.com/" target="_blank" rel="noopener">Exploit Database</a></td><td>A public archive of proof-of-concept exploits — use defensively, to confirm whether a system you're authorized to test is actually exposed.</td></tr>
       <tr><td>21</td><td><a href="https://www.first.org/cvss/" target="_blank" rel="noopener">FIRST CVSS</a></td><td>The standard formula behind a vulnerability's numeric severity score (0–10) that most vulnerability databases quote.</td></tr>
       <tr><td>22</td><td><a href="https://www.first.org/epss/" target="_blank" rel="noopener">FIRST EPSS</a></td><td>Estimates the <i>probability</i> a given CVE will actually be exploited in the next 30 days — a sharper prioritization signal than severity alone.</td></tr>
-      <tr><td>23</td><td><a href="https://www.first.org/" target="_blank" rel="noopener">FIRST</a></td><td>The umbrella organization coordinating CSIRTs/incident-response teams globally — relevant once you have a real incident-response process (Stage 12).</td></tr>
+      <tr><td>23</td><td><a href="https://www.first.org/" target="_blank" rel="noopener">FIRST</a></td><td>The umbrella organization coordinating CSIRTs/incident-response teams globally — relevant once you have a real incident-response process (Stage 13).</td></tr>
     </tbody>
   </table>
   </div>
 
   <h3 class="reveal" id="3-hardening-baselines-and-governance-frameworks">3 · Hardening baselines &amp; governance frameworks<a class="h-anchor" href="#3-hardening-baselines-and-governance-frameworks" aria-label="Link to this section">#</a></h3>
-  <p class="reveal">The "how do I configure this server/cloud account/org correctly" layer — directly behind Stage 08's VM hardening and Stage 01's threat-modeling.</p>
+  <p class="reveal">The "how do I configure this server/cloud account/org correctly" layer — directly behind Stage 09's VM hardening and Stage 01's threat-modeling.</p>
   <div class="tablewrap reveal">
   <table>
     <thead><tr><th style="width:38px">#</th><th>Resource</th><th>What it's for</th></tr></thead>
     <tbody>
-      <tr><td>24</td><td><a href="https://www.cisecurity.org/cis-benchmarks" target="_blank" rel="noopener">CIS Benchmarks</a></td><td>Step-by-step hardening baselines for Linux, Windows, SSH, databases, Kubernetes, and cloud services — the source behind Stage 08's SSH/firewall checklist.</td></tr>
+      <tr><td>24</td><td><a href="https://www.cisecurity.org/cis-benchmarks" target="_blank" rel="noopener">CIS Benchmarks</a></td><td>Step-by-step hardening baselines for Linux, Windows, SSH, databases, Kubernetes, and cloud services — the source behind Stage 09's SSH/firewall checklist.</td></tr>
       <tr><td>25</td><td><a href="https://www.cisecurity.org/controls" target="_blank" rel="noopener">CIS Controls</a></td><td>A prioritized, higher-level list of safeguards (asset inventory, access control, logging, recovery) — good for deciding what to do first with limited time.</td></tr>
       <tr><td>26</td><td><a href="https://www.cisecurity.org/controls/cis-controls-navigator" target="_blank" rel="noopener">CIS Controls Navigator</a></td><td>A tool for mapping CIS Controls onto other frameworks you might already be tracking (ISO 27001, NIST CSF, etc.).</td></tr>
       <tr><td>27</td><td><a href="https://public.cyber.mil/stigs/" target="_blank" rel="noopener">DISA STIGs</a></td><td>Very detailed, US-military-grade hardening requirements — more rigorous than most startups need, but a good reference for maximum-assurance configuration.</td></tr>
       <tr><td>28</td><td><a href="https://www.open-scap.org/" target="_blank" rel="noopener">OpenSCAP</a></td><td>A tool that automatically checks a machine's configuration against a hardening baseline (like a CIS Benchmark) instead of doing it by hand.</td></tr>
       <tr><td>29</td><td><a href="https://csrc.nist.gov/projects/security-content-automation-protocol" target="_blank" rel="noopener">SCAP</a></td><td>The underlying machine-readable standard that tools like OpenSCAP implement.</td></tr>
-      <tr><td>30</td><td><a href="https://www.nist.gov/cyberframework" target="_blank" rel="noopener">NIST Cybersecurity Framework</a></td><td>A five-function structure (Govern, Identify, Protect, Detect, Respond, Recover) for organizing a security program end-to-end — referenced throughout Stage 12 and 14.</td></tr>
-      <tr><td>31</td><td><a href="https://csrc.nist.gov/projects/ssdf" target="_blank" rel="noopener">NIST SSDF</a></td><td>Secure software development practices — the source behind Stage 11's "scan dependencies, sign builds" CI/CD guidance.</td></tr>
+      <tr><td>30</td><td><a href="https://www.nist.gov/cyberframework" target="_blank" rel="noopener">NIST Cybersecurity Framework</a></td><td>A five-function structure (Govern, Identify, Protect, Detect, Respond, Recover) for organizing a security program end-to-end — referenced throughout Stage 13 and 14.</td></tr>
+      <tr><td>31</td><td><a href="https://csrc.nist.gov/projects/ssdf" target="_blank" rel="noopener">NIST SSDF</a></td><td>Secure software development practices — the source behind Stage 12's "scan dependencies, sign builds" CI/CD guidance.</td></tr>
       <tr><td>32</td><td><a href="https://csrc.nist.gov/pubs/sp/800/207/final" target="_blank" rel="noopener">NIST SP 800-207 (Zero Trust)</a></td><td>The formal definition of "zero trust architecture" — never implicitly trust a request just because it's inside your network perimeter.</td></tr>
-      <tr><td>33</td><td><a href="https://csrc.nist.gov/projects/cryptographic-standards-and-guidelines" target="_blank" rel="noopener">NIST Cryptographic Standards</a></td><td>Which hashing/encryption algorithms are actually considered safe today — the basis for Stage 05's Argon2id recommendation.</td></tr>
+      <tr><td>33</td><td><a href="https://csrc.nist.gov/projects/cryptographic-standards-and-guidelines" target="_blank" rel="noopener">NIST Cryptographic Standards</a></td><td>Which hashing/encryption algorithms are actually considered safe today — the basis for Stage 06's Argon2id recommendation.</td></tr>
       <tr><td>34</td><td><a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener">NIST AI RMF</a></td><td>Governance and risk-management guidance specifically for AI systems — relevant if you ship an AI-powered feature.</td></tr>
-      <tr><td>35</td><td><a href="https://attack.mitre.org/" target="_blank" rel="noopener">MITRE ATT&amp;CK</a></td><td>A knowledge base of real attacker tactics and techniques (how they gain persistence, escalate privileges, steal credentials) — the basis for Stage 01's threat-modeling and Stage 12's "watch for credential stuffing" alert.</td></tr>
+      <tr><td>35</td><td><a href="https://attack.mitre.org/" target="_blank" rel="noopener">MITRE ATT&amp;CK</a></td><td>A knowledge base of real attacker tactics and techniques (how they gain persistence, escalate privileges, steal credentials) — the basis for Stage 01's threat-modeling and Stage 13's "watch for credential stuffing" alert.</td></tr>
       <tr><td>36</td><td><a href="https://atlas.mitre.org/" target="_blank" rel="noopener">MITRE ATLAS</a></td><td>ATT&amp;CK's counterpart specifically for attacks against AI/ML systems (model theft, data poisoning, prompt injection).</td></tr>
       <tr><td>37</td><td><a href="https://d3fend.mitre.org/" target="_blank" rel="noopener">MITRE D3FEND</a></td><td>A companion knowledge base of <i>defensive</i> techniques, organized to map directly against ATT&amp;CK's attacker techniques.</td></tr>
       <tr><td>38</td><td><a href="https://ctid.mitre.org/" target="_blank" rel="noopener">Center for Threat-Informed Defense</a></td><td>Research connecting real observed attacker behavior to concrete defensive mappings — a practical layer on top of ATT&amp;CK.</td></tr>
@@ -403,19 +403,19 @@ pre:hover .copy-btn{ opacity:1; }
   </div>
 
   <h3 class="reveal" id="4-cloud-containers-and-software-supply-chain">4 · Cloud, containers &amp; software supply chain<a class="h-anchor" href="#4-cloud-containers-and-software-supply-chain" aria-label="Link to this section">#</a></h3>
-  <p class="reveal">Directly behind Stages 08–11 — VM/cloud configuration, and making sure the code and dependencies you deploy weren't tampered with on the way.</p>
+  <p class="reveal">Directly behind Stages 09–12 — VM/cloud configuration, and making sure the code and dependencies you deploy weren't tampered with on the way.</p>
   <div class="tablewrap reveal">
   <table>
     <thead><tr><th style="width:38px">#</th><th>Resource</th><th>What it's for</th></tr></thead>
     <tbody>
       <tr><td>40</td><td><a href="https://cloudsecurityalliance.org/" target="_blank" rel="noopener">Cloud Security Alliance</a></td><td>Cloud-specific guidance on IAM, data protection, and governance — the general umbrella for the cloud-focused entries below.</td></tr>
-      <tr><td>41</td><td><a href="https://cloudsecurityalliance.org/research/cloud-controls-matrix" target="_blank" rel="noopener">CSA Cloud Controls Matrix</a></td><td>A detailed control framework for cloud environments — the source behind Stage 04/09's "private subnets, security-group scoping" guidance.</td></tr>
+      <tr><td>41</td><td><a href="https://cloudsecurityalliance.org/research/cloud-controls-matrix" target="_blank" rel="noopener">CSA Cloud Controls Matrix</a></td><td>A detailed control framework for cloud environments — the source behind Stage 05/09's "private subnets, security-group scoping" guidance.</td></tr>
       <tr><td>42</td><td><a href="https://cloudsecurityalliance.org/star" target="_blank" rel="noopener">CSA STAR</a></td><td>A registry where cloud providers publish self-assessments and certifications of their security posture — useful for vendor due diligence.</td></tr>
       <tr><td>43</td><td><a href="https://www.finos.org/common-cloud-controls" target="_blank" rel="noopener">FINOS Common Cloud Controls</a></td><td>Cloud control definitions aimed at regulated financial environments — relevant if PixelGram-style app ever adds payments/wallets.</td></tr>
       <tr><td>44</td><td><a href="https://www.cncf.io/" target="_blank" rel="noopener">CNCF</a></td><td>The foundation behind Kubernetes and the broader cloud-native ecosystem — relevant if you later move from plain VMs to container orchestration.</td></tr>
       <tr><td>45</td><td><a href="https://kubernetes.io/docs/concepts/security/" target="_blank" rel="noopener">Kubernetes Security Documentation</a></td><td>RBAC, secrets, and workload-security guidance specifically for Kubernetes — not used in this manual since it deliberately skips containers, but the reference to have on hand if you adopt them later.</td></tr>
-      <tr><td>46</td><td><a href="https://openssf.org/" target="_blank" rel="noopener">OpenSSF</a></td><td>An industry-wide initiative on open-source security practices — dependency scanning, build security, and the source behind Stage 11's CI guidance.</td></tr>
-      <tr><td>47</td><td><a href="https://slsa.dev/" target="_blank" rel="noopener">SLSA</a></td><td>A framework for build provenance — proving that what's deployed is exactly what was reviewed, not a tampered artifact. Referenced in Stage 11.</td></tr>
+      <tr><td>46</td><td><a href="https://openssf.org/" target="_blank" rel="noopener">OpenSSF</a></td><td>An industry-wide initiative on open-source security practices — dependency scanning, build security, and the source behind Stage 12's CI guidance.</td></tr>
+      <tr><td>47</td><td><a href="https://slsa.dev/" target="_blank" rel="noopener">SLSA</a></td><td>A framework for build provenance — proving that what's deployed is exactly what was reviewed, not a tampered artifact. Referenced in Stage 12.</td></tr>
       <tr><td>48</td><td><a href="https://www.sigstore.dev/" target="_blank" rel="noopener">Sigstore</a></td><td>Free tooling for signing and verifying software artifacts — a practical way to implement the SLSA provenance goal above.</td></tr>
       <tr><td>49</td><td><a href="https://in-toto.io/" target="_blank" rel="noopener">in-toto</a></td><td>Verifies each step of a supply chain happened as expected — complementary to Sigstore's artifact-signing focus.</td></tr>
       <tr><td>50</td><td><a href="https://cyclonedx.org/" target="_blank" rel="noopener">CycloneDX</a></td><td>A Software Bill of Materials (SBOM) format — a machine-readable list of every component in your app, for transparency and vulnerability tracking.</td></tr>
@@ -439,10 +439,10 @@ pre:hover .copy-btn{ opacity:1; }
       <tr><td>58</td><td><a href="https://www.isecom.org/OSSTMM.3.pdf" target="_blank" rel="noopener">OSSTMM</a></td><td>A rigorous methodology for testing operational security across systems, networks, and communication channels.</td></tr>
       <tr><td>59</td><td><a href="https://www.crest-approved.org/" target="_blank" rel="noopener">CREST</a></td><td>An accreditation body for professional penetration-testing, red-team, and incident-response providers — useful when hiring an external security firm.</td></tr>
       <tr><td>60</td><td><a href="https://www.sans.org/" target="_blank" rel="noopener">SANS Institute</a></td><td>Widely respected training and certification in penetration testing, SOC operations, and digital forensics.</td></tr>
-      <tr><td>61</td><td><a href="https://www.iso.org/isoiec-27001-information-security.html" target="_blank" rel="noopener">ISO/IEC 27001</a></td><td>An internationally recognized information-security management system standard — referenced in Stage 14 as a common enterprise-customer requirement.</td></tr>
+      <tr><td>61</td><td><a href="https://www.iso.org/isoiec-27001-information-security.html" target="_blank" rel="noopener">ISO/IEC 27001</a></td><td>An internationally recognized information-security management system standard — referenced in Stage 16 as a common enterprise-customer requirement.</td></tr>
       <tr><td>62</td><td><a href="https://www.bsi.bund.de/EN/Themen/Unternehmen-und-Organisationen/Standards-und-Zertifizierung/IT-Grundschutz/it-grundschutz_node.html" target="_blank" rel="noopener">BSI IT-Grundschutz</a></td><td>A detailed German methodology covering organizational, system, and infrastructure security together.</td></tr>
-      <tr><td>63</td><td><a href="https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2" target="_blank" rel="noopener">SOC 2 / AICPA</a></td><td>An audit standard covering security, availability, and confidentiality controls — the most common ask from US B2B SaaS customers, per Stage 14.</td></tr>
-      <tr><td>64</td><td><a href="https://www.pcisecuritystandards.org/" target="_blank" rel="noopener">PCI Security Standards Council</a></td><td>Owns PCI DSS, the mandatory standard the moment you handle card data directly — Stage 14 recommends avoiding this scope via a processor like Razorpay/Stripe instead.</td></tr>
+      <tr><td>63</td><td><a href="https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2" target="_blank" rel="noopener">SOC 2 / AICPA</a></td><td>An audit standard covering security, availability, and confidentiality controls — the most common ask from US B2B SaaS customers, per Stage 16.</td></tr>
+      <tr><td>64</td><td><a href="https://www.pcisecuritystandards.org/" target="_blank" rel="noopener">PCI Security Standards Council</a></td><td>Owns PCI DSS, the mandatory standard the moment you handle card data directly — Stage 16 recommends avoiding this scope via a processor like Razorpay/Stripe instead.</td></tr>
       <tr><td>65</td><td><a href="https://www.commoncriteriaportal.org/" target="_blank" rel="noopener">Common Criteria</a></td><td>A formal, government-recognized security evaluation and certification scheme for IT products — heavier-weight than most startups need.</td></tr>
       <tr><td>66</td><td><a href="https://opencre.org/" target="_blank" rel="noopener">OpenCRE</a></td><td>A tool for mapping the same requirement across multiple overlapping standards (e.g., "where does this ASVS item show up in ISO 27001?").</td></tr>
     </tbody>
@@ -450,7 +450,7 @@ pre:hover .copy-btn{ opacity:1; }
   </div>
 
   <h3 class="reveal" id="6-identity-and-protocol-standards">6 · Identity &amp; protocol standards<a class="h-anchor" href="#6-identity-and-protocol-standards" aria-label="Link to this section">#</a></h3>
-  <p class="reveal">The specifications underneath Stage 05's auth design — what a JWT, OAuth flow, or passkey actually is, defined by the bodies that standardized them.</p>
+  <p class="reveal">The specifications underneath Stage 06's auth design — what a JWT, OAuth flow, or passkey actually is, defined by the bodies that standardized them.</p>
   <div class="tablewrap reveal">
   <table>
     <thead><tr><th style="width:38px">#</th><th>Resource</th><th>What it's for</th></tr></thead>
@@ -458,7 +458,7 @@ pre:hover .copy-btn{ opacity:1; }
       <tr><td>67</td><td><a href="https://www.ietf.org/" target="_blank" rel="noopener">IETF</a></td><td>Publishes the RFCs behind TLS, HTTP, and most internet/security protocols — the ultimate source of truth when a library's docs are ambiguous.</td></tr>
       <tr><td>68</td><td><a href="https://openid.net/" target="_blank" rel="noopener">OpenID Foundation</a></td><td>Standardizes OpenID Connect, the identity-federation layer built on top of OAuth ("Sign in with Google" etc.).</td></tr>
       <tr><td>69</td><td><a href="https://openid.net/wg/fapi/" target="_blank" rel="noopener">OpenID FAPI</a></td><td>A stricter API security profile for high-value use cases like open banking — relevant if PixelGram-style app ever handles financial data.</td></tr>
-      <tr><td>70</td><td><a href="https://fidoalliance.org/" target="_blank" rel="noopener">FIDO Alliance</a></td><td>Standardizes passkeys/FIDO2 — phishing-resistant authentication, referenced in Stage 05 as the long-term upgrade path beyond SMS OTP.</td></tr>
+      <tr><td>70</td><td><a href="https://fidoalliance.org/" target="_blank" rel="noopener">FIDO Alliance</a></td><td>Standardizes passkeys/FIDO2 — phishing-resistant authentication, referenced in Stage 06 as the long-term upgrade path beyond SMS OTP.</td></tr>
       <tr><td>71</td><td><a href="https://www.w3.org/TR/webauthn-3/" target="_blank" rel="noopener">W3C WebAuthn</a></td><td>The actual browser API that implements FIDO2 passkeys on the web.</td></tr>
       <tr><td>72</td><td><a href="https://oauth.net/2/security-best-practice/" target="_blank" rel="noopener">OAuth Security Best Current Practice</a></td><td>Practical security guidance for implementing OAuth correctly — most real-world OAuth vulnerabilities come from ignoring this document.</td></tr>
       <tr><td>73</td><td><a href="https://spiffe.io/" target="_blank" rel="noopener">SPIFFE</a></td><td>A standard for giving services/workloads (not just humans) a verifiable identity — relevant in larger, zero-trust microservice architectures.</td></tr>
@@ -481,7 +481,7 @@ pre:hover .copy-btn{ opacity:1; }
       <tr><td>80</td><td><a href="https://www.enisa.europa.eu/" target="_blank" rel="noopener">ENISA</a></td><td>The EU's cybersecurity agency — threat-landscape reports and guidance spanning cloud, supply chain, and incident response.</td></tr>
       <tr><td>81</td><td><a href="https://cert.europa.eu/" target="_blank" rel="noopener">CERT-EU</a></td><td>Threat intelligence and incident-response guidance for EU institutions, often useful reading regardless of jurisdiction.</td></tr>
       <tr><td>82</td><td><a href="https://www.cisa.gov/topics/cybersecurity-best-practices" target="_blank" rel="noopener">CISA Cybersecurity Best Practices</a></td><td>The US equivalent — broad defensive practices and infrastructure-protection guidance.</td></tr>
-      <tr><td>83</td><td><a href="https://infosec.mozilla.org/guidelines/web_security" target="_blank" rel="noopener">Mozilla Web Security Guidelines</a></td><td>Very practical, copy-pasteable guidance on TLS config, security headers, and cookies — the direct source behind several Stage 08/09 recommendations.</td></tr>
+      <tr><td>83</td><td><a href="https://infosec.mozilla.org/guidelines/web_security" target="_blank" rel="noopener">Mozilla Web Security Guidelines</a></td><td>Very practical, copy-pasteable guidance on TLS config, security headers, and cookies — the direct source behind several Stage 09/09 recommendations.</td></tr>
     </tbody>
   </table>
   </div>
@@ -529,7 +529,7 @@ pre:hover .copy-btn{ opacity:1; }
   <p class="reveal appendix-note" style="margin-top:8px;">Original source file, unmodified: <a href="security/master_cybersecurity_checks_resources.html">security/master_cybersecurity_checks_resources.html</a>.</p>
 </section>
 
-<div class="page-nav reveal"><a class="page-nav-link prev" href="16-glossary.html"><span class="page-nav-label">&larr; Previous</span><span class="page-nav-title">Glossary</span></a><a class="page-nav-link next" href="18-worked-backend-example.html"><span class="page-nav-label">Next &rarr;</span><span class="page-nav-title">A backend, file by file — then an AI security audit</span></a></div>
+<div class="page-nav reveal"><a class="page-nav-link prev" href="20-glossary.html"><span class="page-nav-label">&larr; Previous</span><span class="page-nav-title">Glossary</span></a><span></span></div>
 
 <div class="divider"></div>
 <footer>
@@ -643,7 +643,7 @@ pre:hover .copy-btn{ opacity:1; }
 
 
   /* site-wide search */
-  var SEARCH_INDEX = [{"n": "01", "t": "Plan & threat-model first", "f": "01-plan-and-threat-model.html"}, {"n": "02", "t": "Frontend", "f": "02-frontend.html"}, {"n": "03", "t": "Backend & API", "f": "03-backend-api.html"}, {"n": "04", "t": "Database — structure, scaling, and how it actually gets hacked", "f": "04-database.html"}, {"n": "05", "t": "Auth, OTP & the password wallet", "f": "05-auth-otp-secrets.html"}, {"n": "06", "t": "Email / OTP delivery", "f": "06-email-otp-delivery.html"}, {"n": "07", "t": "File storage & the CDN", "f": "07-storage-cdn.html"}, {"n": "08", "t": "Servers & the VM", "f": "08-servers-vm.html"}, {"n": "09", "t": "Load balancers & autoscaling", "f": "09-load-balancing-autoscaling.html"}, {"n": "10", "t": "Domain names & DNS", "f": "10-domains-dns.html"}, {"n": "11", "t": "CI/CD pipelines", "f": "11-cicd.html"}, {"n": "12", "t": "Monitoring & incident response", "f": "12-monitoring-incident-response.html"}, {"n": "13", "t": "Security hardening checklist — the consolidated view", "f": "13-security-checklist.html"}, {"n": "14", "t": "Compliance & governance, including India", "f": "14-compliance.html"}, {"n": "15", "t": "Skill roadmap: junior → staff", "f": "15-skill-roadmap.html"}, {"n": "16", "t": "Glossary", "f": "16-glossary.html"}, {"n": "17", "t": "Full resource catalog, explained", "f": "17-full-resource-catalog.html"}, {"n": "18", "t": "A backend, file by file — then an AI security audit", "f": "18-worked-backend-example.html"}, {"n": "19", "t": "Reliability & resilience — redundancy, backups, DDoS, and disaster recovery", "f": "19-reliability-and-disaster-recovery.html"}, {"n": "20", "t": "Your first build: checklist & capstone project", "f": "20-your-first-build.html"}, {"n": "21", "t": "Linux fundamentals: from basics to daily-use commands", "f": "21-linux-fundamentals.html"}, {"n": "00", "t": "How to use this manual", "f": "how-to-build-an-application.html"}];
+  var SEARCH_INDEX = [{"n": "01", "t": "Plan & threat-model first", "f": "01-plan-and-threat-model.html"}, {"n": "02", "t": "Linux fundamentals: from basics to daily-use commands", "f": "02-linux-fundamentals.html"}, {"n": "03", "t": "Frontend", "f": "03-frontend.html"}, {"n": "04", "t": "Backend & API", "f": "04-backend-api.html"}, {"n": "05", "t": "Database — structure, scaling, and how it actually gets hacked", "f": "05-database.html"}, {"n": "06", "t": "Auth, OTP & the password wallet", "f": "06-auth-otp-secrets.html"}, {"n": "07", "t": "Email / OTP delivery", "f": "07-email-otp-delivery.html"}, {"n": "08", "t": "File storage & the CDN", "f": "08-storage-cdn.html"}, {"n": "09", "t": "Servers & the VM", "f": "09-servers-vm.html"}, {"n": "10", "t": "Load balancers & autoscaling", "f": "10-load-balancing-autoscaling.html"}, {"n": "11", "t": "Domain names & DNS", "f": "11-domains-dns.html"}, {"n": "12", "t": "CI/CD pipelines", "f": "12-cicd.html"}, {"n": "13", "t": "Monitoring & incident response", "f": "13-monitoring-incident-response.html"}, {"n": "14", "t": "Reliability & resilience — redundancy, backups, DDoS, and disaster recovery", "f": "14-reliability-and-disaster-recovery.html"}, {"n": "15", "t": "Security hardening checklist — the consolidated view", "f": "15-security-checklist.html"}, {"n": "16", "t": "Compliance & governance, including India", "f": "16-compliance.html"}, {"n": "17", "t": "A backend, file by file — then an AI security audit", "f": "17-worked-backend-example.html"}, {"n": "18", "t": "Your first build: checklist & capstone project", "f": "18-your-first-build.html"}, {"n": "19", "t": "Skill roadmap: junior → staff", "f": "19-skill-roadmap.html"}, {"n": "20", "t": "Glossary", "f": "20-glossary.html"}, {"n": "21", "t": "Full resource catalog, explained", "f": "21-full-resource-catalog.html"}, {"n": "00", "t": "How to use this manual", "f": "how-to-build-an-application.html"}];
   var searchBtn=document.getElementById('search-btn'), searchOverlay=document.getElementById('search-overlay'),
       searchInput=document.getElementById('search-input'), searchResults=document.getElementById('search-results');
   function renderResults(q){

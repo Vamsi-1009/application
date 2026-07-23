@@ -1,6 +1,6 @@
 # TinyLink backend
 
-The capstone project from [Stage 20](../../docs/20-your-first-build.html) of the Field Manual, built for real: Node.js + TypeScript + Express + Prisma + PostgreSQL, implementing the auth/OTP, database, and API patterns taught in Stages 03-06 and 18.
+The capstone project from [Stage 18](../../docs/18-your-first-build.html) of the Field Manual, built for real: Node.js + TypeScript + Express + Prisma + PostgreSQL, implementing the auth/OTP, database, and API patterns taught in Stages 04-07 and 17.
 
 ## What it does
 
@@ -33,7 +33,7 @@ The capstone project from [Stage 20](../../docs/20-your-first-build.html) of the
    npm run dev
    ```
 
-No `SMTP_*` variables? OTP codes are logged to the console instead of emailed — see `src/lib/mailer.ts`. Fine for local dev, never for production (Stage 06 covers a real SPF/DKIM/DMARC setup).
+No `SMTP_*` variables? OTP codes are logged to the console instead of emailed — see `src/lib/mailer.ts`. Fine for local dev, never for production (Stage 07 covers a real SPF/DKIM/DMARC setup).
 
 ## Scripts
 
@@ -64,8 +64,8 @@ No `SMTP_*` variables? OTP codes are logged to the console instead of emailed �
 
 This isn't just illustrative code — every non-obvious decision here is explained in the manual:
 
-- Argon2id hashing, JWT algorithm pinning, rotating refresh tokens → Stage 05
-- The exact middleware order in `app.ts`, CORS, ownership checks → Stage 03 and Stage 18
-- OTP generation/hashing/rate-limiting → Stage 06
-- Schema design, unique constraints, migrations → Stage 04
-- Presigned-URL upload pattern → not implemented here (TinyLink has no file upload) — see Stage 07 if you extend this with link preview images
+- Argon2id hashing, JWT algorithm pinning, rotating refresh tokens → Stage 06
+- The exact middleware order in `app.ts`, CORS, ownership checks → Stage 04 and Stage 17
+- OTP generation/hashing/rate-limiting → Stage 07
+- Schema design, unique constraints, migrations → Stage 05
+- Presigned-URL upload pattern → not implemented here (TinyLink has no file upload) — see Stage 08 if you extend this with link preview images

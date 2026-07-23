@@ -8,7 +8,7 @@
 <meta property="og:title" content="Load balancers & autoscaling">
 <meta property="og:description" content="The mechanism that turns &quot;one VM that falls over on a busy Tuesday&quot; into &quot;traffic that just gets absorbed.&quot;">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://webstocking.com/application/09-load-balancing-autoscaling.html">
+<meta property="og:url" content="https://webstocking.com/application/10-load-balancing-autoscaling.html">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Load balancers & autoscaling">
 <meta name="twitter:description" content="The mechanism that turns &quot;one VM that falls over on a busy Tuesday&quot; into &quot;traffic that just gets absorbed.&quot;">
@@ -306,14 +306,14 @@ pre:hover .copy-btn{ opacity:1; }
 <main>
 
 <section class="stage" id="s9">
-  <div class="stage-head reveal"><span class="stage-num">09</span><h2>Load balancers &amp; autoscaling</h2><span class="stage-badge">~1 hr &middot; Intermediate</span></div>
-  <button class="btn complete-toggle reveal" id="complete-toggle" data-page="09-load-balancing-autoscaling.html" type="button">
+  <div class="stage-head reveal"><span class="stage-num">10</span><h2>Load balancers &amp; autoscaling</h2><span class="stage-badge">~1 hr &middot; Intermediate</span></div>
+  <button class="btn complete-toggle reveal" id="complete-toggle" data-page="10-load-balancing-autoscaling.html" type="button">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <span class="ct-label">Mark this stage complete</span>
   </button>
 
   <p class="dek reveal">The mechanism that turns "one VM that falls over on a busy Tuesday" into "traffic that just gets absorbed."</p>
-  <p class="reveal" style="color:var(--muted-2); font-size:13.5px; margin-top:-18px;">New to the terminal commands used here? See <a href="21-linux-fundamentals.html">Stage 21 — Linux fundamentals</a>.</p>
+  <p class="reveal" style="color:var(--muted-2); font-size:13.5px; margin-top:-18px;">New to the terminal commands used here? See <a href="02-linux-fundamentals.html">Stage 02 — Linux fundamentals</a>.</p>
 
 <figure class="anim-fig reveal">
   <span class="fig-tag">Animated · load balancing + autoscaling</span>
@@ -372,7 +372,7 @@ health_check: GET /health every 15s, 2 consecutive failures = unhealthy</pre>
   </div>
 </section>
 
-<div class="page-nav reveal"><a class="page-nav-link prev" href="08-servers-vm.html"><span class="page-nav-label">&larr; Previous</span><span class="page-nav-title">Servers & the VM</span></a><a class="page-nav-link next" href="10-domains-dns.html"><span class="page-nav-label">Next &rarr;</span><span class="page-nav-title">Domain names & DNS</span></a></div>
+<div class="page-nav reveal"><a class="page-nav-link prev" href="09-servers-vm.html"><span class="page-nav-label">&larr; Previous</span><span class="page-nav-title">Servers & the VM</span></a><a class="page-nav-link next" href="11-domains-dns.html"><span class="page-nav-label">Next &rarr;</span><span class="page-nav-title">Domain names & DNS</span></a></div>
 
 <div class="divider"></div>
 <footer>
@@ -486,7 +486,7 @@ health_check: GET /health every 15s, 2 consecutive failures = unhealthy</pre>
 
 
   /* site-wide search */
-  var SEARCH_INDEX = [{"n": "01", "t": "Plan & threat-model first", "f": "01-plan-and-threat-model.html"}, {"n": "02", "t": "Frontend", "f": "02-frontend.html"}, {"n": "03", "t": "Backend & API", "f": "03-backend-api.html"}, {"n": "04", "t": "Database — structure, scaling, and how it actually gets hacked", "f": "04-database.html"}, {"n": "05", "t": "Auth, OTP & the password wallet", "f": "05-auth-otp-secrets.html"}, {"n": "06", "t": "Email / OTP delivery", "f": "06-email-otp-delivery.html"}, {"n": "07", "t": "File storage & the CDN", "f": "07-storage-cdn.html"}, {"n": "08", "t": "Servers & the VM", "f": "08-servers-vm.html"}, {"n": "09", "t": "Load balancers & autoscaling", "f": "09-load-balancing-autoscaling.html"}, {"n": "10", "t": "Domain names & DNS", "f": "10-domains-dns.html"}, {"n": "11", "t": "CI/CD pipelines", "f": "11-cicd.html"}, {"n": "12", "t": "Monitoring & incident response", "f": "12-monitoring-incident-response.html"}, {"n": "13", "t": "Security hardening checklist — the consolidated view", "f": "13-security-checklist.html"}, {"n": "14", "t": "Compliance & governance, including India", "f": "14-compliance.html"}, {"n": "15", "t": "Skill roadmap: junior → staff", "f": "15-skill-roadmap.html"}, {"n": "16", "t": "Glossary", "f": "16-glossary.html"}, {"n": "17", "t": "Full resource catalog, explained", "f": "17-full-resource-catalog.html"}, {"n": "18", "t": "A backend, file by file — then an AI security audit", "f": "18-worked-backend-example.html"}, {"n": "19", "t": "Reliability & resilience — redundancy, backups, DDoS, and disaster recovery", "f": "19-reliability-and-disaster-recovery.html"}, {"n": "20", "t": "Your first build: checklist & capstone project", "f": "20-your-first-build.html"}, {"n": "21", "t": "Linux fundamentals: from basics to daily-use commands", "f": "21-linux-fundamentals.html"}, {"n": "00", "t": "How to use this manual", "f": "how-to-build-an-application.html"}];
+  var SEARCH_INDEX = [{"n": "01", "t": "Plan & threat-model first", "f": "01-plan-and-threat-model.html"}, {"n": "02", "t": "Linux fundamentals: from basics to daily-use commands", "f": "02-linux-fundamentals.html"}, {"n": "03", "t": "Frontend", "f": "03-frontend.html"}, {"n": "04", "t": "Backend & API", "f": "04-backend-api.html"}, {"n": "05", "t": "Database — structure, scaling, and how it actually gets hacked", "f": "05-database.html"}, {"n": "06", "t": "Auth, OTP & the password wallet", "f": "06-auth-otp-secrets.html"}, {"n": "07", "t": "Email / OTP delivery", "f": "07-email-otp-delivery.html"}, {"n": "08", "t": "File storage & the CDN", "f": "08-storage-cdn.html"}, {"n": "09", "t": "Servers & the VM", "f": "09-servers-vm.html"}, {"n": "10", "t": "Load balancers & autoscaling", "f": "10-load-balancing-autoscaling.html"}, {"n": "11", "t": "Domain names & DNS", "f": "11-domains-dns.html"}, {"n": "12", "t": "CI/CD pipelines", "f": "12-cicd.html"}, {"n": "13", "t": "Monitoring & incident response", "f": "13-monitoring-incident-response.html"}, {"n": "14", "t": "Reliability & resilience — redundancy, backups, DDoS, and disaster recovery", "f": "14-reliability-and-disaster-recovery.html"}, {"n": "15", "t": "Security hardening checklist — the consolidated view", "f": "15-security-checklist.html"}, {"n": "16", "t": "Compliance & governance, including India", "f": "16-compliance.html"}, {"n": "17", "t": "A backend, file by file — then an AI security audit", "f": "17-worked-backend-example.html"}, {"n": "18", "t": "Your first build: checklist & capstone project", "f": "18-your-first-build.html"}, {"n": "19", "t": "Skill roadmap: junior → staff", "f": "19-skill-roadmap.html"}, {"n": "20", "t": "Glossary", "f": "20-glossary.html"}, {"n": "21", "t": "Full resource catalog, explained", "f": "21-full-resource-catalog.html"}, {"n": "00", "t": "How to use this manual", "f": "how-to-build-an-application.html"}];
   var searchBtn=document.getElementById('search-btn'), searchOverlay=document.getElementById('search-overlay'),
       searchInput=document.getElementById('search-input'), searchResults=document.getElementById('search-results');
   function renderResults(q){

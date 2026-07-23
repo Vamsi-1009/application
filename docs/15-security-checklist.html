@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%A7%AD%3C/text%3E%3C/svg%3E">
-<title>Backend & API — Field Manual</title>
-<meta property="og:title" content="Backend & API">
-<meta property="og:description" content="The part that enforces the rules the frontend merely suggests. Assume every request is hostile and check anyway.">
+<title>Security hardening checklist — the consolidated view — Field Manual</title>
+<meta property="og:title" content="Security hardening checklist — the consolidated view">
+<meta property="og:description" content="Every amber box above, gathered in one pass, organized by domain instead of by build stage — use this as your pre-launch pass.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://webstocking.com/application/03-backend-api.html">
+<meta property="og:url" content="https://webstocking.com/application/15-security-checklist.html">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Backend & API">
-<meta name="twitter:description" content="The part that enforces the rules the frontend merely suggests. Assume every request is hostile and check anyway.">
+<meta name="twitter:title" content="Security hardening checklist — the consolidated view">
+<meta name="twitter:description" content="Every amber box above, gathered in one pass, organized by domain instead of by build stage — use this as your pre-launch pass.">
 <style>
 :root{
   --bg:#060910; --bg2:#0a0f1a;
@@ -305,87 +305,29 @@ pre:hover .copy-btn{ opacity:1; }
 <div class="shell">
 <main>
 
-<section class="stage" id="s3">
-  <div class="stage-head reveal"><span class="stage-num">03</span><h2>Backend &amp; API</h2><span class="stage-badge">~2 hrs &middot; Intermediate</span></div>
-  <button class="btn complete-toggle reveal" id="complete-toggle" data-page="03-backend-api.html" type="button">
+<section class="stage" id="s13">
+  <div class="stage-head reveal"><span class="stage-num">15</span><h2>Security hardening checklist — the consolidated view</h2><span class="stage-badge">~30 min &middot; Reference</span></div>
+  <button class="btn complete-toggle reveal" id="complete-toggle" data-page="15-security-checklist.html" type="button">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <span class="ct-label">Mark this stage complete</span>
   </button>
 
-  <p class="dek reveal">The part that enforces the rules the frontend merely suggests. Assume every request is hostile and check anyway.</p>
-  <p class="reveal" style="color:var(--muted-2); font-size:13.5px; margin-top:-18px;">New to the terminal commands used here? See <a href="21-linux-fundamentals.html">Stage 21 — Linux fundamentals</a>.</p>
-
-<figure class="anim-fig reveal">
-  <span class="fig-tag">Animated · middleware pipeline</span>
-  <svg viewBox="0 0 820 170" role="img" aria-label="Animation: a request passes through each middleware gate in order before reaching the route handler">
-    <style>
-      .mw-gate{ animation:mw-flash 4.6s linear infinite; }
-      .mw-g2{ animation-delay:.5s; } .mw-g3{ animation-delay:1s; } .mw-g4{ animation-delay:1.5s; } .mw-g5{ animation-delay:2s; } .mw-g6{ animation-delay:2.5s; }
-      @keyframes mw-flash{ 0%,4%{ stroke:var(--accent-2); stroke-width:3; } 12%,100%{ stroke:var(--line); stroke-width:1.5; } }
-      .mw-handler{ animation:mw-hit 4.6s linear infinite; }
-      @keyframes mw-hit{ 0%,62%{ stroke:var(--line); } 66%,86%{ stroke:var(--ok,#63d99a); stroke-width:2.6; } 90%,100%{ stroke:var(--line); } }
-      .mw-check{ opacity:0; animation:mw-show 4.6s linear infinite; }
-      @keyframes mw-show{ 0%,64%{ opacity:0; } 70%,90%{ opacity:1; } 96%,100%{ opacity:0; } }
-      .mw-g{ animation:mw-move 4.6s ease-in-out infinite; }
-      @keyframes mw-move{ 0%{ transform:translateX(30px);} 66%{ transform:translateX(690px);} 100%{ transform:translateX(690px);} }
-    </style>
-    <line class="af-flow" x1="30" y1="70" x2="690" y2="70"/>
-    <g class="af-lbl" text-anchor="middle" font-size="10">
-      <rect class="af-box mw-gate"    x="120" y="46" width="14" height="48" rx="4"/><text x="127" y="112">helmet</text>
-      <rect class="af-box mw-gate mw-g2" x="220" y="46" width="14" height="48" rx="4"/><text x="227" y="112">cors</text>
-      <rect class="af-box mw-gate mw-g3" x="320" y="46" width="14" height="48" rx="4"/><text x="327" y="112">json/limit</text>
-      <rect class="af-box mw-gate mw-g4" x="420" y="46" width="14" height="48" rx="4"/><text x="427" y="112">cookie</text>
-      <rect class="af-box mw-gate mw-g5" x="520" y="46" width="14" height="48" rx="4"/><text x="527" y="112">auth</text>
-      <rect class="af-box mw-gate mw-g6" x="620" y="46" width="14" height="48" rx="4"/><text x="627" y="112">validate</text>
-    </g>
-    <g><rect class="af-box mw-handler" x="690" y="44" width="110" height="52" rx="11"/><text class="af-title" x="745" y="66" text-anchor="middle">handler</text><path class="mw-check af-ok" d="M726 80 l7 7 l14 -16" fill="none" stroke="var(--ok,#63d99a)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
-    <g class="mw-g"><circle class="af-pkt2" cx="0" cy="70" r="6"/></g>
-  </svg>
-  <figcaption>The order in the file <em>is</em> the security model — a request clears every gate before any business logic runs.</figcaption>
-</figure>
-
-  <h3 class="reveal" id="pick-a-stack">Pick a stack<a class="h-anchor" href="#pick-a-stack" aria-label="Link to this section">#</a></h3>
-  <p class="reveal">A defensible 2026 default: <b>Node.js + TypeScript + Express (or Fastify/NestJS)</b>, or <b>Python + FastAPI</b> if your team leans Python. Either is fine — what matters far more than the framework is the discipline below.</p>
-
-  <h3 class="reveal" id="validate-at-the-boundary-authorize-on-every-route">Validate at the boundary, authorize on every route<a class="h-anchor" href="#validate-at-the-boundary-authorize-on-every-route" aria-label="Link to this section">#</a></h3>
-  <pre class="mono reveal">// 1. Validate shape and reject unknown fields (zod, pydantic, whatever your
-//    language offers) — never trust a request body's shape.
-const CreatePost = z.object({ caption: z.string().max(2200), imageKey: z.string() }).strict();
-
-// 2. Authorize: can THIS user do THIS action on THIS resource?
-//    This is the single most commonly missed check in real breaches —
-//    OWASP calls it Broken Object Level Authorization (BOLA/IDOR).
-async function deletePost(req, res) {
-  const post = await db.post.findUnique({ where: { id: req.params.id } });
-  if (!post) return res.status(404).end();
-  if (post.authorId !== req.user.id) return res.status(403).end(); // <- the check
-  await db.post.delete({ where: { id: post.id } });
-  res.status(204).end();
-}</pre>
-
-  <h3 class="reveal" id="rate-limit-anything-an-attacker-can-script">Rate-limit anything an attacker can script<a class="h-anchor" href="#rate-limit-anything-an-attacker-can-script" aria-label="Link to this section">#</a></h3>
-  <p class="reveal">Login, signup, OTP send/verify, and password reset are the endpoints attackers automate against. Rate-limit per account <i>and</i> per IP, and lock out or slow down after repeated failures rather than returning an unlimited number of guesses.</p>
+  <p class="dek reveal">Every amber box above, gathered in one pass, organized by domain instead of by build stage — use this as your pre-launch pass.</p>
 
   <div class="grid2 reveal">
-    <div class="card"><h4>Good error handling</h4><p>Log the real error internally with full detail; return a generic message externally ("Something went wrong") in production. Stack traces are a gift to an attacker mapping your internals.</p></div>
-    <div class="card"><h4>Pagination, always</h4><p>Any list endpoint (feed, comments, search) needs cursor- or offset-based pagination from day one — an unbounded query is a denial-of-service waiting for enough rows.</p></div>
+    <div class="card"><h4>Identity &amp; access</h4><p>Argon2id hashing · short JWTs + rotating refresh · rate-limited auth/OTP · MFA/passkeys where warranted · least-privilege IAM everywhere</p></div>
+    <div class="card"><h4>Injection &amp; input</h4><p>Parameterized queries only · strict schema validation rejecting unknown fields · output escaping, no raw HTML injection</p></div>
+    <div class="card"><h4>Access control</h4><p>Ownership checks on every mutating route · object keys scoped per user · no security decision made client-side alone</p></div>
+    <div class="card"><h4>Transport &amp; storage</h4><p>TLS 1.2+ everywhere · encryption at rest for DB/storage · private subnets for DB and app tier · public-read only through the CDN</p></div>
+    <div class="card"><h4>Secrets</h4><p>Nothing in git · a real secrets manager · least-privilege read access · scheduled rotation</p></div>
+    <div class="card"><h4>Supply chain</h4><p>Dependency scanning in CI · pinned versions · build provenance · minimal third-party JS on the frontend</p></div>
+    <div class="card"><h4>Operations</h4><p>Redacted structured logs · alerting on anomalies · tested backups · a written incident runbook</p></div>
+    <div class="card"><h4>Email/OTP integrity</h4><p>SPF/DKIM/DMARC on the sending domain · hashed, expiring, attempt-capped OTPs · no user-enumeration in error messages</p></div>
   </div>
-
-  <div class="security reveal">
-    <div class="ctitle">Security checklist — backend/API</div>
-    <ul>
-      <li>Authorization check on every route that reads or writes a specific resource, not just authentication <span class="std">OWASP API Security · BOLA</span></li>
-      <li>Parameterized queries / ORM only — never string-concatenate SQL <span class="std">CWE-89 · SQL Injection</span></li>
-      <li>Rate-limit auth, OTP, and password-reset endpoints per account and per IP <span class="std">CWE-307</span></li>
-      <li>Explicit allow-list of JWT signing algorithms — never accept "none" or let the client choose the algorithm <span class="std">OWASP · Broken Authentication</span></li>
-      <li>Global request body size limits and per-route timeouts to blunt resource-exhaustion attacks <span class="std">OWASP API Security · Unrestricted Resource Consumption</span></li>
-      <li>Centralized error handler that never returns stack traces or internal identifiers in production responses <span class="std">OWASP ASVS</span></li>
-      <li>Server-Side Request Forgery guardrails on any endpoint that fetches a URL supplied by the client <span class="std">OWASP · SSRF</span></li>
-    </ul>
-  </div>
+  <p class="reveal" style="margin-top:18px" class="appendix-note">For a much deeper pass — mobile, AI/LLM features, IoT, industrial, automotive, and formal compliance frameworks — work through the <a href="security/master_cybersecurity_checks_resources.html">full 103-item resource catalog</a> (also mirrored in the appendix below), filtering to what's actually relevant to your product.</p>
 </section>
 
-<div class="page-nav reveal"><a class="page-nav-link prev" href="02-frontend.html"><span class="page-nav-label">&larr; Previous</span><span class="page-nav-title">Frontend</span></a><a class="page-nav-link next" href="04-database.html"><span class="page-nav-label">Next &rarr;</span><span class="page-nav-title">Database — structure, scaling, and how it actually gets hacked</span></a></div>
+<div class="page-nav reveal"><a class="page-nav-link prev" href="14-reliability-and-disaster-recovery.html"><span class="page-nav-label">&larr; Previous</span><span class="page-nav-title">Reliability &amp; resilience</span></a><a class="page-nav-link next" href="16-compliance.html"><span class="page-nav-label">Next &rarr;</span><span class="page-nav-title">Compliance & governance, including India</span></a></div>
 
 <div class="divider"></div>
 <footer>
@@ -499,7 +441,7 @@ async function deletePost(req, res) {
 
 
   /* site-wide search */
-  var SEARCH_INDEX = [{"n": "01", "t": "Plan & threat-model first", "f": "01-plan-and-threat-model.html"}, {"n": "02", "t": "Frontend", "f": "02-frontend.html"}, {"n": "03", "t": "Backend & API", "f": "03-backend-api.html"}, {"n": "04", "t": "Database — structure, scaling, and how it actually gets hacked", "f": "04-database.html"}, {"n": "05", "t": "Auth, OTP & the password wallet", "f": "05-auth-otp-secrets.html"}, {"n": "06", "t": "Email / OTP delivery", "f": "06-email-otp-delivery.html"}, {"n": "07", "t": "File storage & the CDN", "f": "07-storage-cdn.html"}, {"n": "08", "t": "Servers & the VM", "f": "08-servers-vm.html"}, {"n": "09", "t": "Load balancers & autoscaling", "f": "09-load-balancing-autoscaling.html"}, {"n": "10", "t": "Domain names & DNS", "f": "10-domains-dns.html"}, {"n": "11", "t": "CI/CD pipelines", "f": "11-cicd.html"}, {"n": "12", "t": "Monitoring & incident response", "f": "12-monitoring-incident-response.html"}, {"n": "13", "t": "Security hardening checklist — the consolidated view", "f": "13-security-checklist.html"}, {"n": "14", "t": "Compliance & governance, including India", "f": "14-compliance.html"}, {"n": "15", "t": "Skill roadmap: junior → staff", "f": "15-skill-roadmap.html"}, {"n": "16", "t": "Glossary", "f": "16-glossary.html"}, {"n": "17", "t": "Full resource catalog, explained", "f": "17-full-resource-catalog.html"}, {"n": "18", "t": "A backend, file by file — then an AI security audit", "f": "18-worked-backend-example.html"}, {"n": "19", "t": "Reliability & resilience — redundancy, backups, DDoS, and disaster recovery", "f": "19-reliability-and-disaster-recovery.html"}, {"n": "20", "t": "Your first build: checklist & capstone project", "f": "20-your-first-build.html"}, {"n": "21", "t": "Linux fundamentals: from basics to daily-use commands", "f": "21-linux-fundamentals.html"}, {"n": "00", "t": "How to use this manual", "f": "how-to-build-an-application.html"}];
+  var SEARCH_INDEX = [{"n": "01", "t": "Plan & threat-model first", "f": "01-plan-and-threat-model.html"}, {"n": "02", "t": "Linux fundamentals: from basics to daily-use commands", "f": "02-linux-fundamentals.html"}, {"n": "03", "t": "Frontend", "f": "03-frontend.html"}, {"n": "04", "t": "Backend & API", "f": "04-backend-api.html"}, {"n": "05", "t": "Database — structure, scaling, and how it actually gets hacked", "f": "05-database.html"}, {"n": "06", "t": "Auth, OTP & the password wallet", "f": "06-auth-otp-secrets.html"}, {"n": "07", "t": "Email / OTP delivery", "f": "07-email-otp-delivery.html"}, {"n": "08", "t": "File storage & the CDN", "f": "08-storage-cdn.html"}, {"n": "09", "t": "Servers & the VM", "f": "09-servers-vm.html"}, {"n": "10", "t": "Load balancers & autoscaling", "f": "10-load-balancing-autoscaling.html"}, {"n": "11", "t": "Domain names & DNS", "f": "11-domains-dns.html"}, {"n": "12", "t": "CI/CD pipelines", "f": "12-cicd.html"}, {"n": "13", "t": "Monitoring & incident response", "f": "13-monitoring-incident-response.html"}, {"n": "14", "t": "Reliability & resilience — redundancy, backups, DDoS, and disaster recovery", "f": "14-reliability-and-disaster-recovery.html"}, {"n": "15", "t": "Security hardening checklist — the consolidated view", "f": "15-security-checklist.html"}, {"n": "16", "t": "Compliance & governance, including India", "f": "16-compliance.html"}, {"n": "17", "t": "A backend, file by file — then an AI security audit", "f": "17-worked-backend-example.html"}, {"n": "18", "t": "Your first build: checklist & capstone project", "f": "18-your-first-build.html"}, {"n": "19", "t": "Skill roadmap: junior → staff", "f": "19-skill-roadmap.html"}, {"n": "20", "t": "Glossary", "f": "20-glossary.html"}, {"n": "21", "t": "Full resource catalog, explained", "f": "21-full-resource-catalog.html"}, {"n": "00", "t": "How to use this manual", "f": "how-to-build-an-application.html"}];
   var searchBtn=document.getElementById('search-btn'), searchOverlay=document.getElementById('search-overlay'),
       searchInput=document.getElementById('search-input'), searchResults=document.getElementById('search-results');
   function renderResults(q){
