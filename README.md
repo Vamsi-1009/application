@@ -8,6 +8,8 @@ A field manual for building an application end-to-end — frontend, backend, dat
 
 Deployed on an Ubuntu VM behind Nginx, served as plain static files (no build step). Every push to `main` auto-deploys via GitHub Actions (`.github/workflows/deploy.yml`) — see [`docs/DEPLOY.md`](docs/DEPLOY.md) for the full deployment setup, the security hardening applied on the VM (restricted deploy key, security headers, HSTS, hidden server version), and how to redeploy or rebuild from scratch.
 
+Every stage was renumbered so file order matches reading order (see "How to read it" below) — the old numbered filenames (everything except Stage 01) now serve a lightweight client-side redirect page pointing to the new location, so old links and bookmarks still land in the right place instead of 404ing.
+
 ## Contents
 
 - [`docs/how-to-build-an-application.html`](docs/how-to-build-an-application.html) — **start here.** The landing page: animated hero, intro, and a full directory linking to every stage below.
@@ -35,7 +37,7 @@ Deployed on an Ubuntu VM behind Nginx, served as plain static files (no build st
   21. [`21-full-resource-catalog.html`](docs/21-full-resource-catalog.html) — all 103 catalog entries, grouped, explained, and linked (not just reprinted)
 - [`docs/security/master_cybersecurity_checks_resources.html`](docs/security/master_cybersecurity_checks_resources.html) — the original standalone 103-entry catalog of security standards/frameworks (OWASP, MITRE ATT&CK/CWE/CAPEC, CIS Benchmarks, NIST, and more) that Stage 21 explains and links out to individually.
 - [`docs/DEPLOY.md`](docs/DEPLOY.md) — VM deployment steps, GitHub Actions auto-deploy setup, and applied security hardening.
-- [`starter/`](starter) — **TinyLink**, a real runnable companion codebase implementing the Stage 18 capstone project: Node.js/TypeScript/Express/Prisma/PostgreSQL backend + React/TypeScript/Vite frontend, verified to install (0 known vulnerabilities), type-check, build, and pass its test suite. Separate from `docs/` — not part of the deployed manual, a local project you clone and run yourself.
+- [`starter/`](starter) — **TinyLink**, a real runnable companion codebase implementing the Stage 18 capstone project: Node.js/TypeScript/Express/Prisma/PostgreSQL backend + React/TypeScript/Vite frontend, verified to install (0 known vulnerabilities), type-check, build, and pass its test suite. Independently security-reviewed (parameterized queries, IDOR/ownership checks, OTP/JWT/CORS handling all verified; an open-redirect/SSRF-adjacent gap in link creation and a fail-open error handler were found and fixed, with regression tests added). Separate from `docs/` — not part of the deployed manual, a local project you clone and run yourself.
 - [`CLAUDE.md`](CLAUDE.md) — notes for future work in this repo: what exists, why, and decisions made along the way.
 
 ## How to read it
